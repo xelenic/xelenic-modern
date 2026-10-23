@@ -1,0 +1,2268 @@
+/* ==========================================================================
+   Xelenic — Base
+   ========================================================================== */
+
+:root {
+  --bg: #05070d;
+  --bg-alt: #0a0e1a;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-strong: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #eef1f8;
+  --text-dim: #9aa3b8;
+  --text-faint: #6b7488;
+
+  /* Brand accent (blue). The soft/pale tints are only for illustrations;
+     --on-accent is the text color used on top of the accent. */
+  --accent: #3b82f6;
+  --accent-rgb: 59, 130, 246;
+  --accent-strong: #2563eb;
+  --accent-soft: #60a5fa;
+  --accent-pale: #93c5fd;
+  --on-accent: #ffffff;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  --shadow-glow: 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px rgba(0,0,0,0.45);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Solution cards: frosted glass face, pointer glare strength, depth shadow */
+  --card-glass: linear-gradient(160deg, rgba(24, 28, 42, 0.72), rgba(12, 15, 26, 0.52));
+  --card-glare: 0.14;
+  --card-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.7);
+  --card-shadow-active: 0 44px 70px -30px rgba(0, 0, 0, 0.85);
+  --card-edge: rgba(59, 130, 246, 0.24);
+  --card-floor: rgba(0, 0, 0, 0.75);
+  --card-highlight: rgba(255, 255, 255, 0.14);
+
+  /* "How We Work" storybook world (night palette by default) */
+  --toon-sky-1: #0b1430;
+  --toon-sky-2: #141a3c;
+  --toon-ink: #04060d;
+  --toon-hill: #24345f;
+  --toon-hill-light: #33497f;
+  --toon-rock: #182446;
+  --toon-rock-line: #22335e;
+  --toon-grass: #3e5a94;
+  --toon-leaf: #3f7a55;
+  --toon-leaf-2: #5aa572;
+  --toon-trunk: #6b4524;
+  --toon-paper: #e8e1d0;
+  --toon-metal: #9aa3b8;
+  --toon-dark: #0b0e1a;
+  --toon-cloud: #262d50;
+  --toon-window: #2e4373;
+  --toon-road: #2a3d6e;
+  --toon-road-edge: #142041;
+  --toon-ghost: rgba(96, 165, 250, 0.32);
+  --toon-card: #111a30;
+  --toon-card-edge: #24365e;
+  --toon-card-shadow: #080b18;
+
+  /* "Our Foundation" 3D chips: glass keycap face and its depth edge */
+  --chip-top: rgba(34, 40, 68, 0.9);
+  --chip-bottom: rgba(14, 18, 34, 0.9);
+  --chip-depth: #070a15;
+
+  /* Hero backdrop built from the logo's shapes: translucent glowing tints
+     at night, soft pastel fills by day */
+  --art-glow: rgba(59, 130, 246, 0.24);
+  --art-square-1: rgba(37, 99, 235, 0.34);
+  --art-square-2: rgba(59, 130, 246, 0.08);
+  --art-penta-1: rgba(56, 189, 248, 0.36);
+  --art-penta-2: rgba(14, 165, 233, 0.08);
+  --art-line: rgba(147, 197, 253, 0.45);
+  --art-facet: rgba(255, 255, 255, 0.22);
+  --art-mini-1: rgba(125, 211, 252, 0.6);
+  --art-mini-2: rgba(165, 180, 252, 0.55);
+  --art-mini-3: rgba(196, 181, 253, 0.5);
+  --art-mini-4: rgba(147, 197, 253, 0.6);
+  --art-sparkle: #bfdbfe;
+
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f5f6fb;
+    --bg-alt: #ffffff;
+    --surface: rgba(10, 14, 30, 0.03);
+    --surface-strong: rgba(10, 14, 30, 0.05);
+    --border: rgba(10, 14, 30, 0.08);
+    --text: #12131c;
+    --text-dim: #4d5266;
+    --text-faint: #8489a0;
+    --shadow-glow: 0 0 0 1px rgba(10,14,30,0.05), 0 20px 60px rgba(20,20,40,0.08);
+    --card-glass: linear-gradient(160deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.4));
+    --card-glare: 0.9;
+    --card-shadow: 0 18px 40px -24px rgba(20, 20, 40, 0.2);
+    --card-shadow-active: 0 44px 70px -30px rgba(20, 20, 40, 0.3);
+    --accent: #2563eb;
+    --accent-rgb: 37, 99, 235;
+    --accent-strong: #1d4ed8;
+    --accent-soft: #3b82f6;
+    --accent-pale: #93c5fd;
+    --card-edge: rgba(37, 99, 235, 0.2);
+    --card-floor: rgba(20, 20, 40, 0.22);
+    --card-highlight: rgba(255, 255, 255, 1);
+
+    --toon-sky-1: #f3f8ff;
+    --toon-sky-2: #dbeaff;
+    --toon-ink: #1e3a6e;
+    --toon-hill: #bfd7fb;
+    --toon-hill-light: #dbe9fe;
+    --toon-rock: #8eb1ea;
+    --toon-rock-line: #6f97d8;
+    --toon-grass: #8fb5ee;
+    --toon-leaf: #7cbf6a;
+    --toon-leaf-2: #b5e0a3;
+    --toon-trunk: #9a6b3e;
+    --toon-paper: #ffffff;
+    --toon-metal: #d6dde8;
+    --toon-dark: #22304d;
+    --toon-cloud: #ffffff;
+    --toon-window: #e3eeff;
+    --toon-road: #ffffff;
+    --toon-road-edge: #a7c4f2;
+    --toon-ghost: rgba(37, 99, 235, 0.3);
+    --toon-card: #fdfeff;
+    --toon-card-edge: #cfe0fb;
+    --toon-card-shadow: #b8cff5;
+
+    --chip-top: rgba(255, 255, 255, 0.95);
+    --chip-bottom: rgba(239, 245, 255, 0.92);
+    --chip-depth: #c7d9f7;
+
+    --art-glow: rgba(147, 197, 253, 0.55);
+    --art-square-1: #c7d2fe;
+    --art-square-2: #eef2ff;
+    --art-penta-1: #a5dcfb;
+    --art-penta-2: #e6f6ff;
+    --art-line: rgba(96, 165, 250, 0.55);
+    --art-facet: rgba(255, 255, 255, 0.9);
+    --art-mini-1: #7dd3fc;
+    --art-mini-2: #a5b4fc;
+    --art-mini-3: #c4b5fd;
+    --art-mini-4: #93c5fd;
+    --art-sparkle: #60a5fa;
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+p { color: var(--text-dim); }
+
+a { color: inherit; text-decoration: none; }
+
+img, svg { display: block; max-width: 100%; }
+
+ul { list-style: none; }
+
+.container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+section { position: relative; z-index: 1; padding: 110px 0; }
+
+/* ==========================================================================
+   Background FX
+   ========================================================================== */
+
+.bg-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  background: var(--accent);
+  opacity: 0.16;
+  will-change: transform;
+}
+
+.blob-1 {
+  width: 520px; height: 520px;
+  top: -160px; left: -120px;
+  opacity: 0.14;
+  animation: float1 22s ease-in-out infinite;
+}
+
+.blob-2 {
+  width: 480px; height: 480px;
+  top: 34%; right: -180px;
+  opacity: 0.1;
+  animation: float2 26s ease-in-out infinite;
+}
+
+.blob-3 {
+  width: 420px; height: 420px;
+  bottom: -160px; left: 28%;
+  opacity: 0.08;
+  animation: float1 30s ease-in-out infinite reverse;
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 60px) scale(1.08); }
+}
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-50px, 40px) scale(1.1); }
+}
+
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+@media (prefers-color-scheme: light) {
+  #bg-canvas { opacity: 0.32; }
+}
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+}
+
+@media (prefers-color-scheme: light) {
+  .blob { opacity: 0.08; }
+  .grid-overlay { display: none; }
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease), border-color .25s var(--ease);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.3);
+}
+.btn-primary:hover {
+  background: var(--accent-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(var(--accent-rgb), 0.4);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+.btn-ghost:hover { border-color: var(--accent); background: var(--surface); transform: translateY(-2px); }
+
+.btn-lg { padding: 16px 34px; font-size: 1.05rem; }
+.btn-sm { padding: 10px 18px; font-size: 0.85rem; }
+.btn-block { width: 100%; }
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 18px 0;
+  transition: background 0.3s var(--ease), padding 0.3s var(--ease), border-color .3s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+
+.site-header.scrolled {
+  padding: 12px 0;
+  background: rgba(5, 7, 13, 0.72);
+  backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+}
+
+@media (prefers-color-scheme: light) {
+  .site-header.scrolled { background: rgba(255, 255, 255, 0.78); }
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+}
+
+.brand-mark { width: 38px; height: 38px; flex-shrink: 0; }
+.brand-mark img { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+.brand-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  position: relative;
+  padding: 6px 0;
+  transition: color 0.2s;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 0; height: 2px;
+  background: var(--accent);
+  transition: width 0.25s var(--ease);
+}
+.nav-link:hover { color: var(--text); }
+.nav-link:hover::after { width: 100%; }
+
+.nav-cta { flex-shrink: 0; }
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+.nav-toggle span {
+  width: 22px; height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+.nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+
+.hero {
+  padding: 190px 0 110px;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 4.6vw, 3.6rem);
+  margin-bottom: 22px;
+}
+
+.hero-sub {
+  font-size: 1.08rem;
+  max-width: 560px;
+  margin-bottom: 34px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+}
+.hero-tags li {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  position: relative;
+  padding-left: 16px;
+}
+.hero-tags li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* Hero visual */
+.hero-visual { position: relative; height: 520px; align-self: start; }
+
+/* Layering: like the storybook section, the hero opens no stacking context
+   of its own, so its logo backdrop (z-index -1) sits behind the robot
+   canvas (z-index 0) while the copy (z-index 1) stays in front. The
+   backdrop may spread wider than the column; clip it at the page sides. */
+.hero { z-index: auto; overflow-x: clip; }
+.hero-copy { position: relative; z-index: 1; }
+
+/* Backdrop from the logo's shapes, centered on the robot (three-robot.js
+   sets --robot-cy to where the robot's middle falls in this spot). */
+.hero-art {
+  position: absolute;
+  left: 50%;
+  top: var(--robot-cy, 36%);
+  width: 122%;
+  height: auto;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+
+/* ---- Logo art kit -------------------------------------------------------
+   Shared by every backdrop drawn from the logo's shapes (.logo-art). Each
+   sits behind the robot (z-index -1) in a section that opens no stacking
+   context of its own. logo-art.js feeds the cursor (--mx/--my) and scroll
+   (--sp) in, and adds .is-pending until the art scrolls into view so its
+   burst-in plays when you get there (without the script it plays on load). */
+.logo-art {
+  --mx: 0;
+  --my: 0;
+  --sp: 0;
+  z-index: -1;
+  overflow: visible;
+  pointer-events: none;
+}
+.logo-art g { transform-box: fill-box; transform-origin: center; }
+/* Each layer drifts with the mouse and scroll by its own depth (in px). */
+.logo-art .art-layer {
+  transform: translate(
+    calc(var(--mx) * var(--depth) * 1px),
+    calc(var(--my) * var(--depth) * 1px - var(--sp) * var(--depth) * 3px)
+  );
+}
+.logo-art .art-line { fill: none; stroke: var(--art-line); stroke-width: 2; stroke-dasharray: 8 12; stroke-linejoin: round; }
+.logo-art .art-line-faint { stroke-width: 2.5; opacity: 0.55; }
+.logo-art .art-facet { fill: none; stroke: var(--art-facet); stroke-width: 3; stroke-linejoin: round; }
+.logo-art .art-fill-mini-1 { fill: var(--art-mini-1); }
+.logo-art .art-fill-mini-2 { fill: var(--art-mini-2); }
+.logo-art .art-fill-mini-3 { fill: var(--art-mini-3); }
+.logo-art .art-fill-mini-4 { fill: var(--art-mini-4); }
+.logo-art .art-sparkle { fill: var(--art-sparkle); transform-box: fill-box; transform-origin: center; animation: art-twinkle 3.2s ease-in-out infinite; }
+
+/* Layers burst in one after another... */
+.logo-art .art-in { animation: art-in 1.1s cubic-bezier(0.34, 1.45, 0.5, 1) var(--delay, 0s) both; }
+.logo-art.is-pending .art-in { animation-play-state: paused; }
+@keyframes art-in {
+  from { opacity: 0; transform: scale(0.55) rotate(-14deg); }
+  to { opacity: 1; transform: none; }
+}
+/* ...then keep moving: the big shapes breathe and sway, the outlines turn,
+   the small shapes drift and the sparkles twinkle. */
+.logo-art .art-float-penta { animation: art-sway 13s ease-in-out infinite; }
+.logo-art .art-float-square { animation: art-sway 16s ease-in-out -5s infinite reverse; }
+@keyframes art-sway {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-10px) rotate(3deg) scale(1.03); }
+}
+.logo-art .art-spin { animation: art-spin 70s linear infinite; }
+.logo-art .art-spin-reverse { animation-duration: 90s; animation-direction: reverse; }
+.logo-art .art-spin-slow { animation-duration: 160s; }
+@keyframes art-spin { to { transform: rotate(360deg); } }
+.logo-art .art-drift { animation: art-drift 10s ease-in-out infinite; }
+@keyframes art-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(6px, -12px) rotate(18deg); }
+  66% { transform: translate(-6px, -4px) rotate(-10deg); }
+}
+@keyframes art-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.6) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(45deg); }
+}
+
+/* The robot canvas is placed in page coordinates by three-robot.js as it
+   travels the page. Its layer sits at z-index 0 — behind the sections, so
+   it passes behind glass cards and copy, yet in front of the hero and story
+   backdrops (z-index -1) — and clips sideways, so a stride or lean near the
+   screen edge can never widen the page on phones. */
+.robot-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  overflow-x: clip;
+  overflow-y: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-robot-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  opacity: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  transition: opacity 0.6s var(--ease);
+}
+/* ==========================================================================
+   Clients — two endless logo rows (clients.js moves them)
+   ========================================================================== */
+
+.clients { padding: 70px 0 84px; overflow-x: clip; }
+/* Left-aligned on desktop: the robot's first flight starts out on the right,
+   so it passes this section beside the heading rather than behind it. */
+.clients-head { text-align: left; margin-bottom: 30px; }
+.clients-head .eyebrow { margin-bottom: 10px; }
+.clients-head h2 { font-size: clamp(1.35rem, 2.4vw, 1.75rem); }
+
+/* The rows run within the page container (not edge to edge), clipped at its
+   sides and fading out softly there. */
+.clients-marquee {
+  display: grid;
+  gap: 8px;
+  overflow-x: clip;
+  overflow-y: visible;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.clients-row {
+  display: flex;
+  gap: 18px;
+  width: max-content;
+  padding: 12px 0; /* room for a tile's hover lift */
+  list-style: none;
+  will-change: transform;
+}
+
+/* Every logo sits on the same clean tile so mixed backgrounds read as one
+   set (MindSpark's own ground is navy, so its tile is too). The outer .client
+   is moved by clients.js — springing aside elastically to make room as the
+   robot flies through — while the inner .client-tile owns the look and the
+   hover lift, so the two motions never fight. */
+.client { flex: 0 0 auto; }
+.clients-marquee.is-elastic .client { will-change: transform; }
+.client-tile {
+  width: 190px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  padding: 14px 22px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 12px 26px -18px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s var(--ease),
+    border-color 0.35s var(--ease);
+}
+.client--dark .client-tile { background: #0c2038; }
+.client img {
+  display: block;
+  max-width: 100%;
+  max-height: 62px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+.client-tile:hover {
+  transform: translateY(-6px) scale(1.06);
+  border-color: rgba(var(--accent-rgb), 0.55);
+  box-shadow: 0 20px 36px -18px rgba(var(--accent-rgb), 0.5);
+}
+
+/* Reduced motion: a still, centered logo wall instead of moving rows. */
+.clients.is-static .clients-marquee { -webkit-mask-image: none; mask-image: none; }
+.clients.is-static .clients-row {
+  width: auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+/* ==========================================================================
+   Value strip
+   ========================================================================== */
+
+.value-strip {
+  padding: 44px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.value-strip-inner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* Each value is a glass keycap card with a real CSS-3D cube icon.
+   value-strip.js drives --rx/--ry (tilt toward the cursor), --mx/--my (the
+   pointer spot) and --pop (0 at rest, 1 hovered) on .value-item; .is-hot
+   marks the hovered one. */
+.value-item {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 50%;
+  --pop: 0;
+  position: relative;
+  perspective: 900px;
+}
+/* Soft floor shadow that spreads and fades as the card lifts away */
+.value-item::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: -18px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, var(--card-floor), transparent 70%);
+  filter: blur(8px);
+  opacity: calc(0.6 - var(--pop) * 0.25);
+  transform: scale(calc(1 + var(--pop) * 0.12));
+  pointer-events: none;
+  z-index: -1;
+}
+.value-card {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 22px 20px 28px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 var(--card-highlight),
+    0 7px 0 var(--chip-depth),
+    0 22px 38px -26px rgba(0, 0, 0, 0.6);
+  transform-style: preserve-3d;
+  transform: translateY(calc(var(--pop) * -8px)) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+/* Frosted glass face with a glare at the pointer and a faint accent glow in
+   the corner. It's on a pseudo-element so the blur doesn't flatten the
+   cube's 3D, and the robot shows through it softly as it flies past. */
+.value-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(240px circle at var(--mx) var(--my), rgba(255, 255, 255, calc(var(--pop) * var(--card-glare))), transparent 65%),
+    radial-gradient(150px circle at 100% 0%, rgba(var(--accent-rgb), 0.16), transparent 70%),
+    var(--card-glass);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  pointer-events: none;
+}
+/* Accent edge light that tracks the pointer along the border */
+.value-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: radial-gradient(160px circle at var(--mx) var(--my), rgba(var(--accent-rgb), 0.95), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: var(--pop);
+  pointer-events: none;
+}
+/* A sheen that sweeps across on hover (moved by value-strip.js) */
+.value-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.35) 50%, rgba(var(--accent-rgb), 0.12) 56%, transparent 66%);
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  pointer-events: none;
+}
+.value-item.is-hot .value-card {
+  border-color: rgba(var(--accent-rgb), 0.45);
+  box-shadow:
+    inset 0 1px 0 var(--card-highlight),
+    0 8px 0 var(--accent-strong),
+    0 30px 50px -24px rgba(var(--accent-rgb), 0.55);
+}
+
+/* The cube: posed to show its top and right faces, floating forward as the
+   card pops. Wrappers: pose (+pop) > idle float > hover spin > six faces. */
+.value-cube {
+  --s: 50px;
+  position: relative;
+  flex: 0 0 var(--s);
+  width: var(--s);
+  height: var(--s);
+  transform-style: preserve-3d;
+  transform: translateZ(calc(16px + var(--pop) * 34px)) rotateX(-20deg) rotateY(-30deg);
+}
+.cube-float,
+.cube-turn {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.cube-float { animation: cube-idle 6s ease-in-out infinite; }
+.value-item:nth-child(2) .cube-float { animation-delay: -1.5s; }
+.value-item:nth-child(3) .cube-float { animation-delay: -3s; }
+.value-item:nth-child(4) .cube-float { animation-delay: -4.5s; }
+@keyframes cube-idle {
+  0%, 100% { transform: translateY(0) rotateY(0deg); }
+  50% { transform: translateY(-5px) rotateY(14deg); }
+}
+.cube-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+}
+.cube-front,
+.cube-back {
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: linear-gradient(150deg, var(--accent-soft), var(--accent-strong));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -3px 6px rgba(0, 0, 0, 0.18);
+}
+.cube-front svg,
+.cube-back svg { width: 24px; height: 24px; }
+.cube-front { transform: translateZ(calc(var(--s) / 2)); }
+.cube-back { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
+.cube-right { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); background: linear-gradient(150deg, var(--accent-strong), #1e3a8a); }
+.cube-left { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); background: linear-gradient(150deg, var(--accent), #1e40af); }
+.cube-top { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); background: linear-gradient(150deg, #dbeafe, var(--accent-pale)); }
+.cube-bottom { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); background: #1e3a8a; }
+
+.value-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+  transform: translateZ(calc(var(--pop) * 22px));
+}
+
+/* ==========================================================================
+   Section head
+   ========================================================================== */
+
+.section-head {
+  max-width: 640px;
+  margin: 0 auto 60px;
+  text-align: center;
+}
+.section-head h2 { font-size: clamp(1.8rem, 3.2vw, 2.5rem); margin-bottom: 16px; }
+
+/* ==========================================================================
+   Solutions
+   ========================================================================== */
+
+/* Layering, as in the hero: the section opens no stacking context, so its
+   logo art (z-index -1) sits behind the robot while the heading and cards
+   (z-index 1) stay in front; the art may spread past the sides, so clip. */
+.solutions { z-index: auto; overflow-x: clip; }
+.solutions-intro .section-head,
+.solutions-grid { position: relative; z-index: 1; }
+.solutions-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* The emblem centers on the robot's landing spot (the robot fills its height). */
+.solutions-emblem {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 132%;
+  width: auto;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+
+.solutions-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 60px;
+}
+.solutions-intro .section-head { margin: 0; text-align: left; }
+
+/* Landing spot for the robot; a soft accent glow fades in under its feet
+   once it has landed (.is-docked is toggled by three-robot.js). */
+.solutions-visual { position: relative; height: 320px; }
+.solutions-visual::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  width: 62%;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(var(--accent-rgb), 0.38), transparent 70%);
+  filter: blur(4px);
+  opacity: 0;
+  transform: translateX(-50%) scale(0.5);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+.solutions-visual.is-docked::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.solutions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* 3D glass cards. solution-cards.js drives these variables: --rx/--ry
+   (tilt — toward the cursor on hover, a slow float otherwise), --mx/--my
+   (pointer spot), --pop (0 at rest, 1 while hovered: lifts the card, floats
+   its content forward in layers, fades in the glare and edge light) and
+   --enter (0 → 1 as the card flips up into view). The 3D lives on
+   .card-inner so it never fights the scroll-reveal on the card itself. */
+.solution-card {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 50%;
+  --pop: 0;
+  --enter: 1;
+  position: relative;
+  perspective: 1100px;
+}
+
+/* Soft floor shadow; it shrinks and fades as the card lifts away from it */
+.solution-card::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -26px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, var(--card-floor), transparent 70%);
+  filter: blur(10px);
+  opacity: calc((0.85 - var(--pop) * 0.35) * var(--enter));
+  transform: scale(calc(1 - var(--pop) * 0.12));
+  pointer-events: none;
+}
+
+.card-inner {
+  position: relative;
+  height: 100%;
+  padding: 32px;
+  border-radius: var(--radius-md);
+  transform:
+    translateY(calc(var(--pop) * -12px + (1 - var(--enter)) * 60px))
+    rotateX(calc(var(--rx) + (1 - var(--enter)) * 42deg))
+    rotateY(var(--ry));
+  transform-style: preserve-3d;
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.5s var(--ease);
+}
+.solution-card.is-active .card-inner {
+  box-shadow: var(--card-shadow-active), 0 26px 60px -34px rgba(var(--accent-rgb), 0.6);
+}
+
+/* Frosted glass face with a soft glare that follows the pointer. It's on a
+   pseudo-element so the blur doesn't flatten the card's 3D layers, and the
+   hero robot shows through it, blurred, as it moves behind the cards. */
+.card-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(280px circle at var(--mx) var(--my), rgba(255, 255, 255, calc(var(--pop) * var(--card-glare))), transparent 65%),
+    radial-gradient(520px circle at var(--mx) var(--my), rgba(var(--accent-rgb), calc(var(--pop) * 0.12)), transparent 60%),
+    radial-gradient(circle at 100% 0%, rgba(var(--accent-rgb), 0.16), transparent 42%),
+    var(--card-glass);
+  box-shadow: inset 0 1px 0 var(--card-highlight);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  transition: border-color 0.5s var(--ease);
+}
+.solution-card.is-active .card-inner::before { border-color: rgba(var(--accent-rgb), 0.3); }
+
+/* Accent edge light that tracks the pointer along the border */
+.card-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: radial-gradient(200px circle at var(--mx) var(--my), rgba(var(--accent-rgb), 0.95), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: var(--pop);
+  pointer-events: none;
+}
+
+/* Content floats forward in layers as the card pops */
+.card-inner > * { transform: translateZ(calc(var(--pop) * 20px)); }
+.card-inner > .card-icon { transform: translateZ(calc(var(--pop) * 60px)); }
+.card-inner > h3 { transform: translateZ(calc(var(--pop) * 36px)); }
+
+/* Card thickness: stacked outline layers behind the face (added by
+   solution-cards.js) read as a solid glass slab edge as the card tilts. */
+.card-inner > .card-slab {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform: none;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.card-slab > i {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--card-edge);
+}
+
+/* Big outlined index number, floating on its own depth layer */
+.card-inner > .card-index {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(var(--accent-rgb), 0.35);
+  transform: translateZ(calc(var(--pop) * 28px));
+  transition: -webkit-text-stroke-color 0.5s var(--ease);
+  pointer-events: none;
+  user-select: none;
+}
+.solution-card.is-active .card-index { -webkit-text-stroke-color: rgba(var(--accent-rgb), 0.85); }
+
+.card-icon {
+  position: relative;
+  width: 64px; height: 64px;
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(var(--accent-rgb), 0.14);
+  color: var(--accent);
+  margin-bottom: 22px;
+}
+.card-icon svg { width: 26px; height: 26px; }
+
+/* A three.js-rendered 3D icon replaces the SVG when WebGL is available; it
+   overflows its tile so the object pops out of it. */
+.card-icon.has-3d {
+  background: radial-gradient(circle at 50% 70%, rgba(var(--accent-rgb), 0.26), rgba(var(--accent-rgb), 0.07) 70%);
+}
+.card-icon.has-3d svg { display: none; }
+.card-icon.has-3d::before {
+  content: '';
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 4px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--card-floor);
+  filter: blur(4px);
+  opacity: 0.6;
+}
+.card-3d {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.solution-card h3 { font-size: 1.15rem; margin-bottom: 10px; }
+.solution-card p { font-size: 0.92rem; }
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.tag-list li {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   Why Us
+   ========================================================================== */
+
+.why-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.why-copy h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: 16px; }
+.why-copy > p { max-width: 480px; margin-bottom: 40px; }
+
+.feature-list { display: flex; flex-direction: column; gap: 26px; }
+.feature-item { display: flex; gap: 16px; align-items: flex-start; }
+
+.feature-icon {
+  flex-shrink: 0;
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: rgba(var(--accent-rgb), 0.1);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent);
+}
+.feature-icon svg { width: 20px; height: 20px; }
+
+.feature-item h4 { font-size: 1rem; margin-bottom: 4px; }
+.feature-item p { font-size: 0.9rem; }
+
+/* Orbit visual. Once the 3D robot has loaded it flies in to stand here,
+   inside a 3D orbit of CRM / ERP / POS / AI drawn in its own scene
+   (three-robot.js adds .has-robot), so this flat CSS orbit is only the
+   fallback for when WebGL isn't available. */
+.why-visual { display: flex; align-items: center; justify-content: center; height: 560px; }
+.why-visual.has-robot .orbit-wrap { display: none; }
+
+.orbit-wrap { position: relative; width: 340px; height: 340px; }
+
+.orbit-core {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 68px; height: 68px;
+  transform: translate(-50%, -50%);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-glow);
+  z-index: 2;
+}
+.orbit-core img { display: block; width: 44px; height: 44px; object-fit: contain; }
+
+.orbit-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  border: 1px dashed var(--border);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin linear infinite;
+}
+.ring-1 { width: 160px; height: 160px; animation-duration: 14s; }
+.ring-2 { width: 220px; height: 220px; animation-duration: 20s; animation-direction: reverse; }
+.ring-3 { width: 280px; height: 280px; animation-duration: 26s; }
+.ring-4 { width: 340px; height: 340px; animation-duration: 32s; animation-direction: reverse; }
+
+@keyframes spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.orbit-node {
+  position: absolute;
+  top: -12px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-alt);
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  animation: counterspin linear infinite;
+  animation-duration: inherit;
+  animation-direction: inherit;
+  white-space: nowrap;
+}
+
+@keyframes counterspin {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(-360deg); }
+}
+
+/* ==========================================================================
+   Process — the storybook path
+   ========================================================================== */
+
+/* Layering: the robot canvas sits below the page sections (z-index 0). This
+   section doesn't open its own stacking context, so its cartoon world, road
+   and scenery (z-index -1) paint *behind* the robot while the cards (z-index
+   1) stay in front of it — the robot walks the road between the two. */
+.process { z-index: auto; }
+.process .section-head { position: relative; z-index: 1; }
+
+.story {
+  --robot-size: 210px; /* how tall the robot stands on the path (three-robot.js) */
+  position: relative;
+  padding: 70px 0 90px;
+}
+
+/* Sky, sun/moon, stars and drifting clouds — a full-width backdrop for the
+   whole section that fades softly into the page at its top and bottom. */
+.story-world {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--toon-sky-1), var(--toon-sky-2));
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 140px, #000 calc(100% - 140px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 140px, #000 calc(100% - 140px), transparent);
+}
+.story-world::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 30px, rgba(255, 244, 214, 0.9), transparent),
+    radial-gradient(1px 1px at 90px 80px, rgba(255, 244, 214, 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 150px 20px, rgba(255, 244, 214, 0.8), transparent),
+    radial-gradient(1px 1px at 210px 110px, rgba(255, 244, 214, 0.6), transparent);
+  background-size: 240px 140px;
+  animation: twinkle 5s ease-in-out infinite alternate;
+}
+@keyframes twinkle { from { opacity: 0.35; } to { opacity: 0.85; } }
+
+.story-sun {
+  position: absolute;
+  top: 120px;
+  right: 8%;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6d8, #fde68a 55%, #f7d06a);
+  border: 3px solid var(--toon-ink);
+  box-shadow: 0 0 0 10px rgba(253, 230, 138, 0.12), 0 0 60px rgba(253, 230, 138, 0.35);
+}
+.story-sun::after { /* moon craters */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 62% 34%, rgba(160, 120, 40, 0.35) 0 9px, transparent 10px),
+    radial-gradient(circle at 36% 64%, rgba(160, 120, 40, 0.3) 0 6px, transparent 7px),
+    radial-gradient(circle at 68% 68%, rgba(160, 120, 40, 0.25) 0 4px, transparent 5px);
+}
+
+.story-cloud {
+  position: absolute;
+  width: 130px;
+  opacity: 0.9;
+  animation: cloud-drift 34s ease-in-out infinite alternate;
+}
+.story-cloud .cloud { display: block; width: 100%; height: auto; }
+.story-cloud.c1 { top: 4%; left: 6%; }
+.story-cloud.c2 { top: 19%; right: 4%; width: 96px; animation-duration: 40s; animation-delay: -12s; }
+.story-cloud.c3 { top: 37%; left: 44%; width: 110px; animation-duration: 46s; animation-delay: -20s; }
+.story-cloud.c4 { top: 55%; left: 3%; width: 90px; animation-duration: 38s; animation-delay: -6s; }
+.story-cloud.c5 { top: 72%; right: 8%; width: 120px; animation-duration: 44s; animation-delay: -28s; }
+.story-cloud.c6 { top: 88%; left: 36%; width: 84px; animation-duration: 36s; animation-delay: -16s; }
+@keyframes cloud-drift {
+  from { transform: translateX(-30px); }
+  to { transform: translateX(40px); }
+}
+
+/* By day: a sun with slowly turning rays instead of the moon and stars */
+@media (prefers-color-scheme: light) {
+  .story-world::before { display: none; }
+  .story-sun {
+    background: radial-gradient(circle at 40% 40%, #fff3c4, #fbbf24 60%, #f59e0b);
+    box-shadow: 0 0 0 12px rgba(251, 191, 36, 0.18), 0 0 0 26px rgba(251, 191, 36, 0.08), 0 0 80px rgba(251, 191, 36, 0.45);
+  }
+  .story-sun::after {
+    inset: -30px;
+    background: repeating-conic-gradient(rgba(251, 191, 36, 0.55) 0 7deg, transparent 7deg 30deg);
+    -webkit-mask: radial-gradient(circle, transparent 54%, #000 55%, #000 72%, transparent 73%);
+    mask: radial-gradient(circle, transparent 54%, #000 55%, #000 72%, transparent 73%);
+    animation: sun-rays 40s linear infinite;
+  }
+}
+@keyframes sun-rays { to { transform: rotate(360deg); } }
+
+/* Steps: cards alternate sides; the other half is the step's scene, where
+   the robot stands on the road (at --stand across, --ground down). */
+.story-steps {
+  position: relative;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+.story-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 52px;
+}
+.story-spot {
+  --stand: 35%;
+  --ground: 80%;
+  position: relative;
+  grid-row: 1;
+  grid-column: 2;
+  aspect-ratio: 9 / 5;
+}
+.story-step.is-right .story-spot { grid-column: 1; --stand: 65%; }
+.story-step.is-right .story-card { grid-column: 2; }
+.story-card { grid-row: 1; grid-column: 1; }
+
+/* The scene lives behind the robot (see the layering note above) */
+.story-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: visible;
+}
+.story-step.is-right .story-scene { transform: scaleX(-1); }
+
+/* Cartoon drawing kit: inked outlines, flat theme-aware fills */
+.toon path, .toon rect, .toon circle { stroke: var(--toon-ink); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.toon .no-stroke { stroke: none; }
+.f-hill { fill: var(--toon-hill); }
+.f-rock { fill: var(--toon-rock); }
+.toon .s-rock { fill: none; stroke: var(--toon-rock-line); stroke-width: 3; }
+.f-paper { fill: var(--toon-paper); }
+.f-metal { fill: var(--toon-metal); }
+.f-dark { fill: var(--toon-dark); }
+.f-trunk { fill: var(--toon-trunk); }
+.f-leaf { fill: var(--toon-leaf); }
+.f-leaf-2 { fill: var(--toon-leaf-2); }
+.f-cloud { fill: var(--toon-cloud); }
+.f-accent { fill: var(--accent); }
+.f-accent-2 { fill: var(--accent-soft); }
+.f-accent-3 { fill: var(--accent-pale); }
+.f-star { fill: #fde68a; }
+.f-glint { fill: #ffffff; }
+.f-fruit { fill: #ef6b3a; }
+.toon .s-hill-light { fill: none; stroke: var(--toon-hill-light); stroke-width: 6; }
+.toon .s-grass { fill: none; stroke: var(--toon-grass); stroke-width: 3; }
+.toon .s-thick { fill: none; stroke-width: 6; }
+.toon .s-thin { fill: none; stroke-width: 2.5; }
+.toon .s-ray { fill: none; stroke: #fbbf24; stroke-width: 4; }
+.toon .s-route { fill: none; stroke: var(--accent); stroke-width: 3; stroke-dasharray: 4 5; }
+.toon .s-mark { fill: none; stroke: #ef6b3a; stroke-width: 3.5; }
+.toon .s-stripe { fill: none; stroke: var(--toon-paper); stroke-width: 4; }
+.lm-windows rect { fill: var(--toon-window); stroke-width: 2; transition: fill 0.6s var(--ease); }
+
+/* Scene landmarks come alive once their step is reached / active */
+.lm * { transform-box: view-box; }
+.lm-twinkle { transform-origin: 488px 63px; animation: lm-twinkle 2.4s ease-in-out infinite; }
+.lm-twinkle.lm-delay { transform-origin: 520px 105px; animation-delay: -1.2s; }
+@keyframes lm-twinkle { 50% { transform: scale(0.6); opacity: 0.6; } }
+.lm-scope { transform-origin: 420px 162px; }
+.is-live .lm-scope { animation: lm-scan 3.6s ease-in-out infinite; }
+@keyframes lm-scan { 50% { transform: rotate(12deg); } }
+
+.lm-sign-a { transform-origin: 420px 119px; }
+.lm-sign-b { transform-origin: 420px 155px; }
+.lm-sign-c { transform-origin: 420px 189px; }
+.is-live .lm-sign-a { animation: lm-swing 2.8s ease-in-out infinite; }
+.is-live .lm-sign-b { animation: lm-swing 2.8s ease-in-out -0.9s infinite reverse; }
+.is-live .lm-sign-c { animation: lm-swing 3.2s ease-in-out -1.6s infinite; }
+@keyframes lm-swing { 50% { transform: rotate(7deg); } }
+.lm-bulb { transform-origin: 492px 54px; opacity: 0.35; transition: opacity 0.6s var(--ease); }
+.is-live .lm-bulb { opacity: 1; animation: lm-pulse 1.6s ease-in-out infinite; }
+@keyframes lm-pulse { 50% { transform: scale(1.1); } }
+
+.lm-jib { transform-origin: 461px 66px; }
+.is-live .lm-jib { animation: lm-jib 5s ease-in-out infinite; }
+@keyframes lm-jib { 50% { transform: rotate(-4deg); } }
+.is-live .lm-hook { animation: lm-hook 2.6s ease-in-out infinite; }
+@keyframes lm-hook { 50% { transform: translateY(-18px); } }
+
+.lm-flame { transform-origin: 423px 178px; transform: scaleY(0.4); opacity: 0.5; transition: transform 0.5s var(--ease), opacity 0.5s; }
+.is-live .lm-flame { opacity: 1; animation: lm-flame 0.18s ease-in-out infinite alternate; }
+@keyframes lm-flame { from { transform: scaleY(0.85); } to { transform: scaleY(1.15); } }
+.is-live .lm-rocket { animation: lm-lift 2.4s ease-in-out infinite; }
+@keyframes lm-lift { 50% { transform: translateY(-10px); } }
+.lm-smoke { opacity: 0.4; transition: opacity 0.6s; }
+.is-live .lm-smoke { opacity: 1; animation: lm-puff 1.8s ease-in-out infinite; transform-origin: 423px 210px; }
+@keyframes lm-puff { 50% { transform: scale(1.12); } }
+
+.lm-tree { transform-origin: 494px 214px; transform: scale(0.55); transition: transform 1.2s var(--ease); }
+.is-reached .lm-tree { transform: scale(1); }
+.is-live .lm-windows rect { fill: #fbbf24; }
+.lm-flag { transform-origin: 398px 75px; }
+.is-live .lm-flag { animation: lm-wave 1.2s ease-in-out infinite; }
+@keyframes lm-wave { 50% { transform: skewY(8deg) scaleX(0.9); } }
+
+/* The road (built by story.js) and its milestone flags */
+.story-road {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: visible;
+  pointer-events: none;
+}
+.story-road .road-ghost { fill: none; stroke: var(--toon-ghost); stroke-width: 4; stroke-dasharray: 2 14; stroke-linecap: round; }
+.story-road .road-edge { fill: none; stroke: var(--toon-road-edge); stroke-width: 36; stroke-linecap: round; }
+.story-road .road-surface { fill: none; stroke: var(--toon-road); stroke-width: 26; stroke-linecap: round; }
+.story-road .road-line { fill: none; stroke: var(--accent-soft); stroke-width: 3.5; stroke-dasharray: 12 12; stroke-linecap: round; }
+.story-road .road-mask-path { fill: none; stroke: #fff; stroke-width: 60; stroke-linecap: round; }
+
+.road-marker .marker-pop {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scale(0);
+  transition: transform 0.7s cubic-bezier(0.34, 1.7, 0.5, 1);
+}
+.road-marker.is-reached .marker-pop { transform: scale(1); }
+.road-marker .marker-flag { transform-box: fill-box; transform-origin: 0% 50%; }
+.road-marker.is-reached .marker-flag { animation: lm-wave 1.6s ease-in-out infinite; }
+.road-marker path, .road-marker rect, .road-marker ellipse { stroke: var(--toon-ink); stroke-width: 3; stroke-linejoin: round; }
+.road-marker .marker-base { fill: var(--toon-hill-light); }
+.road-marker .marker-pole { fill: var(--toon-trunk); }
+.road-marker .marker-flag { fill: var(--accent); }
+.road-marker text {
+  font: 700 13px var(--font-display);
+  fill: var(--on-accent);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* Story cards: chunky comic-panel cards that slide in from their side and
+   light up while the robot stands at their step */
+.story-card {
+  position: relative;
+  z-index: 1;
+  padding: 30px 30px 28px 34px;
+  background: var(--toon-card);
+  border: 2px solid var(--toon-card-edge);
+  border-radius: 26px;
+  box-shadow: 0 9px 0 var(--toon-card-shadow), 0 26px 50px -24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: translateX(-70px) rotate(-3deg);
+  transition:
+    opacity 0.7s var(--ease),
+    transform 0.9s cubic-bezier(0.34, 1.4, 0.5, 1),
+    border-color 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+.story-step.is-right .story-card { transform: translateX(70px) rotate(3deg); }
+.story-step.is-in .story-card { opacity: 1; transform: none; }
+.story-step.is-active .story-card {
+  border-color: var(--accent);
+  box-shadow: 0 9px 0 var(--accent-strong), 0 30px 60px -26px rgba(var(--accent-rgb), 0.55);
+  transform: translateY(-6px);
+}
+
+.story-num {
+  position: absolute;
+  top: -20px;
+  left: -14px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--on-accent);
+  background: var(--accent-soft);
+  border: 3px solid var(--toon-ink);
+  box-shadow: 0 4px 0 var(--toon-ink);
+  transform: rotate(-8deg);
+  transition: transform 0.5s cubic-bezier(0.34, 1.7, 0.5, 1), background 0.4s;
+}
+.story-step.is-active .story-num { background: var(--accent); transform: rotate(0deg) scale(1.12); }
+.story-kicker {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.story-card h3 { font-size: 1.45rem; margin-bottom: 8px; }
+.story-card p { font-size: 0.95rem; }
+
+/* ==========================================================================
+   Technology
+   ========================================================================== */
+
+/* A real CSS-3D field: tech.js places each chip at its spot on a ring
+   around the robot's spot (and at its own depth), tilts the whole stage
+   toward the cursor and springs chips aside as the robot moves among them.
+   --layout tells it which arrangement CSS is using. */
+.tech-field {
+  --layout: ring;
+  --robot-size: 230px; /* how tall the robot stands here (three-robot.js) */
+  position: relative;
+  height: 580px;
+  margin-top: 10px;
+  perspective: 1300px;
+}
+.tech-spot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 260px;
+  margin: -130px 0 0 -130px;
+  pointer-events: none;
+}
+.tech-stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.tech-links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.tech-link {
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 3 7;
+  animation: tech-flow 0.9s linear infinite;
+}
+@keyframes tech-flow { to { stroke-dashoffset: -10; } }
+
+.tech-chips {
+  position: absolute;
+  inset: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+}
+.tech-chip {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+  opacity: 0;
+}
+
+/* Glass keycap: gradient face, a lit top edge and a solid depth edge below */
+.tech-chip-face {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px 10px 10px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, var(--chip-top), var(--chip-bottom));
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 var(--card-highlight),
+    0 6px 0 var(--chip-depth),
+    0 22px 34px -18px rgba(0, 0, 0, 0.55);
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: default;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition:
+    transform 0.35s var(--ease),
+    border-color 0.35s var(--ease),
+    box-shadow 0.35s var(--ease);
+}
+.tech-chip-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.14);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  transition: transform 0.5s cubic-bezier(0.34, 1.7, 0.5, 1), background 0.35s, color 0.35s;
+}
+.tech-chip-icon svg { width: 20px; height: 20px; }
+
+/* Hovered: lifts toward you, leans toward the pointer and lights up */
+.tech-chip.is-hot .tech-chip-face {
+  transform: translateZ(34px) rotateX(var(--rx)) rotateY(var(--ry)) scale(1.06);
+  border-color: rgba(var(--accent-rgb), 0.7);
+  box-shadow:
+    inset 0 1px 0 var(--card-highlight),
+    0 8px 0 var(--accent-strong),
+    0 30px 46px -18px rgba(var(--accent-rgb), 0.55);
+}
+.tech-chip.is-hot .tech-chip-icon {
+  color: var(--on-accent);
+  background: var(--accent);
+  transform: rotate(-12deg) scale(1.15);
+}
+
+/* ==========================================================================
+   CTA
+   ========================================================================== */
+
+.cta {
+  --robot-size: 200px; /* how tall the robot stands here (three-robot.js) */
+  /* Layering, as in the hero: no stacking context of its own, so the box's
+     background (z-index -1) sits behind the robot while the logo and copy
+     (z-index 1) stay in front of it. */
+  z-index: auto;
+  margin: 0 auto 110px;
+  max-width: 1180px;
+  padding: 0 24px;
+}
+.cta-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 36px;
+  padding: 56px 56px 56px 40px;
+  max-width: none;
+}
+.cta-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(420px circle at 28% 50%, rgba(var(--accent-rgb), 0.18), transparent 70%),
+    rgba(var(--accent-rgb), 0.07);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+}
+.cta-stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  min-height: 300px;
+}
+/* A soft pool of light the logo and robot stand on */
+.cta-stage::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -14px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(var(--accent-rgb), 0.35), transparent 70%);
+  filter: blur(6px);
+  pointer-events: none;
+}
+.lg-defs { position: absolute; }
+.cta-copy { position: relative; z-index: 1; }
+.cta-title { font-size: clamp(1.8rem, 3.2vw, 2.5rem); margin-bottom: 16px; perspective: 600px; }
+.cta-title .w { display: inline-block; }
+.cta-text { max-width: 480px; margin: 0 0 32px; }
+
+/* ---- The 3D logo ------------------------------------------------------
+   Built from the logo's own shapes (rounded square, pentagon, "Xe"), each a
+   stack of SVG layers spaced in depth so it has real thickness: square at
+   the back, pentagon floating in front of it, letters in front of that.
+   .lg-tilt follows the mouse (cta.js sets --tx/--ty); .lg-3d holds the
+   resting three-quarter pose and, on desktop, a slow sway. */
+.cta-logo {
+  --L: 270px;
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--L);
+  height: calc(var(--L) * 531 / 515);
+  perspective: 1000px;
+  margin-bottom: 6px;
+}
+.lg-tilt,
+.lg-3d,
+.lg-part {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.lg-tilt { transform: rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)); }
+.lg-3d { transform: rotateX(8deg) rotateY(-16deg); }
+.lg-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.lg-square { transform: translateZ(0); }
+.lg-penta { transform: translateZ(26px); }
+.lg-x,
+.lg-e { transform: translateZ(46px); }
+.lg-x text,
+.lg-e text {
+  font-family: Arial, 'Helvetica Neue', Helvetica, 'Liberation Sans', sans-serif;
+  font-weight: 700;
+  font-size: 250px;
+}
+.lg-front { filter: drop-shadow(0 6px 10px rgba(10, 30, 90, 0.18)); }
+.lg-glow {
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.38), transparent 62%);
+  transform: translateZ(-60px);
+}
+.lg-ring-wrap {
+  position: absolute;
+  inset: -14%;
+  transform: translateZ(-30px);
+}
+.lg-ring {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: rgba(var(--accent-rgb), 0.55);
+  stroke-width: 1.6;
+  stroke-dasharray: 6 9;
+}
+.lg-ring .lg-ring-dot { fill: var(--accent-soft); stroke: none; }
+.lg-shine { opacity: 0; }
+.lg-sparks { position: absolute; inset: 0; transform: translateZ(60px); pointer-events: none; }
+.lg-spark {
+  position: absolute;
+  left: var(--sx);
+  top: var(--sy);
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  fill: var(--accent-soft);
+}
+.lg-spark svg { display: block; width: 100%; height: 100%; }
+
+/* The robot's spot beside the logo (its feet stand on the spot's bottom). */
+.cta-robot-spot {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(var(--robot-size) * 0.92);
+  height: var(--robot-size);
+}
+.cta-robot-still { display: none; }
+
+/* ---- Desktop: the build-up ----------------------------------------------
+   cta.js adds .is-armed (everything waits at its starting pose) and, once the
+   section is in view, .is-playing to run it. Without the script — or on
+   phones — the finished logo and copy simply show. */
+.cta.is-armed .lg-glow { animation: lg-fade 1s ease 0s both; }
+.cta.is-armed .lg-square { animation: lg-square-in 1s cubic-bezier(0.34, 1.35, 0.5, 1) 0.1s both; }
+.cta.is-armed .lg-penta { animation: lg-penta-in 1.1s cubic-bezier(0.34, 1.3, 0.5, 1) 0.45s both; }
+.cta.is-armed .lg-x { animation: lg-x-in 0.8s cubic-bezier(0.34, 1.5, 0.5, 1) 0.95s both; }
+.cta.is-armed .lg-e { animation: lg-e-in 0.8s cubic-bezier(0.34, 1.5, 0.5, 1) 1.1s both; }
+/* Opacity fades on the flat leaf layers only — on the 3D groups themselves
+   it would flatten their depth while it plays. */
+.cta.is-armed .lg-square .lg-layer { animation: lg-fade 0.35s ease 0.1s both; }
+.cta.is-armed .lg-penta .lg-layer { animation: lg-fade 0.35s ease 0.45s both; }
+.cta.is-armed .lg-x .lg-layer { animation: lg-fade 0.3s ease 0.95s both; }
+.cta.is-armed .lg-e .lg-layer { animation: lg-fade 0.3s ease 1.1s both; }
+.cta.is-armed .lg-ring-wrap { animation: lg-ring-in 1s cubic-bezier(0.34, 1.45, 0.5, 1) 1.3s both; }
+.cta.is-armed .lg-ring { animation: lg-spin 36s linear 1.3s infinite; }
+.cta.is-armed .lg-shine { animation: lg-shine 6s ease-in-out 1.45s infinite; }
+.cta.is-armed .lg-spark { opacity: 0; animation: lg-spark 3.4s ease-out calc(1.45s + var(--sd)) infinite; }
+.cta.is-armed .lg-3d { animation: lg-sway 9s ease-in-out 1.8s infinite; }
+.cta.is-armed .cta-title .w { animation: cta-word 0.7s cubic-bezier(0.34, 1.35, 0.5, 1) both; }
+.cta.is-armed .cta-title .w:nth-child(1) { animation-delay: 1.45s; }
+.cta.is-armed .cta-title .w:nth-child(2) { animation-delay: 1.52s; }
+.cta.is-armed .cta-title .w:nth-child(3) { animation-delay: 1.59s; }
+.cta.is-armed .cta-title .w:nth-child(4) { animation-delay: 1.66s; }
+.cta.is-armed .cta-title .w:nth-child(5) { animation-delay: 1.73s; }
+.cta.is-armed .cta-title .w:nth-child(6) { animation-delay: 1.8s; }
+.cta.is-armed .cta-title .w:nth-child(7) { animation-delay: 1.87s; }
+.cta.is-armed .cta-text { animation: cta-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.15s both; }
+.cta.is-armed .cta-button { animation: cta-pop 0.7s cubic-bezier(0.34, 1.6, 0.5, 1) 2.4s both; }
+.cta.is-armed .cta-button::after { animation: cta-pulse 2.4s ease-out 3.2s infinite; }
+/* Everything holds at its starting pose until the build-up plays. (This
+   comes after the rules above and outranks them, so their animation
+   shorthands can't quietly restart anything early.) */
+.cta.is-armed:not(.is-playing) :is(.lg-glow, .lg-part, .lg-layer, .lg-ring-wrap, .lg-ring, .lg-shine, .lg-spark, .lg-3d, .w, .cta-text, .cta-button),
+.cta.is-armed:not(.is-playing) .cta-button::after {
+  animation-play-state: paused;
+}
+.cta-button { position: relative; }
+.cta-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.55);
+  pointer-events: none;
+}
+
+@keyframes lg-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lg-square-in {
+  from { transform: translate3d(0, 90px, -320px) rotateX(80deg) scale(0.5); }
+  to { transform: translateZ(0); }
+}
+@keyframes lg-penta-in {
+  from { transform: translateZ(240px) rotateY(-220deg) scale(0.2); }
+  to { transform: translateZ(26px); }
+}
+@keyframes lg-x-in {
+  from { transform: translate3d(-110px, -170px, 180px) rotate(-38deg) scale(0.4); }
+  to { transform: translateZ(46px); }
+}
+@keyframes lg-e-in {
+  from { transform: translate3d(110px, 170px, 180px) rotate(38deg) scale(0.4); }
+  to { transform: translateZ(46px); }
+}
+@keyframes lg-ring-in {
+  from { opacity: 0; transform: translateZ(-30px) scale(0.3); }
+  to { opacity: 1; transform: translateZ(-30px) scale(1); }
+}
+@keyframes lg-spin { to { transform: rotate(360deg); } }
+@keyframes lg-shine {
+  0% { opacity: 1; transform: translateX(0) skewX(-18deg); }
+  22% { opacity: 1; transform: translateX(980px) skewX(-18deg); }
+  23%, 100% { opacity: 0; transform: translateX(980px) skewX(-18deg); }
+}
+@keyframes lg-spark {
+  0% { opacity: 0; transform: scale(0) rotate(0deg); }
+  14% { opacity: 1; transform: scale(1.15) rotate(45deg); }
+  40% { opacity: 0.9; transform: scale(0.8) rotate(90deg); }
+  60%, 100% { opacity: 0; transform: scale(0.4) rotate(120deg); }
+}
+@keyframes lg-sway {
+  0%, 100% { transform: rotateX(8deg) rotateY(-16deg) translateY(0); }
+  25% { transform: rotateX(4deg) rotateY(2deg) translateY(-8px); }
+  50% { transform: rotateX(10deg) rotateY(16deg) translateY(0); }
+  75% { transform: rotateX(5deg) rotateY(-2deg) translateY(-6px); }
+}
+@keyframes cta-word {
+  from { opacity: 0; transform: translateY(40px) rotateX(-70deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cta-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cta-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cta-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.55); }
+  70%, 100% { box-shadow: 0 0 0 18px rgba(var(--accent-rgb), 0); }
+}
+
+/* ==========================================================================
+   Contact
+   ========================================================================== */
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 60px;
+}
+
+.contact-copy h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: 16px; }
+.contact-copy > p { margin-bottom: 32px; max-width: 420px; }
+
+.contact-info { display: flex; flex-direction: column; gap: 18px; }
+.contact-info li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.94rem;
+  color: var(--text-dim);
+}
+.contact-info svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--accent); }
+
+.contact-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-dim);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
+}
+.form-group textarea { resize: vertical; }
+
+.form-note {
+  margin-top: 14px;
+  font-size: 0.86rem;
+  color: var(--accent);
+  min-height: 1.2em;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 70px 0 0;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  gap: 40px;
+  padding-bottom: 50px;
+}
+
+.footer-brand p { font-size: 0.88rem; margin: 14px 0 20px; max-width: 260px; }
+
+.social-links { display: flex; gap: 12px; }
+.social-links a {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s, transform 0.2s var(--ease);
+}
+.social-links a:hover { border-color: var(--accent); transform: translateY(-3px); }
+.social-links svg { width: 16px; height: 16px; }
+
+.footer-col h5 {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  margin-bottom: 18px;
+}
+.footer-col ul { display: flex; flex-direction: column; gap: 11px; }
+.footer-col ul a { font-size: 0.88rem; color: var(--text-dim); transition: color 0.2s; }
+.footer-col ul a:hover { color: var(--accent); }
+.footer-col > p { font-size: 0.85rem; margin-bottom: 16px; }
+
+.footer-form { display: flex; gap: 8px; }
+.footer-form input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+.footer-form input:focus { outline: none; border-color: var(--accent); }
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  padding: 22px 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--text-faint);
+}
+
+/* ==========================================================================
+   Back to top
+   ========================================================================== */
+
+.back-to-top {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10px 30px rgba(var(--accent-rgb), 0.4);
+  opacity: 0; visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), visibility 0.3s, background 0.25s;
+  z-index: 90;
+}
+.back-to-top:hover { background: var(--accent-strong); }
+.back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.back-to-top svg { width: 20px; height: 20px; }
+
+/* Robot sounds on/off (robot-sound.js), bottom-left opposite back-to-top.
+   While on, its little sound waves pulse; muted, the speaker is crossed out. */
+.sound-toggle {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-glow);
+  cursor: pointer;
+  z-index: 90;
+  transition: transform 0.25s var(--ease), border-color 0.25s, color 0.25s;
+}
+.sound-toggle:hover { transform: translateY(-2px); border-color: rgba(var(--accent-rgb), 0.5); }
+.sound-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.sound-toggle svg { width: 22px; height: 22px; }
+.sound-toggle .sound-off { display: none; }
+.sound-toggle:not(.is-muted) .sound-wave { animation: sound-wave 1.6s ease-in-out infinite; }
+.sound-toggle:not(.is-muted) .sound-wave-2 { animation-delay: 0.25s; }
+.sound-toggle.is-muted { color: var(--text-faint); }
+.sound-toggle.is-muted .sound-wave { display: none; }
+.sound-toggle.is-muted .sound-off { display: inline; }
+@keyframes sound-wave { 50% { opacity: 0.3; } }
+
+/* ==========================================================================
+   Reveal animation
+   ========================================================================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 980px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-visual { height: 420px; margin-top: 20px; }
+  .value-strip-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cta-inner { grid-template-columns: 1fr; padding: 48px 32px; gap: 28px; text-align: center; }
+  .cta-text { margin: 0 auto 28px; }
+  .solutions-intro { grid-template-columns: 1fr; gap: 36px; }
+  .solutions-intro .section-head { margin: 0 auto; text-align: center; }
+  .solutions-visual { height: 260px; }
+  .why-grid { grid-template-columns: 1fr; }
+  .why-visual { order: -1; height: 400px; }
+  .solutions-grid { grid-template-columns: repeat(2, 1fr); }
+  .story { --robot-size: 150px; padding: 50px 0 70px; }
+  .story-steps { gap: 56px; }
+  .story-step { grid-template-columns: 1fr; gap: 6px; }
+  .story-step .story-spot,
+  .story-step.is-right .story-spot { grid-row: 1; grid-column: 1; width: min(100%, 520px); justify-self: center; }
+  .story-step .story-card,
+  .story-step.is-right .story-card { grid-row: 2; grid-column: 1; }
+  /* Stacked, the cards rise into place rather than sliding in from the
+     side, so nothing pokes past the screen edge before it arrives. */
+  .story-step:not(.is-in) .story-card { transform: translateY(60px) rotate(-2deg); }
+  .story-step.is-right:not(.is-in) .story-card { transform: translateY(60px) rotate(2deg); }
+  .contact-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 720px) {
+  section { padding: 80px 0; }
+  .hero { padding: 150px 0 70px; min-height: unset; }
+
+  .nav-links {
+    position: fixed;
+    top: 68px; left: 16px; right: 16px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 16px;
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s var(--ease);
+  }
+  .nav-links.open { transform: translateY(0); opacity: 1; visibility: visible; }
+  .nav-toggle { display: flex; }
+  .nav-cta { display: none; }
+
+  .value-strip { padding: 36px 0; }
+  .value-strip-inner { gap: 14px 12px; }
+  .value-card {
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    padding: 22px 14px 20px;
+    text-align: center;
+  }
+  .value-cube { --s: 44px; }
+  .cube-front svg,
+  .cube-back svg { width: 21px; height: 21px; }
+  .value-title { font-size: 0.9rem; }
+  .solutions-grid { grid-template-columns: 1fr; }
+  .story-card { padding: 28px 22px 24px 26px; }
+
+  .story-world {
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 60px, #000 calc(100% - 60px), transparent);
+    mask-image: linear-gradient(180deg, transparent, #000 60px, #000 calc(100% - 60px), transparent);
+  }
+  .story-sun { top: 36px; right: 16px; width: 54px; height: 54px; }
+  .story-cloud.c1 { display: none; }
+  .solutions-field { display: none; }
+  .cta { margin-bottom: 40px; }
+
+  .clients { padding: 54px 0 64px; }
+  .clients-head { text-align: center; }
+  .clients-row { gap: 12px; }
+  .client-tile { width: 148px; height: 78px; padding: 12px 16px; border-radius: 16px; }
+  .client img { max-height: 50px; }
+
+  .tech-field { --layout: flow; --robot-size: 170px; height: auto; perspective: none; }
+  .tech-spot { position: relative; left: auto; top: auto; margin: 0 auto 6px; width: 200px; height: 200px; }
+  .tech-stage { position: relative; inset: auto; transform: none; }
+  .tech-chips { position: relative; inset: auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 10px; }
+  .tech-chip { position: relative; }
+  .tech-chip-face { font-size: 0.84rem; padding: 8px 16px 8px 8px; }
+  .tech-chip-icon { width: 32px; height: 32px; }
+  .form-row { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  .cta { --robot-size: 150px; }
+  .cta-inner { padding: 40px 18px 44px; }
+  .cta-logo { --L: 180px; }
+  .cta-stage { min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ==========================================================================
+   Lite (phone) page — html.is-lite, decided in <head> for narrow screens and
+   phones held sideways. No 3D and no scroll-driven animation: the live robot,
+   3D background, robot sounds, 3D card effects, scroll reveals and parallax
+   are all off (their scripts aren't even loaded). The layout stays clean,
+   and a few gentle 2D loops keep it lively.
+   ========================================================================== */
+
+.hero-robot-still { display: none; }
+
+.is-lite .robot-layer,
+.is-lite #bg-canvas,
+.is-lite .sound-toggle,
+.is-lite .solutions-visual { display: none; }
+
+/* CTA: the finished logo, floating gently, with the robot's still beside it. */
+.is-lite .cta-logo { animation: robot-bob 5s ease-in-out infinite; }
+.is-lite .cta-robot-still {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  animation: robot-bob 4.6s ease-in-out -1.2s infinite;
+}
+
+/* Value cards: the same 3D-styled cubes, held still. */
+.is-lite .cube-float { animation: none; }
+
+/* Content is simply there — no fade-in as you scroll. */
+.is-lite .reveal { opacity: 1; transform: none; transition: none; }
+
+/* Hero: the robot as a still image, floating over the logo shapes, with a
+   soft glow beneath that breathes as it bobs. */
+.is-lite .hero-visual {
+  --robot-cy: 50%;
+  height: auto;
+  display: grid;
+  place-items: center;
+  padding: 34px 0 48px;
+}
+.is-lite .hero-robot-still {
+  display: block;
+  position: relative;
+  z-index: 0;
+  width: min(72%, 300px);
+  height: auto;
+  filter: drop-shadow(0 22px 26px rgba(var(--accent-rgb), 0.28));
+  animation: robot-bob 4.6s ease-in-out infinite;
+}
+.is-lite .hero-visual::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: 26px;
+  width: min(48%, 210px);
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(var(--accent-rgb), 0.4), transparent 70%);
+  transform: translateX(-50%);
+  animation: robot-glow 4.6s ease-in-out infinite;
+}
+@keyframes robot-bob {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-14px) rotate(1.5deg); }
+}
+@keyframes robot-glow {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 1; }
+  50% { transform: translateX(-50%) scale(0.78); opacity: 0.55; }
+}
+
+/* Why Xelenic: the flat orbit (its rings keep turning), sized to fit. */
+.is-lite .why-us { overflow-x: clip; }
+.is-lite .why-visual { height: 360px; }
+@media (max-width: 420px) {
+  .is-lite .why-visual { height: 320px; }
+  .is-lite .orbit-wrap { transform: scale(0.8); }
+}
+@media (max-width: 360px) {
+  .is-lite .orbit-wrap { transform: scale(0.72); }
+}
+
+/* How We Work: cards in place, the whole road drawn, every scene alive. */
+.is-lite .story-steps .story-step .story-card { opacity: 1; transform: none; }
+
+/* Our Foundation: chips in tidy centered rows, each floating softly. */
+.is-lite .tech-field { height: auto; margin-top: 0; perspective: none; }
+.is-lite .tech-spot,
+.is-lite .tech-links { display: none; }
+.is-lite .tech-stage { position: relative; inset: auto; transform: none; }
+.is-lite .solutions-field { display: none; }
+.is-lite .tech-chips {
+  position: relative;
+  inset: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px 10px;
+}
+.is-lite .tech-chip { position: relative; opacity: 1; animation: chip-float 5s ease-in-out infinite; }
+.is-lite .tech-chip-face {
+  width: 100%;
+  height: 100%;
+  white-space: normal;
+  line-height: 1.25;
+  font-size: 0.82rem;
+  padding: 9px 12px 9px 9px;
+  gap: 10px;
+}
+.is-lite .tech-chip-icon { flex-shrink: 0; width: 32px; height: 32px; }
+.is-lite .tech-chip:nth-child(3n + 2) { animation-delay: -1.7s; }
+.is-lite .tech-chip:nth-child(3n) { animation-delay: -3.3s; }
+@keyframes chip-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}

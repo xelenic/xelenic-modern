@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <clipPath id="screen">
+      <path d="M88 139 H312 L334 215 H66 Z"/>
+    </clipPath>
+  </defs>
+
+  <circle cx="200" cy="200" r="168" fill="#EFF6FF"/>
+  <circle cx="96" cy="96" r="10" fill="#DBEAFE"/>
+  <circle cx="312" cy="290" r="13" fill="#DBEAFE"/>
+  <ellipse cx="200" cy="354" rx="110" ry="10" fill="#1E3A8A" opacity=".12"/>
+
+  <!-- wide foot and K-shaped stand -->
+  <path d="M138 346 H262 L254 330 H146 Z" fill="#1E293B"/>
+  <path d="M168 330 H230 L222 280 L238 230 H182 L166 280 Z" fill="#1E293B"/>
+  <path d="M222 280 L238 230 H248 L232 282 L240 330 H230 Z" fill="#0F172A"/>
+
+  <!-- wide, shallow screen -->
+  <path d="M54 222 H346 L343 232 H57 Z" fill="#1E293B"/>
+  <path d="M78 132 H322 L346 222 H54 Z" fill="#0F172A"/>
+  <path d="M88 139 H312 L334 215 H66 Z" fill="#2563EB"/>
+  <g clip-path="url(#screen)">
+    <circle cx="146" cy="170" r="24" fill="#60A5FA"/>
+    <circle cx="200" cy="160" r="15" fill="#FBBF24"/>
+    <circle cx="250" cy="172" r="26" fill="#38BDF8"/>
+    <circle cx="298" cy="154" r="11" fill="#BFDBFE"/>
+    <circle cx="108" cy="154" r="10" fill="#93C5FD"/>
+    <rect x="118" y="196" width="46" height="12" rx="3" fill="#FFFFFF"/>
+    <rect x="177" y="196" width="46" height="12" rx="3" fill="#FFFFFF"/>
+    <rect x="236" y="196" width="46" height="12" rx="3" fill="#FFFFFF"/>
+  </g>
+  <rect x="188" y="217" width="24" height="3" rx="1.5" fill="#334155"/>
+</svg>

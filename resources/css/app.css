@@ -3,7 +3,40 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/* The panel's sidebar slides in on small screens while <html> has this class
+   (toggled from app.js). */
+@custom-variant sidebar-open (&:where(.sidebar-open, .sidebar-open *));
+
+/* Same type as the marketing site (public/moderning_xelenic). */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Kiosk screen preview with WebGL rendering switched on: a slowly moving
+   gradient stands in for animated 3D content. */
+@layer components {
+    .kiosk-webgl {
+        background-image: linear-gradient(135deg, var(--color-blue-600), var(--color-sky-400), var(--color-indigo-600), var(--color-blue-600));
+        background-size: 300% 300%;
+        animation: kiosk-webgl 8s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .kiosk-webgl {
+            animation: none;
+        }
+    }
+}
+
+@keyframes kiosk-webgl {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
 }

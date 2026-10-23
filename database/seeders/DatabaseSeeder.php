@@ -15,11 +15,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(RolesAndPermissionsSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // One demo account per role for local development, all with the
+        // password "password". Never seeded outside the local environment.
+        if (app()->isLocal()) {
+            foreach (['admin' => 'Admin User', 'manager' => 'Manager User', 'user' => 'Regular User'] as $role => $name) {
+                User::firstOrCreate(
+                    ['email' => "{$role}@example.com"],
+                    ['name' => $name, 'password' => 'password'],
+                )->syncRoles($role);
+            }
+        }
     }
 }

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <circle cx="200" cy="200" r="168" fill="#EFF6FF"/>
+  <circle cx="98" cy="290" r="12" fill="#DBEAFE"/>
+  <circle cx="306" cy="88" r="10" fill="#DBEAFE"/>
+  <ellipse cx="208" cy="350" rx="90" ry="10" fill="#1E3A8A" opacity=".12"/>
+
+  <!-- base and K-shaped stand -->
+  <rect x="160" y="336" width="100" height="12" rx="3" fill="#1E293B"/>
+  <path d="M176 336 H232 L224 284 L240 232 H186 L170 284 Z" fill="#1E293B"/>
+  <path d="M224 284 L240 232 H250 L234 286 L240 336 H232 Z" fill="#0F172A"/>
+
+  <!-- tilted landscape screen -->
+  <path d="M84 222 H316 L314 234 H86 Z" fill="#1E293B"/>
+  <path d="M104 112 H296 L316 222 H84 Z" fill="#0F172A"/>
+  <path d="M114 120 H286 L304 214 H96 Z" fill="#2563EB"/>
+
+  <!-- catalogue tiles, following the screen's perspective -->
+  <path d="M121 129.4 H168.4 L166 165.1 H114.9 Z" fill="#FFFFFF"/>
+  <path d="M176.3 129.4 H223.7 L225.6 165.1 H174.5 Z" fill="#BFDBFE"/>
+  <path d="M231.6 129.4 H279 L285.2 165.1 H234.1 Z" fill="#FFFFFF"/>
+  <path d="M113.5 172.6 H165.4 L163 206.5 H107.7 Z" fill="#60A5FA"/>
+  <path d="M174.1 172.6 H225.9 L227.6 206.5 H172.3 Z" fill="#FFFFFF"/>
+  <path d="M234.6 172.6 H286.5 L292.2 206.5 H236.9 Z" fill="#38BDF8"/>
+  <circle cx="141" cy="145" r="8" fill="#93C5FD"/>
+  <circle cx="256" cy="145" r="8" fill="#FBBF24"/>
+  <circle cx="200" cy="188" r="8" fill="#93C5FD"/>
+</svg>
