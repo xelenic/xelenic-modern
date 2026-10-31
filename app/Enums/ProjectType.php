@@ -40,6 +40,24 @@ enum ProjectType: string
     }
 
     /**
+     * Three short points for the "What would you like to build?" cards, each
+     * backed by what the form for this type actually covers.
+     *
+     * @return array<int, string>
+     */
+    public function highlights(): array
+    {
+        return match ($this) {
+            self::KioskApp => ['Choose from '.count(KioskMachine::cases()).' kiosk machines', 'Payments, games and WebGL', 'Live screen-size preview'],
+            self::SoftwareSolution => ['CRM, ERP and POS', 'Business automation and payroll', 'Or something custom'],
+            self::HireEngineers => ['The skills your team needs', 'Full-time or part-time', 'Or for a single project'],
+            self::Ecommerce => ['A brand-new store', 'Moving from Shopify or WooCommerce', 'Or improving your current one'],
+            self::MobileApp => ['iOS and Android', 'Ready-made designs welcome', 'Or we design it with you'],
+            self::GrowBusiness => ['More leads and online sales', 'Marketing automation', 'Analytics and reporting'],
+        };
+    }
+
+    /**
      * The <x-icon> name shown for this type.
      */
     public function icon(): string

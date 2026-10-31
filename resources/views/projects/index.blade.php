@@ -6,28 +6,13 @@
         </x-button>
     </x-slot:actions>
 
-    @can('manage projects')
-        <div class="mb-6 inline-flex rounded-lg border border-slate-200 bg-white p-1 shadow-xs">
-            <a href="{{ route('projects.index') }}" @class([
-                'rounded-md px-3 py-1.5 text-sm font-medium transition',
-                'bg-blue-50 text-blue-700' => ! $showAll,
-                'text-slate-600 hover:text-slate-900' => $showAll,
-            ])>My projects</a>
-            <a href="{{ route('projects.index', ['scope' => 'all']) }}" @class([
-                'rounded-md px-3 py-1.5 text-sm font-medium transition',
-                'bg-blue-50 text-blue-700' => $showAll,
-                'text-slate-600 hover:text-slate-900' => ! $showAll,
-            ])>All projects</a>
-        </div>
-    @endcan
-
     @if ($projects->isEmpty())
         <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
             <span class="mx-auto flex size-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                 <x-icon name="folder" class="size-6" />
             </span>
             <h2 class="mt-4 font-display text-lg font-semibold text-slate-900">
-                {{ $showAll ? 'No projects yet' : "You don't have any projects yet" }}
+                You don't have any projects yet
             </h2>
             <p class="mx-auto mt-2 max-w-sm text-sm text-slate-500">
                 Tell us what you'd like to build and the Xelenic team will get back to you.
@@ -64,9 +49,6 @@
                                 <x-icon name="wallet" class="size-3.5" />
                                 {{ $project->budget }}
                             </span>
-                        @endif
-                        @if ($showAll)
-                            <span class="ml-auto font-medium text-slate-700">{{ $project->user->name }}</span>
                         @endif
                     </div>
                 </a>

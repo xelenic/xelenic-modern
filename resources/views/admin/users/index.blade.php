@@ -1,4 +1,4 @@
-<x-layouts.app title="Users">
+<x-layouts.admin title="Users">
     @can('create users')
         <x-slot:actions>
             <x-button :href="route('admin.users.create')">
@@ -104,4 +104,4 @@
     <div class="mt-6">
         {{ $users->links('partials.pagination') }}
     </div>
-</x-layouts.app>
+</x-layouts.admin>

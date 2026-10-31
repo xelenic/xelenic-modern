@@ -1,4 +1,4 @@
-<x-layouts.app title="Edit user">
+<x-layouts.admin title="Edit user">
     <div class="max-w-3xl">
         <x-card :title="$user->name" :description="'Joined '.$user->created_at->format('j F Y')">
             <form method="POST" action="{{ route('admin.users.update', $user) }}">
@@ -14,4 +14,4 @@
             </form>
         </x-card>
     </div>
-</x-layouts.app>
+</x-layouts.admin>

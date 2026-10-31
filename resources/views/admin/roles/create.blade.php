@@ -1,4 +1,4 @@
-<x-layouts.app title="New role">
+<x-layouts.admin title="New role">
     <div class="max-w-3xl">
         <x-card title="Role details" description="Name the role and choose what it allows.">
             <form method="POST" action="{{ route('admin.roles.store') }}">
@@ -13,4 +13,4 @@
             </form>
         </x-card>
     </div>
-</x-layouts.app>
+</x-layouts.admin>

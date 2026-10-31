@@ -1,4 +1,4 @@
-<x-layouts.app title="Roles & permissions">
+<x-layouts.admin title="Roles & permissions">
     <x-slot:actions>
         <x-button :href="route('admin.roles.create')">
             <x-icon name="plus" class="size-4" />
@@ -58,4 +58,4 @@
             </x-card>
         @endforeach
     </div>
-</x-layouts.app>
+</x-layouts.admin>

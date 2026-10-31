@@ -1,7 +1,9 @@
+{{-- Section links point back at the home page when shown on other pages. --}}
+@php($sectionBase = request()->routeIs('home') ? '' : route('home'))
 <footer class="site-footer">
   <div class="container footer-grid">
     <div class="footer-brand">
-      <a href="#home" class="brand">
+      <a href="{{ $sectionBase }}#home" class="brand">
         <span class="brand-mark"><img src="{{ asset('moderning_xelenic/assets/img/logo-mark.png') }}" alt="" width="38" height="38" /></span>
         <span class="brand-name">Xelenic</span>
       </a>
@@ -17,22 +19,22 @@
     <div class="footer-col">
       <h5>Solutions</h5>
       <ul>
-        <li><a href="#solutions">AI Middleware</a></li>
-        <li><a href="#solutions">CRM &amp; ERP</a></li>
-        <li><a href="#solutions">POS Systems</a></li>
-        <li><a href="#solutions">Business Automation</a></li>
-        <li><a href="#solutions">Payroll</a></li>
-        <li><a href="#solutions">AI Kiosk Apps</a></li>
+        <li><a href="{{ $sectionBase }}#solutions">AI Middleware</a></li>
+        <li><a href="{{ $sectionBase }}#solutions">CRM &amp; ERP</a></li>
+        <li><a href="{{ $sectionBase }}#solutions">POS Systems</a></li>
+        <li><a href="{{ $sectionBase }}#solutions">Business Automation</a></li>
+        <li><a href="{{ $sectionBase }}#solutions">Payroll</a></li>
+        <li><a href="{{ $sectionBase }}#solutions">AI Kiosk Apps</a></li>
       </ul>
     </div>
 
     <div class="footer-col">
       <h5>Company</h5>
       <ul>
-        <li><a href="#why-us">Why Xelenic</a></li>
-        <li><a href="#process">Our Process</a></li>
-        <li><a href="#technology">Technology</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="{{ $sectionBase }}#why-us">Why Xelenic</a></li>
+        <li><a href="{{ $sectionBase }}#process">Our Process</a></li>
+        <li><a href="{{ $sectionBase }}#technology">Technology</a></li>
+        <li><a href="{{ $sectionBase }}#contact">Contact</a></li>
       </ul>
     </div>
 

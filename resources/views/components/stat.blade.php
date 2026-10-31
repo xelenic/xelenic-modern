@@ -1,4 +1,4 @@
-@props(['label', 'value', 'icon'])
+@props(['label', 'value', 'icon', 'hint' => null])
 
 <div {{ $attributes->class('rounded-2xl border border-slate-200 bg-white p-5 shadow-sm') }}>
     <div class="flex items-center justify-between">
@@ -8,4 +8,7 @@
         </span>
     </div>
     <p class="mt-3 font-display text-3xl font-semibold text-slate-900">{{ $value }}</p>
+    @if ($hint)
+        <p class="mt-1 text-xs text-slate-500">{{ $hint }}</p>
+    @endif
 </div>

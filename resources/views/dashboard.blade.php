@@ -22,43 +22,22 @@
         </div>
     </div>
 
-    {{-- Site-wide numbers, for people who can see other users --}}
-    @if ($stats)
-        <div class="mt-6 grid gap-4 sm:grid-cols-3">
-            <x-stat label="Total users" :value="number_format($stats['users'])" icon="users" />
-            <x-stat label="New this week" :value="number_format($stats['newThisWeek'])" icon="trending" />
-            <x-stat label="Roles" :value="$stats['roles']" icon="shield" />
-        </div>
-    @endif
+    {{-- Staff get a way into the admin panel --}}
+    @can('access-admin')
+        <a href="{{ route('admin.dashboard') }}" class="group mt-6 flex items-center gap-4 rounded-2xl border border-blue-200 bg-blue-50/60 p-5 transition hover:border-blue-300 hover:bg-blue-50">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-sky-400 text-white">
+                <x-icon name="shield" class="size-5" />
+            </span>
+            <span class="min-w-0 flex-1">
+                <span class="block font-display font-semibold text-slate-900">Admin panel</span>
+                <span class="block text-sm text-slate-600">Review project requests, manage users and set up roles.</span>
+            </span>
+            <x-icon name="arrow-right" class="size-5 text-blue-600 transition group-hover:translate-x-0.5" />
+        </a>
+    @endcan
 
     <div class="mt-6 grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
-            @can('view users')
-                <x-card title="Recent sign-ups" description="The newest accounts on Xelenic.">
-                    <x-slot:actions>
-                        <a href="{{ route('admin.users.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-700">View all</a>
-                    </x-slot:actions>
-
-                    <ul class="divide-y divide-slate-100">
-                        @foreach ($recentUsers as $recent)
-                            <li class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                                <x-avatar :user="$recent" size="sm" />
-                                <div class="min-w-0 flex-1">
-                                    <p class="truncate text-sm font-medium text-slate-900">{{ $recent->name }}</p>
-                                    <p class="truncate text-xs text-slate-500">{{ $recent->email }}</p>
-                                </div>
-                                <div class="hidden gap-1.5 sm:flex">
-                                    @foreach ($recent->roles as $role)
-                                        <x-badge :role="$role->name" />
-                                    @endforeach
-                                </div>
-                                <p class="w-24 shrink-0 text-right text-xs text-slate-500">{{ $recent->created_at->diffForHumans() }}</p>
-                            </li>
-                        @endforeach
-                    </ul>
-                </x-card>
-            @endcan
-
             <x-card title="Your projects" description="What you've asked the Xelenic team to build.">
                 <x-slot:actions>
                     <a href="{{ route('projects.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-700">View all</a>
@@ -96,12 +75,6 @@
                 <div class="grid gap-3 sm:grid-cols-2">
                     <x-quick-link :href="route('profile.edit')" icon="user" title="Your profile">Keep your name and email up to date.</x-quick-link>
                     <x-quick-link :href="route('profile.edit').'#password'" icon="key" title="Change password">Use a strong password you don't use elsewhere.</x-quick-link>
-                    @can('view users')
-                        <x-quick-link :href="route('admin.users.index')" icon="users" title="Manage users">Find accounts and change their details.</x-quick-link>
-                    @endcan
-                    @can('manage roles')
-                        <x-quick-link :href="route('admin.roles.index')" icon="shield" title="Roles & permissions">Decide who can do what.</x-quick-link>
-                    @endcan
                     <x-quick-link :href="route('home')" icon="globe" title="Explore Xelenic">AI middleware, business systems and kiosk apps.</x-quick-link>
                     <x-quick-link :href="route('projects.create')" icon="folder" title="Start a project">Kiosks, software, ecommerce, mobile apps and more.</x-quick-link>
                 </div>
@@ -112,7 +85,7 @@
             <x-card title="Your access" description="What your roles let you do.">
                 @role('admin')
                     <p class="text-sm text-slate-600">
-                        You're an admin, so you have <span class="font-medium text-slate-900">full access</span> to everything in the panel.
+                        You're an admin, so you have <span class="font-medium text-slate-900">full access</span> to everything, including the admin panel.
                     </p>
                 @else
                     @if ($permissions->isEmpty())

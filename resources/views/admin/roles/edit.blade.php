@@ -1,4 +1,4 @@
-<x-layouts.app :title="ucfirst($role->name).' role'">
+<x-layouts.admin :title="ucfirst($role->name).' role'">
     <div class="max-w-3xl">
         @if ($role->name === 'admin')
             <x-card title="Admin" description="This role can't be edited.">
@@ -26,4 +26,4 @@
             </x-card>
         @endif
     </div>
-</x-layouts.app>
+</x-layouts.admin>

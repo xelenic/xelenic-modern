@@ -1,4 +1,5 @@
 import './kiosk-settings';
+import './project-steps';
 
 // Panel sidebar on small screens: any [data-sidebar-toggle] opens/closes it,
 // and Escape closes it.

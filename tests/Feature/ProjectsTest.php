@@ -12,6 +12,15 @@ beforeEach(function () {
 });
 
 /**
+ * Which step of the kiosk form a page opens on (its [data-step-panel] with
+ * data-active), or null if none is.
+ */
+function openStep(string $html): ?int
+{
+    return preg_match('/data-step-panel="(\d)"\s+data-active/', $html, $matches) ? (int) $matches[1] : null;
+}
+
+/**
  * The kiosk settings panel as the form posts it (switches as "0"/"1").
  *
  * @param  array<string, mixed>  $overrides
@@ -36,8 +45,10 @@ test('the create page offers every kind of project', function () {
     $response = $this->actingAs(userWithRole('user'))->get('/projects/create')->assertOk();
 
     foreach (ProjectType::cases() as $type) {
-        $response->assertSee($type->label())->assertSee("/projects/create/{$type->value}");
+        $response->assertSee($type->label())->assertSee("/projects/create/{$type->value}")->assertSee($type->highlights());
     }
+
+    $response->assertSee('Choose from '.count(KioskMachine::cases()).' kiosk machines');
 });
 
 test('every kind of project has a working form', function () {
@@ -128,9 +139,22 @@ test('users can submit a project with its extra details', function () {
 test('the kiosk form starts from the chosen machine’s screen', function () {
     $user = userWithRole('user');
 
-    $this->actingAs($user)->get('/projects/create/kiosk-app?machine=portrait-55')
+    $response = $this->actingAs($user)->get('/projects/create/kiosk-app?machine=portrait-55')
         ->assertOk()
-        ->assertSee(['Kiosk settings', 'WebGL rendering', 'Game board', 'Payment integration', 'Extras'])
+        // Step 3 has the project and screen; step 4 the budget, features and questions.
+        ->assertSeeInOrder([
+            'data-step-panel="3"',
+            'Project name', 'Tell us about it', 'Screen size', 'Resolution', 'Orientation',
+            'Continue to budget &amp; features',
+            'data-step-panel="4"',
+            'Budget', 'Timeline', 'WebGL rendering', 'Game board', 'Payment integration', 'Extras',
+            'A few more details', 'How many kiosks do you need?',
+            'Submit project',
+        ], false);
+
+    expect(openStep($response->getContent()))->toBe(3);
+
+    $response
         ->assertSee('<option value="55" selected>', false)
         ->assertSee('value="portrait" class="peer sr-only" checked', false)
         ->assertSee('<span data-preview-diagonal>55″</span>', false)
@@ -140,8 +164,37 @@ test('the kiosk form starts from the chosen machine’s screen', function () {
         ->assertSee('value="landscape" class="peer sr-only" checked', false)
         ->assertSee('<span data-preview-dimensions>121.8 × 68.5</span>', false);
 
-    // Only other types skip the settings panel.
-    $this->actingAs($user)->get('/projects/create/mobile-app')->assertOk()->assertDontSee('Kiosk settings');
+    // Other types keep their one-page form.
+    $this->actingAs($user)->get('/projects/create/mobile-app')
+        ->assertOk()
+        ->assertDontSee('data-step-panel', false)
+        ->assertSeeInOrder(['Project name', 'Budget', 'Timeline', 'A few more details', 'Submit project']);
+});
+
+test('a failed kiosk submit reopens the step with the problem', function () {
+    $user = userWithRole('user');
+    $form = '/projects/create/kiosk-app?machine=ticketing';
+
+    // A bad budget lives on step 4…
+    $budgetProblem = $this->actingAs($user)->from($form)->followingRedirects()->post('/projects', [
+        'type' => 'kiosk-app',
+        'name' => 'Lobby kiosk',
+        'description' => 'A kiosk for our lobby.',
+        'budget' => 'A million dollars',
+        'settings' => kioskSettingsInput(),
+    ])->assertOk()->assertSee('Lobby kiosk');
+
+    expect(openStep($budgetProblem->getContent()))->toBe(4);
+
+    // …while a missing name sends them back to step 3.
+    $nameProblem = $this->actingAs($user)->from($form)->followingRedirects()->post('/projects', [
+        'type' => 'kiosk-app',
+        'description' => 'A kiosk for our lobby.',
+        'budget' => 'A million dollars',
+        'settings' => kioskSettingsInput(),
+    ])->assertOk();
+
+    expect(openStep($nameProblem->getContent()))->toBe(3);
 });
 
 test('kiosk settings are saved, dropping choices under switches that are off', function () {
@@ -225,29 +278,23 @@ test('users only see their own projects', function () {
     $theirs = Project::factory()->create(['name' => 'Someone else’s project']);
 
     $this->actingAs($user)->get('/projects')->assertOk()->assertSee('My project')->assertDontSee('Someone else’s project');
-    $this->actingAs($user)->get('/projects?scope=all')->assertOk()->assertDontSee('Someone else’s project');
-    $this->actingAs($user)->get("/projects/{$mine->id}")->assertOk();
+    $this->actingAs($user)->get("/projects/{$mine->id}")->assertOk()->assertDontSee('Update status');
     $this->actingAs($user)->get("/projects/{$theirs->id}")->assertForbidden();
 });
 
-test('managers see every project and can change its status', function () {
+test('the client panel only shows a manager their own projects', function () {
     $manager = userWithRole('manager');
     $project = Project::factory()->create(['name' => 'Client project']);
 
-    $this->actingAs($manager)->get('/projects?scope=all')->assertOk()->assertSee('Client project');
-    $this->actingAs($manager)->get("/projects/{$project->id}")->assertOk()->assertSee('Update status');
-
-    $this->actingAs($manager)->patch("/projects/{$project->id}/status", ['status' => 'in_progress'])
-        ->assertRedirect("/projects/{$project->id}");
-
-    expect($project->fresh()->status)->toBe(ProjectStatus::InProgress);
+    $this->actingAs($manager)->get('/projects')->assertOk()->assertDontSee('Client project');
+    $this->actingAs($manager)->get("/projects/{$project->id}")->assertForbidden();
 });
 
 test('clients cannot change the status of their own project', function () {
     $user = userWithRole('user');
     $project = Project::factory()->for($user)->create();
 
-    $this->actingAs($user)->patch("/projects/{$project->id}/status", ['status' => 'completed'])->assertForbidden();
+    $this->actingAs($user)->patch("/admin/projects/{$project->id}/status", ['status' => 'completed'])->assertForbidden();
 
     expect($project->fresh()->status)->toBe(ProjectStatus::Submitted);
 });

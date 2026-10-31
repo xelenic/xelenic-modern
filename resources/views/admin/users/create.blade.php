@@ -1,4 +1,4 @@
-<x-layouts.app title="New user">
+<x-layouts.admin title="New user">
     <div class="max-w-3xl">
         <x-card title="Account details" description="They can change their name, email and password later from their profile.">
             <form method="POST" action="{{ route('admin.users.store') }}">
@@ -13,4 +13,4 @@
             </form>
         </x-card>
     </div>
-</x-layouts.app>
+</x-layouts.admin>

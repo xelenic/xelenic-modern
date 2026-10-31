@@ -27,6 +27,15 @@
     renderer.setPixelRatio(dpr);
     if ('outputEncoding' in renderer) renderer.outputEncoding = THREE.sRGBEncoding;
 
+    // Most of the robot's cost is the pixels it shades, so on a machine that
+    // can't keep up it draws fewer of them.
+    let pixelRatio = dpr;
+    const watchFrames = window.XelenicFrameBudget(() => {
+      if (pixelRatio <= 1) return;
+      pixelRatio = Math.max(1, pixelRatio - 0.5);
+      renderer.setPixelRatio(pixelRatio);
+    });
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
 
@@ -734,7 +743,19 @@
       // The robot takes over the "Why Xelenic" spot from the flat CSS orbit.
       if (whySpot) whySpot.classList.add('has-robot');
       layout();
+      prepareOrbit();
       canvas.style.opacity = '1';
+    }
+
+    // The orbit's shaders and label textures would otherwise be built the first
+    // time it opens, freezing the page for about a second in the middle of a
+    // scroll. Do it now, while the canvas is still hidden.
+    function prepareOrbit() {
+      orbit.group.visible = true;
+      renderer.compile(scene, camera);
+      orbit.rings.forEach((r) => renderer.initTexture(r.texture));
+      renderer.render(scene, camera);
+      orbit.group.visible = false;
     }
 
     function onModelError(err) {
@@ -742,11 +763,12 @@
       canvas.style.display = 'none';
     }
 
-    // Served over http(s), the model is fetched as plain glTF + binary (smaller
-    // and cacheable). Opened straight from disk, browsers block that fetch,
-    // so only then is the base64-embedded copy in robot-model-data.js loaded
-    // and parsed in memory instead. A page served from somewhere other than
-    // this folder (the Laravel view) sets XELENIC_ASSET_BASE to find it.
+    // Served over http(s), the model is fetched as one binary file (smaller
+    // and cacheable; scripts/optimize-robot-model.mjs builds it). Opened
+    // straight from disk, browsers block that fetch, so only then is the
+    // base64-embedded copy in robot-model-data.js loaded and parsed in memory
+    // instead. A page served from somewhere other than this folder (the
+    // Laravel view) sets XELENIC_ASSET_BASE to find it.
     const assetBase = window.XELENIC_ASSET_BASE || 'assets/';
     function parseEmbedded() {
       new THREE.GLTFLoader().parse(
@@ -765,8 +787,9 @@
       script.onerror = onModelError;
       document.body.appendChild(script);
     } else {
-      new THREE.GLTFLoader().load(
-        assetBase + 'cute_robot_gltf/scene.gltf',
+      // robot.glb is meshopt-compressed, so it needs the decoder to be read.
+      new THREE.GLTFLoader().setMeshoptDecoder(window.MeshoptDecoder).load(
+        assetBase + 'robot/robot.glb',
         onModelLoaded,
         undefined,
         onModelError
@@ -1004,6 +1027,7 @@
       const top = pose.y - window.scrollY;
       if (top > window.innerHeight || top + baseHeight * pose.s < 0) return;
       renderer.render(scene, camera);
+      watchFrames(frameTime);
     }
     requestAnimationFrame(animate);
   }

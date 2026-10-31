@@ -5,7 +5,7 @@
   // up into view, floats gently while idle, tilts toward the cursor and
   // pops forward on hover (via CSS variables read by style.css), and each
   // card's icon is a small animated three.js object that spins up while
-  // hovered.
+  // hovered. If the page starts to lag they give all of that up and lie flat.
 
   const cards = Array.from(document.querySelectorAll('.solution-card'));
   if (!cards.length) return;
@@ -31,6 +31,7 @@
     pop: 0,
     enter: 1,
     enterAt: Infinity, // when the entrance flip may start
+    raised: false,
     written: '',
     icon: null, // 3D icon, when WebGL is available
     visible: !('IntersectionObserver' in window),
@@ -115,6 +116,11 @@
     states.forEach((s) => {
       s.card.addEventListener('pointermove', (e) => {
         if (e.pointerType !== 'mouse') return;
+        if (!s.hover) {
+          s.hover = true;
+          s.card.classList.add('is-active');
+        }
+        if (flat) return;
         // The card itself never tilts (its inner face does), so its rect is
         // a stable frame of reference.
         const r = s.card.getBoundingClientRect();
@@ -122,10 +128,6 @@
         s.py = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
         s.card.style.setProperty('--mx', (s.px * 100).toFixed(1) + '%');
         s.card.style.setProperty('--my', (s.py * 100).toFixed(1) + '%');
-        if (!s.hover) {
-          s.hover = true;
-          s.card.classList.add('is-active');
-        }
       });
       s.card.addEventListener('pointerleave', () => {
         s.hover = false;
@@ -154,6 +156,14 @@
     if (!s.hover && s.pop < 0.002) s.pop = 0;
     if (s.enter < 1 && now >= s.enterAt) {
       s.enter = easeOutCubic(Math.min(1, (now - s.enterAt) / ENTER_MS));
+    }
+
+    // The slab and floating layers only read when a card leans well over, so
+    // the rest of the time it's one flat layer (see .is-raised in style.css).
+    const raised = s.hover || s.pop > 0.01 || (s.enter > 0 && s.enter < 1);
+    if (raised !== s.raised) {
+      s.raised = raised;
+      s.card.classList.toggle('is-raised', raised);
     }
 
     // Written at a resolution just below what's visible (0.1deg of tilt is
@@ -270,6 +280,18 @@
           ctx.clearRect(0, 0, size, size);
           ctx.drawImage(renderer.domElement, 0, 0, size, size);
         }
+      },
+      // Back to the SVG icons, and the WebGL context back to the browser.
+      dispose() {
+        states.forEach((s) => {
+          if (!s.icon) return;
+          const tile = s.card.querySelector('.card-icon');
+          tile.querySelector('.card-3d').remove();
+          tile.classList.remove('has-3d');
+          s.icon = null;
+        });
+        renderer.dispose();
+        renderer.forceContextLoss();
       },
     };
   }
@@ -486,6 +508,7 @@
 
   let icons = null;
   let iconsTried = false;
+  let flat = false;
   function ensureIcons() {
     if (iconsTried) return;
     iconsTried = true;
@@ -497,10 +520,36 @@
 
   if (reduceMotion) return;
 
+  // When the page lags the cards lie flat for the rest of the visit. It's a small
+  // loss, so it doesn't take much: a couple of seconds under about 35 frames a
+  // second, scrolling included, since that's when lag is felt. The watch covers
+  // the whole page, so a slow machine has flat cards before it reaches them.
+  function goFlat() {
+    flat = true;
+    iconsTried = true; // if they aren't built yet, they never will be
+    if (icons) icons.dispose();
+    icons = null;
+    states.forEach((s) => {
+      s.card.classList.remove('is-raised');
+      s.card.classList.add('is-flat');
+      s.card.style.setProperty('--pop', '0');
+      s.card.style.setProperty('--enter', '1');
+    });
+  }
+  const watchFrames = window.XelenicFrameBudget(goFlat, {
+    frames: 60,
+    slowMs: 28,
+    strikesAllowed: 1,
+    whileScrolling: true,
+  });
+  const watchFrom = performance.now() + 3000; // starting up isn't lagging
+
   let time = 0;
   let last = null;
   let frame = 0;
   function tick(now) {
+    if (now > watchFrom) watchFrames(now);
+    if (flat) return;
     requestAnimationFrame(tick);
     // A frame's timestamp can predate this script's start, so never let
     // the step go negative (it would fling the easing) or jump after a stall.

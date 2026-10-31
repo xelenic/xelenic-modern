@@ -20,6 +20,7 @@ class RolesAndPermissionsSeeder extends Seeder
         'delete users',
         'manage roles',
         'manage projects',
+        'manage clients',
     ];
 
     /**

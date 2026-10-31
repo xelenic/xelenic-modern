@@ -76,6 +76,8 @@
         copy.setAttribute('data-clone', '');
         copy.setAttribute('aria-hidden', 'true');
         copy.querySelectorAll('img').forEach((img) => { img.alt = ''; });
+        // Copies still link to the story, but only the originals take focus.
+        copy.querySelectorAll('a').forEach((link) => { link.tabIndex = -1; });
         s.row.appendChild(copy);
       });
       width += s.period;

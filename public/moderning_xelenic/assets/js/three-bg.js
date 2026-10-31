@@ -22,12 +22,13 @@
     const LINK_DISTANCE = 4.4;
 
     // This full-screen layer of faint dots and hairlines is the largest
-    // canvas on the page, so it renders at no more than 1.5x density and
-    // skips multisampling on high-density screens — at 2x with MSAA it
+    // canvas on the page, so it renders at no more than 1.5x density, with no
+    // multisampling, and asks for the low-power GPU — at 2x with MSAA it
     // shaded ~5M pixels a frame on a retina laptop for a barely-there effect.
     const dpr = window.devicePixelRatio || 1;
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: dpr < 2 });
-    renderer.setPixelRatio(Math.min(dpr, 1.5));
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'low-power' });
+    let pixelRatio = Math.min(dpr, 1.5);
+    renderer.setPixelRatio(pixelRatio);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
@@ -86,25 +87,27 @@
       camera.aspect = innerWidth / innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(innerWidth, innerHeight);
+      // Nothing moves with reduced motion, so this is the only time it draws.
+      if (reduceMotion) renderer.render(scene, camera);
     }
     resize();
     window.addEventListener('resize', resize);
+    if (reduceMotion) return;
 
     // --- Mouse parallax tilt (subtle, independent of scroll rotation) -------
     let mouseX = 0;
     let mouseY = 0;
-    if (!reduceMotion) {
-      window.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
-        mouseY = (e.clientY / window.innerHeight - 0.5) * 0.4;
-      });
-    }
+    window.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 0.4;
+    }, { passive: true });
 
     // --- Scroll-driven rotation via GSAP ScrollTrigger ----------------------
     // Y-axis rotation is owned entirely by scroll progress through the page;
     // idle animation below only ever touches Z, so the two never fight.
-    if (window.gsap && window.ScrollTrigger && !reduceMotion) {
-      window.gsap.to(group.rotation, {
+    let scrollSpin = null;
+    if (window.gsap && window.ScrollTrigger) {
+      scrollSpin = window.gsap.to(group.rotation, {
         y: Math.PI * 1.4,
         ease: 'none',
         scrollTrigger: {
@@ -117,17 +120,54 @@
     }
 
     // --- Render loop ---------------------------------------------------------
-    function animate() {
-      requestAnimationFrame(animate);
+    // Left alone the motion is slow and faint, so 30 frames a second look the
+    // same as 60 for half the work. (The small allowance keeps a 60Hz screen on
+    // every second frame instead of drifting.) Scrolling spins the field fast
+    // enough to see it step, so while it's spinning every frame is drawn. It
+    // all runs on the clock, so the speed is the same at any refresh rate.
+    const FRAME_MS = 1000 / 30 - 4;
+    const SPINNING = 0.0002; // radians since the last frame
+    let lastDraw = null;
+    let lastSpin = group.rotation.y;
+    let stopped = false;
 
-      if (!reduceMotion) {
-        group.rotation.z += 0.0007;
-        group.rotation.x += (0.35 + mouseY - group.rotation.x) * 0.02;
-        group.position.x += (mouseX * 1.5 - group.position.x) * 0.02;
+    // On a machine that can't keep up this decorative layer gives way first:
+    // lower density, then gone, leaving the page and the robot the GPU.
+    const watchFrames = window.XelenicFrameBudget(() => {
+      if (pixelRatio > 1) {
+        pixelRatio = 1;
+        renderer.setPixelRatio(pixelRatio);
+        return;
       }
+      stopped = true;
+      if (scrollSpin) {
+        scrollSpin.scrollTrigger.kill();
+        scrollSpin.kill();
+      }
+      window.removeEventListener('resize', resize);
+      canvas.style.display = 'none';
+      renderer.dispose();
+    });
+
+    function animate(now) {
+      if (stopped) return;
+      requestAnimationFrame(animate);
+      // Every browser frame counts, not just the ones drawn here: frames this
+      // layer skips on purpose say nothing about how the machine is coping.
+      watchFrames(now);
+      const spinning = Math.abs(group.rotation.y - lastSpin) > SPINNING;
+      lastSpin = group.rotation.y;
+      if (!spinning && lastDraw !== null && now - lastDraw < FRAME_MS) return;
+
+      const dt = lastDraw === null ? 0 : Math.min(0.1, (now - lastDraw) / 1000);
+      lastDraw = now;
+      const ease = 1 - Math.pow(0.98, dt * 60);
+      group.rotation.z += 0.042 * dt;
+      group.rotation.x += (0.35 + mouseY - group.rotation.x) * ease;
+      group.position.x += (mouseX * 1.5 - group.position.x) * ease;
 
       renderer.render(scene, camera);
     }
-    animate();
+    requestAnimationFrame(animate);
   }
 })();

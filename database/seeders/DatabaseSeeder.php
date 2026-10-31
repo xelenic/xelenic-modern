@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RolesAndPermissionsSeeder::class);
+        $this->call(ClientSeeder::class);
 
         // One demo account per role for local development, all with the
         // password "password". Never seeded outside the local environment.

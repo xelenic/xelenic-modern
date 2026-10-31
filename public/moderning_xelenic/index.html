@@ -966,6 +966,7 @@
         'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js',
         'https://unpkg.com/three@0.144.0/build/three.min.js',
         'https://unpkg.com/three@0.144.0/examples/js/loaders/GLTFLoader.js',
+        'https://unpkg.com/three@0.144.0/examples/js/libs/meshopt_decoder.js',
       ];
       var scripts = (lite ? [] : full).concat([
         'assets/js/main.js',
@@ -975,6 +976,7 @@
         'assets/js/clients.js',
         'assets/js/logo-art.js',
       ], lite ? [] : [
+        'assets/js/frame-budget.js',
         'assets/js/three-bg.js',
         'assets/js/robot-sound.js',
       ], [

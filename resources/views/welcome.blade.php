@@ -14,13 +14,34 @@
   <script>
     // Phones (narrow screens, or touch screens held sideways) get the "lite"
     // page: no 3D and no scroll-driven animation, just the clean responsive
-    // layout with gentle 2D motion. Decided once, before anything renders.
+    // layout with gentle 2D motion. So do visitors saving data and devices
+    // with very little memory. Decided once, before anything renders.
     (function () {
+      var lite = false;
       try {
-        if (window.matchMedia('(max-width: 720px), (pointer: coarse) and (max-height: 500px)').matches) {
-          document.documentElement.classList.add('is-lite');
-        }
+        var connection = navigator.connection;
+        lite = window.matchMedia('(max-width: 720px), (pointer: coarse) and (max-height: 500px)').matches
+          || Boolean(connection && connection.saveData)
+          || (navigator.deviceMemory !== undefined && navigator.deviceMemory <= 2);
       } catch (err) { /* very old browser: full page */ }
+
+      if (lite) {
+        document.documentElement.classList.add('is-lite');
+        return;
+      }
+
+      // The full page needs the 3D libraries and the robot, so start on them
+      // now rather than when the end of the page is reached.
+      function hint(rel, href, attributes) {
+        var link = document.createElement('link');
+        link.rel = rel;
+        link.href = href;
+        Object.keys(attributes || {}).forEach(function (name) { link.setAttribute(name, attributes[name]); });
+        document.head.appendChild(link);
+      }
+      hint('preconnect', 'https://unpkg.com', { crossorigin: '' });
+      hint('preconnect', 'https://cdnjs.cloudflare.com', { crossorigin: '' });
+      hint('preload', @json(asset('moderning_xelenic/assets/robot/robot.glb')), { as: 'fetch', crossorigin: '' });
     })();
   </script>
 </head>
@@ -81,6 +102,7 @@
         'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js',
         'https://unpkg.com/three@0.144.0/build/three.min.js',
         'https://unpkg.com/three@0.144.0/examples/js/loaders/GLTFLoader.js',
+        'https://unpkg.com/three@0.144.0/examples/js/libs/meshopt_decoder.js',
       ];
       var scripts = (lite ? [] : full).concat([
         base + 'js/main.js',
@@ -90,6 +112,7 @@
         base + 'js/clients.js',
         base + 'js/logo-art.js',
       ], lite ? [] : [
+        base + 'js/frame-budget.js',
         base + 'js/three-bg.js',
         base + 'js/robot-sound.js',
       ], [

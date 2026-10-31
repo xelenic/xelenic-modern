@@ -11,29 +11,18 @@ use App\Support\KioskSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
     /**
-     * The signed-in user's projects. People who can manage projects can
-     * switch to everyone's with ?scope=all.
+     * The signed-in user's projects. Everyone's are in the admin panel
+     * (Admin\ProjectController).
      */
     public function index(Request $request): View
     {
-        $showAll = $request->query('scope') === 'all' && $request->user()->can('manage projects');
-
-        $projects = Project::query()
-            ->unless($showAll, fn ($query) => $query->whereBelongsTo($request->user()))
-            ->with('user')
-            ->latest()
-            ->paginate(12)
-            ->withQueryString();
-
         return view('projects.index', [
-            'projects' => $projects,
-            'showAll' => $showAll,
+            'projects' => $request->user()->projects()->latest()->paginate(12),
         ]);
     }
 
@@ -66,7 +55,9 @@ class ProjectController extends Controller
             }
         }
 
-        return view('projects.form', [
+        // Kiosk projects finish in two more steps (projects.kiosk-form); the
+        // rest fill in one page.
+        return view($type === ProjectType::KioskApp ? 'projects.kiosk-form' : 'projects.form', [
             'type' => $type,
             'machine' => $machine,
             'kioskSettings' => $type === ProjectType::KioskApp ? KioskSettings::defaults($machine) : null,
@@ -86,32 +77,17 @@ class ProjectController extends Controller
             ->with('success', "Thanks! We've received your {$project->type->label()} project and will be in touch soon.");
     }
 
+    /**
+     * A client's own project. The Xelenic team opens projects from the
+     * admin panel instead.
+     */
     public function show(Request $request, Project $project): View
     {
-        $isOwner = $project->user()->is($request->user());
-
-        abort_unless($isOwner || $request->user()->can('manage projects'), 403);
+        abort_unless($project->user()->is($request->user()), 403);
 
         return view('projects.show', [
-            'project' => $project->load('user'),
-            'isOwner' => $isOwner,
-            'statuses' => ProjectStatus::options(),
+            'project' => $project,
         ]);
-    }
-
-    /**
-     * Move a project along (route requires the "manage projects" permission).
-     */
-    public function updateStatus(Request $request, Project $project): RedirectResponse
-    {
-        $validated = $request->validate([
-            'status' => ['required', Rule::enum(ProjectStatus::class)],
-        ]);
-
-        $project->update($validated);
-
-        return to_route('projects.show', $project)
-            ->with('success', "The project is now {$project->status->label()}.");
     }
 
     /**

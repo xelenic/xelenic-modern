@@ -60,6 +60,8 @@
   });
 
   let geom = null;
+  const pointCache = new Map();
+  let roadOffset = Infinity; // the dash offset last written to the road
 
   // Position relative to the story box (layout offsets; ignores transforms).
   function offsetIn(el) {
@@ -127,6 +129,8 @@
     const total = ghost.getTotalLength();
     [maskPath, ...layers].forEach((path) => path.setAttribute('d', d));
     maskPath.style.strokeDasharray = `${total} ${total}`;
+    pointCache.clear();
+    roadOffset = Infinity;
 
     // Flags stand beside the road, on the card's side of the robot.
     points.forEach((p, i) => {
@@ -150,6 +154,27 @@
       })),
     };
     update();
+  }
+
+  // A point along the road. getPointAtLength walks the whole path each time
+  // and this runs several times a frame while scrolling, so answers are kept on
+  // a 4px grid (layout() clears them) and blended, which is just as smooth.
+  const POINT_STEP = 4;
+  function gridPoint(index) {
+    let point = pointCache.get(index);
+    if (!point) {
+      const { x, y } = ghost.getPointAtLength(index * POINT_STEP);
+      point = { x, y };
+      pointCache.set(index, point);
+    }
+    return point;
+  }
+  function pointAt(length) {
+    const index = Math.floor(length / POINT_STEP);
+    const t = length / POINT_STEP - index;
+    const a = gridPoint(index);
+    const b = gridPoint(index + 1);
+    return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t) };
   }
 
   // Where along the road the robot is for a scroll position. Between two
@@ -177,8 +202,8 @@
       index = i + walk;
       dwell = 1 - Math.sin(Math.PI * walk);
     }
-    const p = ghost.getPointAtLength(length);
-    const q = ghost.getPointAtLength(Math.min(geom.total, length + 6));
+    const p = pointAt(length);
+    const q = pointAt(Math.min(geom.total, length + 6));
     return {
       x: geom.left + p.x,
       y: geom.top + p.y,
@@ -195,6 +220,7 @@
     if (!geom) return;
     const scrollY = window.scrollY;
     const s = geom.stops;
+    const at = travel(scrollY);
     let drawn;
     if (still) {
       drawn = geom.total;
@@ -203,11 +229,15 @@
       const vh = window.innerHeight;
       drawn = s[0].length * clamp01((scrollY - (s[0].scroll - vh * 0.6)) / (vh * 0.6));
     } else {
-      drawn = travel(scrollY).length + LEAD;
+      drawn = at.length + LEAD;
     }
-    maskPath.style.strokeDashoffset = String(geom.total - Math.min(geom.total, drawn));
+    // Writing this repaints the road, so only when it has actually grown.
+    const offset = geom.total - Math.min(geom.total, drawn);
+    if (Math.abs(offset - roadOffset) >= 0.5) {
+      roadOffset = offset;
+      maskPath.style.strokeDashoffset = String(offset);
+    }
 
-    const at = travel(scrollY);
     steps.forEach((step, i) => {
       const reached = still || drawn >= s[i].length - 2;
       const active = !lite && reached && Math.round(at.index) === i && at.dwell > 0.5;

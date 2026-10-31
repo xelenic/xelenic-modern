@@ -29,7 +29,7 @@
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Solution cards: frosted glass face, pointer glare strength, depth shadow */
-  --card-glass: linear-gradient(160deg, rgba(24, 28, 42, 0.72), rgba(12, 15, 26, 0.52));
+  --card-glass: linear-gradient(160deg, rgba(24, 28, 42, 0.95), rgba(12, 15, 26, 0.89));
   --card-glare: 0.14;
   --card-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.7);
   --card-shadow-active: 0 44px 70px -30px rgba(0, 0, 0, 0.85);
@@ -96,7 +96,7 @@
     --text-dim: #4d5266;
     --text-faint: #8489a0;
     --shadow-glow: 0 0 0 1px rgba(10,14,30,0.05), 0 20px 60px rgba(20,20,40,0.08);
-    --card-glass: linear-gradient(160deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.4));
+    --card-glass: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
     --card-glare: 0.9;
     --card-shadow: 0 18px 40px -24px rgba(20, 20, 40, 0.2);
     --card-shadow-active: 0 44px 70px -30px rgba(20, 20, 40, 0.3);
@@ -214,32 +214,43 @@ section { position: relative; z-index: 1; padding: 110px 0; }
   pointer-events: none;
 }
 
+/* Soft glows, painted once as gradients that follow the falloff of a 100px
+   blur. A real filter: blur() would be recomputed on every frame they move,
+   for layers this size the most expensive thing on the page. Each box is 440px
+   larger than the glow's solid disc, to hold the falloff. */
 .blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
-  background: var(--accent);
+  background: radial-gradient(
+    closest-side,
+    rgba(var(--accent-rgb), 0.97),
+    rgba(var(--accent-rgb), 0.84) 33%,
+    rgba(var(--accent-rgb), 0.5) 54%,
+    rgba(var(--accent-rgb), 0.16) 75%,
+    rgba(var(--accent-rgb), 0.02) 96%,
+    rgba(var(--accent-rgb), 0)
+  );
   opacity: 0.16;
   will-change: transform;
 }
 
 .blob-1 {
-  width: 520px; height: 520px;
-  top: -160px; left: -120px;
+  width: 960px; height: 960px;
+  top: -380px; left: -340px;
   opacity: 0.14;
   animation: float1 22s ease-in-out infinite;
 }
 
 .blob-2 {
-  width: 480px; height: 480px;
-  top: 34%; right: -180px;
+  width: 920px; height: 920px;
+  top: calc(34% - 220px); right: -400px;
   opacity: 0.1;
   animation: float2 26s ease-in-out infinite;
 }
 
 .blob-3 {
-  width: 420px; height: 420px;
-  bottom: -160px; left: 28%;
+  width: 860px; height: 860px;
+  bottom: -380px; left: calc(28% - 220px);
   opacity: 0.08;
   animation: float1 30s ease-in-out infinite reverse;
 }
@@ -267,6 +278,17 @@ section { position: relative; z-index: 1; padding: 110px 0; }
 @media (prefers-color-scheme: light) {
   #bg-canvas { opacity: 0.32; }
 }
+
+/* Sections scrolled out of view stop their CSS animations (main.js sets this).
+   Many are on SVG shapes, which redo style and layout on every frame even when
+   nobody can see them, so they would otherwise pile up as you scroll. Their
+   decoration is hidden too, which hands its GPU layers back: a section keeps
+   them once it's been revealed, so the page got slower with every pass. Only
+   decoration, because hidden text and links can't be tabbed to or searched. */
+.is-paused *,
+.is-paused *::before,
+.is-paused *::after { animation-play-state: paused !important; }
+.is-paused [aria-hidden="true"] { visibility: hidden; }
 
 .grid-overlay {
   position: absolute;
@@ -339,13 +361,12 @@ section { position: relative; z-index: 1; padding: 110px 0; }
 
 .site-header.scrolled {
   padding: 12px 0;
-  background: rgba(5, 7, 13, 0.72);
-  backdrop-filter: blur(16px) saturate(140%);
+  background: rgba(5, 7, 13, 0.94);
   border-bottom: 1px solid var(--border);
 }
 
 @media (prefers-color-scheme: light) {
-  .site-header.scrolled { background: rgba(255, 255, 255, 0.78); }
+  .site-header.scrolled { background: rgba(255, 255, 255, 0.95); }
 }
 
 .navbar {
@@ -720,9 +741,11 @@ section { position: relative; z-index: 1; padding: 110px 0; }
   transform: translateY(calc(var(--pop) * -8px)) rotateX(var(--rx)) rotateY(var(--ry));
   transition: border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
 }
-/* Frosted glass face with a glare at the pointer and a faint accent glow in
-   the corner. It's on a pseudo-element so the blur doesn't flatten the
-   cube's 3D, and the robot shows through it softly as it flies past. */
+/* Glass face with a glare at the pointer and a faint accent glow in the
+   corner, on a pseudo-element so it stays behind the cube's 3D. It's nearly
+   opaque instead of blurring what's behind it (a live backdrop blur was the
+   heaviest thing on the page to scroll past), and the robot still shows
+   through it faintly as it flies past. */
 .value-card::before {
   content: '';
   position: absolute;
@@ -732,8 +755,6 @@ section { position: relative; z-index: 1; padding: 110px 0; }
     radial-gradient(240px circle at var(--mx) var(--my), rgba(255, 255, 255, calc(var(--pop) * var(--card-glare))), transparent 65%),
     radial-gradient(150px circle at 100% 0%, rgba(var(--accent-rgb), 0.16), transparent 70%),
     var(--card-glass);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  backdrop-filter: blur(14px) saturate(150%);
   pointer-events: none;
 }
 /* Accent edge light that tracks the pointer along the border */
@@ -942,17 +963,21 @@ section { position: relative; z-index: 1; padding: 110px 0; }
     translateY(calc(var(--pop) * -12px + (1 - var(--enter)) * 60px))
     rotateX(calc(var(--rx) + (1 - var(--enter)) * 42deg))
     rotateY(var(--ry));
-  transform-style: preserve-3d;
   box-shadow: var(--card-shadow);
   transition: box-shadow 0.5s var(--ease);
 }
+/* A card only comes apart into 3D layers while it's flipping in or hovered
+   (solution-cards.js sets this). At rest they'd all lie flat on the face, as
+   dozens of GPU layers per card for nothing to see. */
+.solution-card.is-raised .card-inner { transform-style: preserve-3d; }
 .solution-card.is-active .card-inner {
   box-shadow: var(--card-shadow-active), 0 26px 60px -34px rgba(var(--accent-rgb), 0.6);
 }
 
-/* Frosted glass face with a soft glare that follows the pointer. It's on a
-   pseudo-element so the blur doesn't flatten the card's 3D layers, and the
-   hero robot shows through it, blurred, as it moves behind the cards. */
+/* Glass face with a soft glare that follows the pointer, on a pseudo-element
+   so it stays behind the card's 3D layers. It's nearly opaque instead of
+   blurring what's behind it (see .value-card::before), and the hero robot
+   still shows through it faintly as it moves behind the cards. */
 .card-inner::before {
   content: '';
   position: absolute;
@@ -965,11 +990,31 @@ section { position: relative; z-index: 1; padding: 110px 0; }
     radial-gradient(circle at 100% 0%, rgba(var(--accent-rgb), 0.16), transparent 42%),
     var(--card-glass);
   box-shadow: inset 0 1px 0 var(--card-highlight);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  backdrop-filter: blur(14px) saturate(150%);
   transition: border-color 0.5s var(--ease);
 }
-.solution-card.is-active .card-inner::before { border-color: rgba(var(--accent-rgb), 0.3); }
+/* The robot comes to stand behind a hovered card, so that one card gets a real
+   blur, which melts the robot into a soft glow. One small card can afford it. */
+.solution-card.is-active .card-inner::before {
+  border-color: rgba(var(--accent-rgb), 0.3);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+}
+
+/* When the page lags (solution-cards.js) the cards lie flat: a plain, solid face
+   with no depth, tilt or blur, and just a small lift on hover. */
+.solution-card.is-flat {
+  --card-glass: var(--bg-alt);
+  perspective: none;
+}
+.solution-card.is-flat .card-inner {
+  transform: none;
+  transition: box-shadow 0.5s var(--ease), transform 0.3s var(--ease);
+}
+.solution-card.is-flat.is-active .card-inner { transform: translateY(-4px); }
+.solution-card.is-flat.is-active .card-inner::before {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
 
 /* Accent edge light that tracks the pointer along the border */
 .card-inner::after {
@@ -986,21 +1031,24 @@ section { position: relative; z-index: 1; padding: 110px 0; }
   pointer-events: none;
 }
 
-/* Content floats forward in layers as the card pops */
-.card-inner > * { transform: translateZ(calc(var(--pop) * 20px)); }
-.card-inner > .card-icon { transform: translateZ(calc(var(--pop) * 60px)); }
-.card-inner > h3 { transform: translateZ(calc(var(--pop) * 36px)); }
+/* Content floats forward in layers as the card pops. It's positioned so it
+   always paints above the face, with or without a transform. */
+.card-inner > * { position: relative; }
+.is-raised .card-inner > * { transform: translateZ(calc(var(--pop) * 20px)); }
+.is-raised .card-inner > .card-icon { transform: translateZ(calc(var(--pop) * 60px)); }
+.is-raised .card-inner > h3 { transform: translateZ(calc(var(--pop) * 36px)); }
 
 /* Card thickness: stacked outline layers behind the face (added by
    solution-cards.js) read as a solid glass slab edge as the card tilts. */
 .card-inner > .card-slab {
+  display: none;
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  transform: none;
   transform-style: preserve-3d;
   pointer-events: none;
 }
+.is-raised .card-inner > .card-slab { display: block; transform: none; }
 .card-slab > i {
   position: absolute;
   inset: 0;
@@ -1020,11 +1068,11 @@ section { position: relative; z-index: 1; padding: 110px 0; }
   letter-spacing: -0.02em;
   color: transparent;
   -webkit-text-stroke: 1px rgba(var(--accent-rgb), 0.35);
-  transform: translateZ(calc(var(--pop) * 28px));
   transition: -webkit-text-stroke-color 0.5s var(--ease);
   pointer-events: none;
   user-select: none;
 }
+.is-raised .card-inner > .card-index { transform: translateZ(calc(var(--pop) * 28px)); }
 .solution-card.is-active .card-index { -webkit-text-stroke-color: rgba(var(--accent-rgb), 0.85); }
 
 .card-icon {
@@ -1197,20 +1245,21 @@ section { position: relative; z-index: 1; padding: 110px 0; }
 }
 
 /* Sky, sun/moon, stars and drifting clouds — a full-width backdrop for the
-   whole section that fades softly into the page at its top and bottom. */
+   whole section. The sky's own gradient fades softly into the page at its top
+   and bottom: a mask here would be recomputed for this whole section on every
+   frame the clouds move. */
 .story-world {
+  --world-fade: 140px;
   position: absolute;
   inset: 0;
   z-index: -1;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--toon-sky-1), var(--toon-sky-2));
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 140px, #000 calc(100% - 140px), transparent);
-  mask-image: linear-gradient(180deg, transparent, #000 140px, #000 calc(100% - 140px), transparent);
+  background: linear-gradient(180deg, transparent, var(--toon-sky-1) var(--world-fade), var(--toon-sky-2) calc(100% - var(--world-fade)), transparent);
 }
 .story-world::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: var(--world-fade) 0;
   background-image:
     radial-gradient(1.5px 1.5px at 20px 30px, rgba(255, 244, 214, 0.9), transparent),
     radial-gradient(1px 1px at 90px 80px, rgba(255, 244, 214, 0.7), transparent),
@@ -2115,10 +2164,7 @@ section { position: relative; z-index: 1; padding: 110px 0; }
   .solutions-grid { grid-template-columns: 1fr; }
   .story-card { padding: 28px 22px 24px 26px; }
 
-  .story-world {
-    -webkit-mask-image: linear-gradient(180deg, transparent, #000 60px, #000 calc(100% - 60px), transparent);
-    mask-image: linear-gradient(180deg, transparent, #000 60px, #000 calc(100% - 60px), transparent);
-  }
+  .story-world { --world-fade: 60px; }
   .story-sun { top: 36px; right: 16px; width: 54px; height: 54px; }
   .story-cloud.c1 { display: none; }
   .solutions-field { display: none; }

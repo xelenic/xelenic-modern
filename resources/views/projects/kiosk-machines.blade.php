@@ -1,14 +1,10 @@
-{{-- Step 1 of a Kiosk App project: pick the hardware. --}}
+{{-- Kiosk App step 2: pick the hardware. --}}
 <x-layouts.app title="Create project">
     <div class="max-w-6xl">
-        <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900">
-            <x-icon name="arrow-right" class="size-4 rotate-180" />
-            All project types
-        </a>
+        @include('projects.kiosk.steps', ['current' => 2])
 
-        <div class="mt-4 mb-8">
-            <p class="text-sm font-medium text-blue-600">{{ $type->label() }} · Step 1 of 2</p>
-            <h2 class="mt-1 font-display text-2xl font-semibold text-slate-900">Which kiosk machine do you need?</h2>
+        <div class="mt-8 mb-8">
+            <h2 class="font-display text-2xl font-semibold text-slate-900">Which kiosk machine do you need?</h2>
             <p class="mt-2 text-slate-500">Pick the hardware that fits your space. You'll tell us about the software next.</p>
         </div>
 

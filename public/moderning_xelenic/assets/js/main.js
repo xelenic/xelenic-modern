@@ -5,6 +5,15 @@
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  // Rest the sections out of view (see .is-paused in style.css), waking them
+  // well ahead of arrival so they're already moving when they come into view.
+  if ('IntersectionObserver' in window) {
+    const sections = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => entry.target.classList.toggle('is-paused', !entry.isIntersecting));
+    }, { rootMargin: '50% 0px' });
+    document.querySelectorAll('main > section, .site-footer').forEach((section) => sections.observe(section));
+  }
+
   // Header shrink + back-to-top visibility on scroll
   const header = document.getElementById('siteHeader');
   const backToTop = document.getElementById('backToTop');
