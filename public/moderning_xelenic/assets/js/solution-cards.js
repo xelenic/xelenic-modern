@@ -520,10 +520,8 @@
 
   if (reduceMotion) return;
 
-  // When the page lags the cards lie flat for the rest of the visit. It's a small
-  // loss, so it doesn't take much: a couple of seconds under about 35 frames a
-  // second, scrolling included, since that's when lag is felt. The watch covers
-  // the whole page, so a slow machine has flat cards before it reaches them.
+  // When the page lags the cards lie flat for the rest of the visit. The watch
+  // covers the whole page, so a slow machine has flat cards before it reaches them.
   function goFlat() {
     flat = true;
     iconsTried = true; // if they aren't built yet, they never will be
@@ -536,19 +534,13 @@
       s.card.style.setProperty('--enter', '1');
     });
   }
-  const watchFrames = window.XelenicFrameBudget(goFlat, {
-    frames: 60,
-    slowMs: 28,
-    strikesAllowed: 1,
-    whileScrolling: true,
-  });
-  const watchFrom = performance.now() + 3000; // starting up isn't lagging
+  const watchFrames = window.XelenicFrameBudget(goFlat, window.XelenicFrameBudget.QUICK);
 
   let time = 0;
   let last = null;
   let frame = 0;
   function tick(now) {
-    if (now > watchFrom) watchFrames(now);
+    watchFrames(now);
     if (flat) return;
     requestAnimationFrame(tick);
     // A frame's timestamp can predate this script's start, so never let

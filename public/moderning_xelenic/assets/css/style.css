@@ -154,6 +154,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+/* Lenis takes over while it runs (smooth-scroll.js); smoothing its every move
+   a second time would leave the page trailing behind it. */
+html.lenis { scroll-behavior: auto; }
 
 body {
   background: var(--bg);

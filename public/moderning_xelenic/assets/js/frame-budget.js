@@ -24,13 +24,16 @@
     slowMs = SLOW_MS,
     strikesAllowed = STRIKES,
     whileScrolling = false,
+    graceMs = 0,
   } = {}) => {
+    const from = performance.now() + graceMs;
     let last = null;
     let total = 0;
     let count = 0;
     let strikes = 0;
 
     return (now) => {
+      if (now < from) return;
       const gap = last === null ? Infinity : now - last;
       last = now;
       if (gap >= IGNORE_GAPS_OVER_MS) return;
@@ -47,5 +50,16 @@
         onSlow();
       }
     };
+  };
+
+  // For what's cheap to give up: a couple of seconds under about 35 frames a
+  // second, once the page has started up, and scrolling counts because that's
+  // when lag is felt.
+  window.XelenicFrameBudget.QUICK = {
+    frames: 60,
+    slowMs: 28,
+    strikesAllowed: 1,
+    whileScrolling: true,
+    graceMs: 3000,
   };
 })();

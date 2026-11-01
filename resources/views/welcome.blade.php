@@ -103,8 +103,12 @@
         'https://unpkg.com/three@0.144.0/build/three.min.js',
         'https://unpkg.com/three@0.144.0/examples/js/loaders/GLTFLoader.js',
         'https://unpkg.com/three@0.144.0/examples/js/libs/meshopt_decoder.js',
+        'https://unpkg.com/lenis@1.3.27/dist/lenis.min.js',
       ];
-      var scripts = (lite ? [] : full).concat([
+      var scripts = (lite ? [] : full).concat(lite ? [] : [
+        base + 'js/frame-budget.js',
+        base + 'js/smooth-scroll.js',
+      ], [
         base + 'js/main.js',
       ], lite ? [] : [
         base + 'js/value-strip.js',
@@ -112,7 +116,6 @@
         base + 'js/clients.js',
         base + 'js/logo-art.js',
       ], lite ? [] : [
-        base + 'js/frame-budget.js',
         base + 'js/three-bg.js',
         base + 'js/robot-sound.js',
       ], [

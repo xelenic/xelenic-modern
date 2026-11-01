@@ -1,10 +1,10 @@
 <?php
 
-test('the home page loads the optimized robot, its decoder and the frame watcher before the 3D layers', function () {
+test('the home page loads the optimized robot, its decoder, the frame watcher and smooth scrolling before the animated layers', function () {
     $this->get('/')
         ->assertOk()
         ->assertSee('moderning_xelenic\/assets\/robot\/robot.glb', false)
-        ->assertSeeInOrder(["libs/meshopt_decoder.js'", "'js/frame-budget.js'", "'js/three-bg.js'", "'js/three-robot.js'", "'js/solution-cards.js'"], false);
+        ->assertSeeInOrder(["libs/meshopt_decoder.js'", "lenis@1.3.27/dist/lenis.min.js'", "'js/frame-budget.js'", "'js/smooth-scroll.js'", "'js/main.js'", "'js/three-bg.js'", "'js/three-robot.js'", "'js/solution-cards.js'"], false);
 });
 
 test('the robot model is a valid binary glTF that the page can decode', function () {
