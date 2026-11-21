@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kiosk Studio</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/studio.css">
+  <script>
+    /* Apply the saved editor theme before first paint. */
+    (function () {
+      var m = 'dark';
+      try { m = localStorage.getItem('kioskStudio.theme') || 'dark'; } catch (e) {}
+      if (m === 'system') m = window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', m);
+    })();
+  </script>
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand"><span class="logo"></span><span>Kiosk Studio</span></div>
+    <input id="projName" class="proj-name" spellcheck="false" title="Project name">
+    <div class="seg" id="viewSeg">
+      <button data-view="flow" data-icon="flow">Flow Map</button>
+      <button data-view="editor" data-icon="editor">Screen Editor</button>
+    </div>
+    <div class="tb-group">
+      <button id="btnUndo" class="icon-btn" data-icon="undo" title="Undo (Ctrl+Z)"></button>
+      <button id="btnRedo" class="icon-btn" data-icon="redo" title="Redo (Ctrl+Shift+Z)"></button>
+    </div>
+    <div class="spacer"></div>
+    <select id="orient" class="tb-select" title="Kiosk screen orientation">
+      <option value="portrait">Portrait 1080 × 1920</option>
+      <option value="landscape">Landscape 1920 × 1080</option>
+    </select>
+    <button id="btnTheme" class="icon-btn" title="Editor theme"></button>
+    <button id="btnData" class="tb-btn" data-icon="table">Data</button>
+    <div class="menu-wrap">
+      <button id="btnFile" class="tb-btn" data-icon="file">File</button>
+      <div class="menu" id="fileMenu" hidden>
+        <button data-cmd="new" data-icon="plus">New project…</button>
+        <button data-cmd="open" data-icon="upload">Open project (.json)…</button>
+        <button data-cmd="save" data-icon="download">Save project (.json)</button>
+        <div class="menu-sep"></div>
+        <button data-cmd="export" data-icon="kiosk">Export kiosk app (.html)</button>
+        <div class="menu-sep"></div>
+        <button data-cmd="importTemplate" data-icon="upload">Import game template (.zip)…</button>
+        <button data-cmd="sampleTemplate" data-icon="download">Download sample template</button>
+      </div>
+    </div>
+    <button id="btnPlayHere" class="tb-btn" data-icon="play" title="Play from the current screen">This screen</button>
+    <button id="btnPlay" class="play-btn" data-icon="play" title="Play from the start screen (P)">Play</button>
+  </header>
+
+  <main id="main">
+    <aside id="left">
+      <div class="tabs" id="leftTabs">
+        <button data-tab="objects" class="on">Objects</button>
+        <button data-tab="screens">Screens</button>
+        <button data-tab="assets">Assets</button>
+      </div>
+      <div class="left-body" id="leftBody"></div>
+    </aside>
+
+    <section id="center">
+      <div id="flowView" class="view">
+        <div id="flowWorld">
+          <svg id="flowEdges" width="1" height="1"></svg>
+          <div id="flowNodes"></div>
+        </div>
+        <div class="float-tools top-left">
+          <button class="tool-btn" id="flowAdd" data-icon="plus">Screen</button>
+          <button class="tool-btn" id="flowLayout" data-icon="layout">Auto layout</button>
+          <button class="tool-btn" id="flowFit" data-icon="fit">Fit</button>
+        </div>
+        <div class="flow-hint">Drag a <b>●</b> port onto a screen to link it · Double-click a screen to edit · Drag the background to pan · Scroll to zoom</div>
+      </div>
+
+      <div id="editorView" class="view" hidden>
+        <div id="stageArea">
+          <div id="stageLabel"></div>
+          <div id="stageHolder"><div id="stage"></div></div>
+          <div class="float-tools bottom-right">
+            <button class="tool-btn accent" id="stageAnimate" data-icon="play" title="Replay this screen's animations">Animate</button>
+            <button class="tool-btn icon-only" id="zoomOut" data-icon="minus" title="Zoom out"></button>
+            <span id="zoomLabel">100%</span>
+            <button class="tool-btn icon-only" id="zoomIn" data-icon="plus" title="Zoom in"></button>
+            <button class="tool-btn" id="zoomFit" data-icon="fit">Fit</button>
+          </div>
+        </div>
+        <div id="dock">
+          <div class="dock-resize" id="dockResize" title="Drag to resize"></div>
+          <div class="dock-bar">
+            <div class="dock-tabs" id="dockTabs">
+              <button data-dock="screens" class="on" data-icon="editor">Screens</button>
+              <button data-dock="timeline" data-icon="timeline">Timeline</button>
+            </div>
+            <div class="tl-tools" id="tlTools" hidden>
+              <button class="tool-btn icon-only" id="tlRestart" data-icon="rewind" title="Back to start (Home)"></button>
+              <button class="tool-btn tl-play" id="tlPlay" title="Play / pause (Space)"></button>
+              <span class="tl-time"><b id="tlTime">0.00s</b> / <span id="tlLen">0s</span></span>
+              <span class="tl-legend"><i class="lg start"></i>Start <i class="lg mid"></i>Meanwhile <i class="lg exit"></i>Exit</span>
+              <span class="spacer"></span>
+              <span class="muted">Zoom</span>
+              <input type="range" id="tlZoom" min="40" max="260" step="10" value="110" title="Timeline zoom">
+            </div>
+          </div>
+          <div id="strip"></div>
+          <div id="timeline" hidden><div class="tl-scroll" id="tlScroll"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <aside id="right">
+      <div class="tabs" id="rightTabs">
+        <button data-tab="props" class="on">Properties</button>
+        <button data-tab="project">Project</button>
+      </div>
+      <div id="inspector"></div>
+    </aside>
+  </main>
+
+  <div id="preview" hidden>
+    <div class="pv-bar">
+      <span class="pv-dot"></span>
+      <span id="pvTitle">Preview</span>
+      <div class="spacer"></div>
+      <button class="tb-btn" id="pvRestart" data-icon="restart">Restart</button>
+      <button class="tb-btn" id="pvClose" data-icon="close">Close (Esc)</button>
+    </div>
+    <div class="pv-body"><div class="pv-device" id="pvDevice"><div id="pvScreen"></div></div></div>
+  </div>
+
+  <div id="modal" hidden><div class="modal-card" id="modalCard"></div></div>
+  <div id="toast"></div>
+  <input type="file" id="fileOpen" accept=".json,application/json" hidden>
+  <input type="file" id="fileImage" accept="image/*" multiple hidden>
+  <input type="file" id="fileTemplate" accept=".zip,application/zip" hidden>
+
+  <script src="js/games.js"></script>
+  <script src="js/runtime.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/zip.js"></script>
+  <script src="js/editor-core.js"></script>
+  <script src="js/editor-packages.js"></script>
+  <script src="js/editor-stage.js"></script>
+  <script src="js/editor-flow.js"></script>
+  <script src="js/editor-inspector.js"></script>
+  <script src="js/editor-timeline.js"></script>
+  <script src="js/editor-main.js"></script>
+</body>
+</html>
