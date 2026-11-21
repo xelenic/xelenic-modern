@@ -510,11 +510,9 @@ function renderLeft() {
       h('div', {}, h('b', {}, 'Page'), h('small', {}, 'Text, buttons, images, forms'))));
     renderTemplateSection(body);
     body.append(h('div', { class: 'lp-title', style: 'margin-top:14px' }, 'Animated screen templates'));
-    SCREEN_TEMPLATES.forEach(function (t) {
-      body.append(h('button', { class: 'card', onclick: function () { addScreenTemplate(t); } },
-        h('div', { class: 'ci', style: 'background:linear-gradient(135deg,#5b21b6,#f72585)' }, t.icon),
-        h('div', {}, h('b', {}, t.name), h('small', {}, t.blurb))));
-    });
+    body.append(h('button', { class: 'card', onclick: function () { openTemplateMarket(null, false, 'screens'); } },
+      h('div', { class: 'ci', style: 'background:linear-gradient(135deg,#5b21b6,#f72585);color:#fff' }, '✨'),
+      h('div', {}, h('b', {}, 'Browse screen templates'), h('small', {}, SCREEN_TEMPLATES.length + ' animated screens · welcome, how to play, results'))));
     body.append(h('div', { class: 'lp-title', style: 'margin-top:14px' }, 'All screens'));
     project.screens.forEach(function (s) {
       body.append(h('button', { class: 'card', style: 'padding:7px 10px' + (s.id === curId ? ';border-color:var(--accent)' : ''), onclick: function () { openScreen(s.id); } },
@@ -569,8 +567,10 @@ function closePreview() {
 }
 
 /* ---------- Modal ---------- */
-function openModal(content) {
+/* opts.wide: the large dialog (80% of the window), as for the game templates. */
+function openModal(content, opts) {
   const card = $('#modalCard');
+  card.className = 'modal-card' + (opts && opts.wide ? ' wide' : '');
   card.innerHTML = '';
   card.append(content);
   $('#modal').hidden = false;
@@ -585,6 +585,12 @@ function newProjectDialog() {
     h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('catch'); }) }, h('div', { class: 'te' }, '🧺'), h('b', {}, 'Catch game'), h('small', {}, 'Start screen, catch game, result')),
     h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('slice'); }) }, h('div', { class: 'te' }, '🍉'), h('b', {}, 'Slice game'), h('small', {}, 'Start screen, slice game, result')),
     h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('wheel'); }) }, h('div', { class: 'te' }, '🎡'), h('b', {}, 'Prize wheel'), h('small', {}, 'Start screen, spin wheel, prize result')),
+    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('runner'); }) }, h('div', { class: 'te' }, '🏃'), h('b', {}, 'Runner game'), h('small', {}, 'Start screen, runner game, result')),
+    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('memory'); }) }, h('div', { class: 'te' }, '🃏'), h('b', {}, 'Memory match'), h('small', {}, 'Start screen, memory game, result')),
+    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('whack'); }) }, h('div', { class: 'te' }, '🔨'), h('b', {}, 'Whack attack'), h('small', {}, 'Start screen, whack game, result')),
+    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('stack'); }) }, h('div', { class: 'te' }, '🧱'), h('b', {}, 'Tower stack'), h('small', {}, 'Start screen, stacking game, result')),
+    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('hoop'); }) }, h('div', { class: 'te' }, '🏀'), h('b', {}, 'Hoop shot'), h('small', {}, 'Start screen, basketball game, result')),
+    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('scratch'); }) }, h('div', { class: 'te' }, '🎟️'), h('b', {}, 'Scratch card'), h('small', {}, 'Start screen, scratch card, prize result')),
     h('button', { class: 'tpl', onclick: pickT(blankProject) }, h('div', { class: 'te' }, '📄'), h('b', {}, 'Blank project'), h('small', {}, 'One empty screen')));
   openModal(h('div', {},
     h('h2', {}, 'New project'),
@@ -610,8 +616,8 @@ function singleGameProject(kind) {
     A(B('TAP TO PLAY', 1420, game.id, { bg: '#ffd166', color: '#3a0ca3' }), 'pop', 1.8, 0.7, 'pulse'));
   game.game.win = result.id;
   game.game.lose = result.id;
-  const isWheel = kind === 'wheel';
-  result.objects.push(E(isWheel ? '🎉' : '🏆', 380, 460, { anim: 'wiggle' }), T(isWheel ? 'Your spin' : 'Your score', 900, 72, { bold: false }),
+  const isWheel = PRIZE_GAMES.indexOf(kind) >= 0;
+  result.objects.push(E(isWheel ? '🎉' : '🏆', 380, 460, { anim: 'wiggle' }), T(isWheel ? (kind === 'scratch' ? 'Your prize' : 'Your spin') : 'Your score', 900, 72, { bold: false }),
     T(isWheel ? '{{prize}}' : '{{score}}', 1010, isWheel ? 140 : 180, { shadow: true, h: 240 }), B('Play again', 1400, game.id, { bg: '#ffffff', color: '#118ab2' }), B('Done', 1630, start.id, { x: 270, w: 540, h: 140, fontSize: 48, bg: 'rgba(255,255,255,0.2)', shadow: false }));
   return { id: uid('p'), name: gi.name + ' Kiosk', version: 1, width: 1080, height: 1920, startScreen: start.id, idleTimeout: 60, vars: { score: 0 }, assets: [], screens: [start, game, result] };
 }
@@ -699,4 +705,3 @@ function setOrientation(o) {
   fitStage();
   toast('Switched to ' + o + '. Check each screen\'s layout.');
 }
-function closeMenus() { $('#fileMenu').hidden = true; }

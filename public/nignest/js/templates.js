@@ -76,12 +76,84 @@ GAME_DEFAULTS.wheel = {
   }
 };
 
+GAME_DEFAULTS.runner = {
+  bg: '#5ec8f8', bg2: '#fff1c1', threshold: 150,
+  config: {
+    duration: 30, points: 10, clearPoints: 5, penalty: 20, crashEnds: false, doubleJump: true, coinChance: 70,
+    speedStart: 650, speedEnd: 1200, gapStart: 1.7, gapEnd: 1,
+    runner: '🏃', faceRight: true, obstacles: '🌵 🪨 📦', coins: '🪙 ⭐ 💎', runnerSize: 210, itemSize: 150,
+    bgTop: '#5ec8f8', bgBottom: '#fff1c1', ground: '#7cb342'
+  }
+};
+
+GAME_DEFAULTS.memory = {
+  bg: '#7209b7', bg2: '#3a0ca3', threshold: 160,
+  config: {
+    duration: 60, pairs: 8, points: 20, penalty: 0, timeBonus: 5, peek: 2, flipBack: 0.8,
+    symbols: '🍎 🍊 🍌 🍓 🍇 🍉 🍒 🥝 🍍 🥥', cardBack: '❓',
+    backColor: '#4361ee', faceColor: '#ffffff', matchColor: '#06d6a0', textColor: '#ffffff'
+  }
+};
+
+GAME_DEFAULTS.whack = {
+  bg: '#8bd450', bg2: '#3d8b37', threshold: 150,
+  config: {
+    duration: 30, points: 10, penalty: 20, bonusPoints: 30, badChance: 15, bonusChance: 8,
+    rateStart: 1.2, rateEnd: 2.6, upStart: 1.1, upEnd: 0.55,
+    critters: '🐹 🐭 🐰', bad: '💣', bonus: '⭐', hammer: '🔨', itemSize: 190,
+    bgTop: '#8bd450', bgBottom: '#3d8b37', holeColor: '#2b1a0e', moundColor: '#8b5a2b'
+  }
+};
+
+GAME_DEFAULTS.stack = {
+  bg: '#0f172a', bg2: '#3a86ff', threshold: 150,
+  config: {
+    duration: 45, points: 10, perfectBonus: 10, speedStart: 600, speedEnd: 1300, startWidth: 600, blockHeight: 110, missEnds: true,
+    colors: '#ff006e #fb5607 #ffbe0b #8ac926 #1982c4 #6a4c93', bgTop: '#0f172a', bgBottom: '#3a86ff'
+  }
+};
+
+GAME_DEFAULTS.hoop = {
+  bg: '#1e1b4b', bg2: '#4338ca', threshold: 100,
+  config: {
+    duration: 30, points: 20, swishBonus: 10, hoopMoves: true,
+    ball: '🏀', ballSize: 170, bgTop: '#1e1b4b', bgBottom: '#4338ca',
+    boardColor: '#ffffff', rimColor: '#f97316', netColor: '#ffffff', floor: '#9a3412'
+  }
+};
+
+GAME_DEFAULTS.scratch = {
+  bg: '#a4133c', bg2: '#ff4d6d', threshold: 0,
+  config: {
+    title: 'SCRATCH & WIN', subtitle: 'Scratch the card to reveal your prize!', foilText: 'SCRATCH HERE',
+    winText: 'YOU WON!', loseText: 'NOT THIS TIME', revealAt: 55, brush: 80, resultTime: 3,
+    textColor: '#ffffff', foilColor: '#c0c4cc', cardBorder: '#ffd166',
+    segments: [
+      { label: '🎁 Free gift', color: '#ef476f', textColor: '#ffffff', weight: 1, points: 100, win: true },
+      { label: '10% OFF', color: '#ffd166', textColor: '#5a3e00', weight: 3, points: 50, win: true },
+      { label: '☕ Free coffee', color: '#06d6a0', textColor: '#063b2e', weight: 2, points: 80, win: true },
+      { label: 'Try again', color: '#118ab2', textColor: '#ffffff', weight: 3, points: 0, win: false },
+      { label: '🍦 Ice cream', color: '#fb5607', textColor: '#ffffff', weight: 2, points: 80, win: true },
+      { label: 'JACKPOT', color: '#8338ec', textColor: '#ffffff', weight: 0.5, points: 500, win: true }
+    ]
+  }
+};
+
 const GAME_INFO = {
   quiz: { name: 'Quiz', icon: '🧠', blurb: 'Questions with timed answers' },
   catch: { name: 'Catch', icon: '🧺', blurb: 'Drag to catch falling items' },
   slice: { name: 'Slice', icon: '🍉', blurb: 'Swipe to slice flying fruit' },
-  wheel: { name: 'Spin Wheel', icon: '🎡', blurb: 'Spin the wheel to win a prize' }
+  wheel: { name: 'Spin Wheel', icon: '🎡', blurb: 'Spin the wheel to win a prize' },
+  runner: { name: 'Runner', icon: '🏃', blurb: 'Tap to jump obstacles and grab coins' },
+  memory: { name: 'Memory Match', icon: '🃏', blurb: 'Flip the cards to find matching pairs' },
+  whack: { name: 'Whack Attack', icon: '🔨', blurb: 'Tap the critters as they pop up' },
+  stack: { name: 'Tower Stack', icon: '🧱', blurb: 'Tap to drop blocks and build high' },
+  hoop: { name: 'Hoop Shot', icon: '🏀', blurb: 'Swipe up to shoot baskets' },
+  scratch: { name: 'Scratch & Win', icon: '🎟️', blurb: 'Scratch the card to reveal a prize' }
 };
+
+/* Games that end in a prize from a list (cfg.segments) rather than a score. */
+const PRIZE_GAMES = ['wheel', 'scratch'];
 
 const WHEEL_COLORS = ['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#8338ec', '#fb5607', '#ff006e', '#3a86ff', '#073b4c', '#80b918'];
 
@@ -164,7 +236,19 @@ const START_INFO = {
   slice: { title: 'FRUIT SLICE', emoji: '🍉', bg: '#9d0208', bg2: '#f48c06', effect: 'rays',
     steps: ['Swipe across fruit to slice it', 'Slice 3 at once for a combo bonus', "Don't slice the bombs!"] },
   wheel: { title: 'SPIN & WIN', emoji: '🎡', bg: '#7209b7', bg2: '#f72585', effect: 'sparkles',
-    steps: ['Tap SPIN to turn the wheel', 'Wherever it stops is your prize', 'One spin per player'] }
+    steps: ['Tap SPIN to turn the wheel', 'Wherever it stops is your prize', 'One spin per player'] },
+  runner: { title: 'COIN RUNNER', emoji: '🏃', bg: '#0096c7', bg2: '#80ed99', effect: 'bubbles',
+    steps: ['Tap anywhere to jump', 'Tap again in the air to double jump', 'Grab coins and dodge the obstacles!'] },
+  memory: { title: 'MEMORY MATCH', emoji: '🃏', bg: '#7209b7', bg2: '#4361ee', effect: 'sparkles',
+    steps: ['Remember where the pictures are', 'Tap two cards to find a pair', 'Match them all before time runs out!'] },
+  whack: { title: 'WHACK ATTACK', emoji: '🔨', bg: '#2d6a4f', bg2: '#95d5b2', effect: 'rays',
+    steps: ['Critters pop out of the holes', 'Tap them before they hide', 'Leave the bombs alone!'] },
+  stack: { title: 'TOWER STACK', emoji: '🧱', bg: '#14213d', bg2: '#3a86ff', effect: 'stars',
+    steps: ['A block slides across the top', 'Tap to drop it on the tower', 'Line it up perfectly for a bonus!'] },
+  hoop: { title: 'HOOP SHOT', emoji: '🏀', bg: '#ea580c', bg2: '#7c2d12', effect: 'rays',
+    steps: ['Swipe up to throw the ball', 'Sink as many baskets as you can', 'Miss the rim for a bonus!'] },
+  scratch: { title: 'SCRATCH & WIN', emoji: '🎟️', bg: '#a4133c', bg2: '#ff4d6d', effect: 'sparkles',
+    steps: ['Rub the silver foil with your finger', 'Your prize appears underneath', 'One card per player'] }
 };
 
 /* The "how to play" screen shown before a game, with a PLAY button that opens it. */
@@ -182,7 +266,7 @@ function gameStartScreen(kind, target) {
     objs.push(A({ id: uid('o'), type: 'shape', shape: 'rect', x: 110, y: y, w: 860, h: 124, bg: '#ffffff', radius: 62, opacity: 0.14 }, 'left', 1.7 + j * 0.15, 0.6));
     objs.push(A(T((j + 1) + '.   ' + s, y, 42, { x: 160, w: 780, h: 124, align: 'left', bold: false, font: 'sans' }), 'left', 1.7 + j * 0.15, 0.6));
   });
-  objs.push(A(B(kind === 'wheel' ? '▶  LET\'S SPIN' : '▶  PLAY', 1540, target || '', { bg: '#ffd166', color: '#3a0ca3', fontSize: 72, h: 190 }), 'pop', 2.4, 0.8, 'shine'));
+  objs.push(A(B(kind === 'wheel' ? '▶  LET\'S SPIN' : kind === 'scratch' ? '▶  GET MY CARD' : '▶  PLAY', 1540, target || '', { bg: '#ffd166', color: '#3a0ca3', fontSize: 72, h: 190 }), 'pop', 2.4, 0.8, 'shine'));
   return {
     id: uid('s'), name: GAME_INFO[kind].name + ' · Start', type: 'page', bg: g.bg, bg2: g.bg2, effect: g.effect, transition: 'slide',
     timer: { seconds: 0, target: '' }, objects: objs
@@ -204,14 +288,22 @@ function winnerScreen(claimTarget, againTarget) {
   };
 }
 
-/* Ready-made screens offered in the Screens tab. `kind` = the game a start screen opens. */
+/* Ready-made animated screens, offered in the template marketplace's Screens
+   section. `group` files them (welcome | howto | result); `kind` = the game a
+   how-to-play screen opens. */
 const SCREEN_TEMPLATES = [
-  { name: 'Welcome', icon: '✨', blurb: 'Logo, animated title, start button', make: function () { return welcomeScreen(''); } },
-  { name: 'Quiz start', icon: '🧠', blurb: 'How to play + PLAY button', kind: 'quiz', make: function () { return gameStartScreen('quiz'); } },
-  { name: 'Catch start', icon: '🧺', blurb: 'How to play + PLAY button', kind: 'catch', make: function () { return gameStartScreen('catch'); } },
-  { name: 'Slice start', icon: '🍉', blurb: 'How to play + PLAY button', kind: 'slice', make: function () { return gameStartScreen('slice'); } },
-  { name: 'Wheel start', icon: '🎡', blurb: 'How to play + SPIN button', kind: 'wheel', make: function () { return gameStartScreen('wheel'); } },
-  { name: 'Winner', icon: '🏆', blurb: 'Trophy, score and confetti', make: function () { return winnerScreen('', ''); } }
+  { name: 'Welcome', icon: '✨', group: 'welcome', blurb: 'Logo, animated title, start button', make: function () { return welcomeScreen(''); } },
+  { name: 'Quiz start', icon: '🧠', blurb: 'How to play + PLAY button', group: 'howto', kind: 'quiz', make: function () { return gameStartScreen('quiz'); } },
+  { name: 'Catch start', icon: '🧺', blurb: 'How to play + PLAY button', group: 'howto', kind: 'catch', make: function () { return gameStartScreen('catch'); } },
+  { name: 'Slice start', icon: '🍉', blurb: 'How to play + PLAY button', group: 'howto', kind: 'slice', make: function () { return gameStartScreen('slice'); } },
+  { name: 'Wheel start', icon: '🎡', blurb: 'How to play + SPIN button', group: 'howto', kind: 'wheel', make: function () { return gameStartScreen('wheel'); } },
+  { name: 'Runner start', icon: '🏃', blurb: 'How to play + PLAY button', group: 'howto', kind: 'runner', make: function () { return gameStartScreen('runner'); } },
+  { name: 'Memory start', icon: '🃏', blurb: 'How to play + PLAY button', group: 'howto', kind: 'memory', make: function () { return gameStartScreen('memory'); } },
+  { name: 'Whack start', icon: '🔨', blurb: 'How to play + PLAY button', group: 'howto', kind: 'whack', make: function () { return gameStartScreen('whack'); } },
+  { name: 'Stack start', icon: '🧱', blurb: 'How to play + PLAY button', group: 'howto', kind: 'stack', make: function () { return gameStartScreen('stack'); } },
+  { name: 'Hoop start', icon: '🏀', blurb: 'How to play + PLAY button', group: 'howto', kind: 'hoop', make: function () { return gameStartScreen('hoop'); } },
+  { name: 'Scratch start', icon: '🎟️', blurb: 'How it works + card button', group: 'howto', kind: 'scratch', make: function () { return gameStartScreen('scratch'); } },
+  { name: 'Winner', icon: '🏆', group: 'result', blurb: 'Trophy, score and confetti', make: function () { return winnerScreen('', ''); } }
 ];
 
 function demoProject() {

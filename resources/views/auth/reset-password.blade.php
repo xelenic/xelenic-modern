@@ -4,8 +4,8 @@
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
         <x-form.input name="email" type="email" label="Email" :value="$request->email" autocomplete="email" required />
-        <x-form.input name="password" type="password" label="New password" autocomplete="new-password" required autofocus />
-        <x-form.input name="password_confirmation" type="password" label="Confirm new password" autocomplete="new-password" required />
+        <x-form.input name="password" type="password" label="New password" autocomplete="new-password" required autofocus strength />
+        <x-form.input name="password_confirmation" type="password" label="Confirm new password" autocomplete="new-password" required confirms="password" />
 
         <x-button class="w-full">Reset password</x-button>
     </form>

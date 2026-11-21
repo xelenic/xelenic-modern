@@ -11,7 +11,7 @@
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             @foreach ($machines as $machine)
                 <a href="{{ route('projects.create.type', [$type->value, 'machine' => $machine->value]) }}"
-                    class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-600/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                     <div class="aspect-square overflow-hidden border-b border-slate-100 bg-white p-3">
                         <img src="{{ $machine->image() }}" alt="{{ $machine->label() }}" width="400" height="400" loading="lazy" class="size-full object-contain transition duration-300 group-hover:scale-105">
                     </div>

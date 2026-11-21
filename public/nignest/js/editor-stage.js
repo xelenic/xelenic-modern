@@ -47,7 +47,7 @@ function gamePreview(sc, withLabel) {
     return d;
   };
   const emoji = function (ch, x, y, size, rot) {
-    add(esc(ch), 'left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;width:' + size + 'px;height:' + size + 'px;font-size:' + size * 0.85 +
+    return add(esc(ch), 'left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;width:' + size + 'px;height:' + size + 'px;font-size:' + size * 0.85 +
       'px;line-height:' + size + 'px;text-align:center;font-family:' + RT.EMOJI_FONT + ';rotate:' + (rot || 0) + 'deg');
   };
   const pill = function (title, val, right) {
@@ -89,6 +89,126 @@ function gamePreview(sc, withLabel) {
     pill('TIME', +c.duration || 30, true);
   } else if (kind === 'wheel') {
     root.appendChild(GX.wheelUI(c, W, H, false).root);
+  } else if (kind === 'whack' || kind === 'stack' || kind === 'hoop') {
+    // A still frame drawn with the game's own drawing code, at half resolution.
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(W / 2);
+    cv.height = Math.round(H / 2);
+    cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
+    root.appendChild(cv);
+    const x = cv.getContext('2d');
+    x.scale(cv.width / W, cv.height / H);
+    const sky = function (top, bottom) {
+      const g = x.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, top);
+      g.addColorStop(1, bottom);
+      x.fillStyle = g;
+      x.fillRect(0, 0, W, H);
+    };
+    const put = function (ch, size, cx, cy) {
+      const img = GX.sprite(ch, size);
+      x.drawImage(img, cx - img.width / 2, cy - img.height / 2);
+    };
+    if (kind === 'whack') {
+      sky(c.bgTop || '#8bd450', c.bgBottom || '#3d8b37');
+      x.fillStyle = 'rgba(255,255,255,.07)';
+      for (let sx = 0; sx < W; sx += 360 * k) x.fillRect(sx, 0, 180 * k, H);
+      const size = (+c.itemSize || 190) * k;
+      const crit = GX.list(c.critters, ['🐹']);
+      const up = { 1: [crit[0], 1], 3: [GX.list(c.bad, ['💣'])[0], 0.85], 5: [crit[1 % crit.length], 1], 6: [GX.list(c.bonus, ['⭐'])[0], 0.9], 10: [crit[2 % crit.length], 0.6] };
+      const holes = GX.whackLayout(W, H, k);
+      holes.forEach(function (o, i) {
+        const u = up[i];
+        GX.drawHole(x, o, c, k, u ? function () { put(u[0], size, o.x, o.y + size * 0.55 - size * 0.95 * u[1]); } : null);
+      });
+      if (holes[1]) put(GX.list(c.hammer, ['🔨'])[0], size * 0.9, holes[1].x + size * 0.45, holes[1].y - size * 0.75);
+    } else if (kind === 'stack') {
+      sky(c.bgTop || '#0f172a', c.bgBottom || '#3a86ff');
+      x.fillStyle = 'rgba(255,255,255,.7)';
+      for (let i = 0; i < 30; i++) { x.beginPath(); x.arc((i * 263.7) % W, (i * 517.3) % (H * 0.7), (2 + i % 4) * k, 0, Math.PI * 2); x.fill(); }
+      const colors = GX.stackColors(c);
+      const bh = (+c.blockHeight || 110) * k;
+      const gy = H - 170 * k;
+      x.fillStyle = 'rgba(0,0,0,.32)';
+      x.fillRect(0, gy, W, H - gy);
+      let b = { x: (W - Math.min(W * 0.9, (+c.startWidth || 600) * k)) / 2, w: Math.min(W * 0.9, (+c.startWidth || 600) * k) };
+      for (let i = 0; i < 7; i++) {
+        GX.stackBlock(x, b.x, gy - (i + 1) * bh, b.w, bh, colors[i % colors.length], k);
+        const cut = i > 1 ? 34 * k : 0;
+        b = { x: i % 2 ? b.x : b.x + cut, w: b.w - cut };
+      }
+      GX.stackBlock(x, b.x + W * 0.22, gy - 8.6 * bh, b.w, bh, colors[7 % colors.length], k);
+      x.font = '900 ' + 110 * k + 'px system-ui';
+      x.textAlign = 'center';
+      x.fillStyle = 'rgba(255,255,255,.92)';
+      x.fillText('6', W / 2, 290 * k);
+    } else {
+      const L = GX.hoopLayout(W, H, k, +c.ballSize || 170);
+      sky(c.bgTop || '#1e1b4b', c.bgBottom || '#4338ca');
+      x.fillStyle = c.floor || '#9a3412';
+      x.fillRect(0, L.floorY, W, H - L.floorY);
+      GX.drawHoop(x, L, W / 2, c, k, 0, 'back');
+      x.setLineDash([8 * k, 26 * k]);
+      x.strokeStyle = 'rgba(255,255,255,.55)';
+      x.lineWidth = 8 * k;
+      x.beginPath();
+      x.moveTo(L.startX, L.startY - L.bsize * 0.6);
+      x.quadraticCurveTo(W * 0.2, L.hoopY - L.rimW * 1.6, W / 2 - L.rimW * 0.1, L.hoopY - L.bsize * 0.3);
+      x.stroke();
+      x.setLineDash([]);
+      GX.drawHoop(x, L, W / 2, c, k, 0, 'front');
+      put(GX.list(c.ball, ['🏀'])[0], L.bsize, L.startX, L.startY);
+    }
+    pill('SCORE', 0, false);
+    pill('TIME', +c.duration || 30, true);
+  } else if (kind === 'scratch') {
+    const segs = GX.wheelSegments(c);
+    const ui = GX.scratchUI(c, W, H, segs.find(function (s) { return s.win !== false; }) || segs[0]);
+    // Part of the foil scratched away, to show what's under it.
+    const fc = ui.foil.getContext('2d');
+    const fw = ui.foil.width, fh = ui.foil.height;
+    fc.globalCompositeOperation = 'destination-out';
+    fc.lineCap = 'round';
+    fc.lineJoin = 'round';
+    fc.lineWidth = (+c.brush || 80) * k;
+    fc.beginPath();
+    fc.moveTo(fw * 0.1, fh * 0.3);
+    fc.lineTo(fw * 0.32, fh * 0.62);
+    fc.lineTo(fw * 0.44, fh * 0.28);
+    fc.lineTo(fw * 0.58, fh * 0.66);
+    fc.stroke();
+    root.appendChild(ui.root);
+  } else if (kind === 'memory') {
+    const sy = GX.memorySymbols(c);
+    const deck = sy.concat(sy.slice().reverse());
+    const board = GX.memoryBoard(c, W, H, deck);
+    board.cards.forEach(function (card) { card.inner.style.transition = 'none'; });
+    const show = function (i, matched) {
+      const card = board.cards[i];
+      if (!card) return;
+      card.inner.style.transform = 'rotateY(180deg)';
+      if (matched) card.front.style.background = card.front.style.borderColor = c.matchColor || '#06d6a0';
+    };
+    show(0, true);
+    show(deck.length - 1, true);
+    show(2, false);
+    board.score.textContent = String(+c.points || 20);
+    board.pairs.textContent = '1 / ' + sy.length;
+    root.appendChild(board.root);
+  } else if (kind === 'runner') {
+    const gy = H * (W > H ? 0.8 : 0.77);
+    const rsz = (+c.runnerSize || 210) * k, osz = (+c.itemSize || 150) * k;
+    root.style.background = 'linear-gradient(180deg,' + (c.bgTop || '#5ec8f8') + ',' + (c.bgBottom || '#fff1c1') + ' ' + gy + 'px,' + (c.ground || '#7cb342') + ' ' + gy + 'px)';
+    add('', 'left:0;right:0;top:' + gy + 'px;height:' + 16 * k + 'px;background:rgba(255,255,255,.28)');
+    const obs = GX.list(c.obstacles, ['🌵']);
+    const co = GX.list(c.coins, ['🪙']);
+    emoji(obs[0], W * 0.62, gy - osz * 0.42, osz, 0);
+    if (obs[1]) emoji(obs[1], W * 0.95, gy - osz * 0.42, osz, 0);
+    [[-1, 0.62], [0, 0.95], [1, 0.62]].forEach(function (p, i) { emoji(co[i % co.length], W * 0.62 + p[0] * 250 * k, gy - osz * 0.5 - p[1] * 440 * k, osz * 0.78, 0); });
+    const hero = emoji(GX.list(c.runner, ['🏃'])[0], Math.max(rsz, W * 0.22), gy - rsz * 0.45 - 240 * k, rsz, 0);
+    if (c.faceRight !== false) hero.style.scale = '-1 1';
+    pill('SCORE', 0, false);
+    pill('TIME', +c.duration || 30, true);
   } else if (kind === 'slice') {
     root.style.background = 'repeating-linear-gradient(90deg, transparent 0 ' + 177 * k + 'px, rgba(0,0,0,.18) ' + 177 * k + 'px ' + 183 * k + 'px), linear-gradient(180deg,' + (c.bgTop || '#5d3a1a') + ',' + (c.bgBottom || '#2b1708') + ')';
     const fr = GX.list(c.fruits, ['🍉']);
@@ -115,7 +235,7 @@ function gamePreview(sc, withLabel) {
   }
   if (withLabel) {
     add('<b>' + esc(info.icon) + ' ' + esc(info.name) + ' game</b><br><span style="opacity:.75;font-weight:500">Set it up in Properties · press Play to test</span>',
-      'left:50%;' + (kind === 'wheel' ? 'bottom:' + 50 * k : 'top:' + 250 * k) + 'px;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font:600 ' + 34 * k + 'px/1.35 system-ui;padding:' + 18 * k + 'px ' + 34 * k + 'px;border-radius:' + 20 * k + 'px;text-align:center;white-space:nowrap');
+      'left:50%;' + (kind === 'wheel' || kind === 'scratch' ? 'bottom:' + 50 * k : 'top:' + 250 * k) + 'px;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font:600 ' + 34 * k + 'px/1.35 system-ui;padding:' + 18 * k + 'px ' + 34 * k + 'px;border-radius:' + 20 * k + 'px;text-align:center;white-space:nowrap');
   }
   return root;
 }

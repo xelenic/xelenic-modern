@@ -8,7 +8,7 @@
 
             {{-- The type picked on the previous step --}}
             <div class="flex items-center gap-4 rounded-2xl border border-blue-200 bg-blue-50/60 p-4">
-                <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-sky-400 text-white">
+                <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
                     <x-icon :name="$type->icon()" class="size-5" />
                 </span>
                 <div class="min-w-0 flex-1">

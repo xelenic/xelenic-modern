@@ -175,7 +175,9 @@ final class KioskSettings
     }
 
     /**
-     * Stored settings in words, for the project page.
+     * Stored settings in words, for the project page. Features that are off
+     * are left out: the kiosk form stopped asking about them, so on newer
+     * projects off just means nobody was asked.
      *
      * @param  array<string, mixed>  $settings
      * @return array<string, string>
@@ -183,15 +185,15 @@ final class KioskSettings
     public static function summary(array $settings): array
     {
         $dimensions = self::dimensions($settings['screen_size'], $settings['orientation'], $settings['resolution']);
-        $onOff = fn (bool $on, array $choices) => $on ? (implode(', ', $choices) ?: 'On') : 'Off';
+        $choices = fn (array $choices) => implode(', ', $choices) ?: 'On';
 
-        return [
+        return array_filter([
             'Screen' => self::sizeLabel($settings['screen_size'], $settings['orientation'])." · {$dimensions['width_cm']} × {$dimensions['height_cm']} cm",
             'Resolution' => (self::RESOLUTIONS[$settings['resolution']] ?? $settings['resolution'])." · {$dimensions['width_px']} × {$dimensions['height_px']} px · {$dimensions['ppi']} PPI",
-            'WebGL rendering' => $settings['webgl'] ? 'Enabled' : 'Disabled',
-            'Game board' => $onOff($settings['game_board'], $settings['games']).($settings['leaderboard'] ? ' · with leaderboard' : ''),
-            'Payments' => $onOff($settings['payments'], $settings['payment_methods']),
-            'Extras' => implode(', ', $settings['add_ons']) ?: 'None',
-        ];
+            'WebGL rendering' => $settings['webgl'] ? 'Enabled' : null,
+            'Game board' => $settings['game_board'] ? $choices($settings['games']).($settings['leaderboard'] ? ' · with leaderboard' : '') : null,
+            'Payments' => $settings['payments'] ? $choices($settings['payment_methods']) : null,
+            'Extras' => implode(', ', $settings['add_ons']) ?: null,
+        ]);
     }
 }

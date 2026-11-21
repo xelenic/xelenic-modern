@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './brand-scene.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,13 +7,6 @@
 /* The panel's sidebar slides in on small screens while <html> has this class
    (toggled from app.js). */
 @custom-variant sidebar-open (&:where(.sidebar-open, .sidebar-open *));
-
-/* Multi-step forms (projects/kiosk-form): once JavaScript is running (the
-   panel layout adds .js to <html> before first paint), only the active step
-   shows. Without it, every step stays visible. */
-.js [data-step-panel]:not([data-active]) {
-    display: none;
-}
 
 /* Same type as the marketing site (public/moderning_xelenic). */
 @theme {

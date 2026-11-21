@@ -14,7 +14,7 @@
             @php($active = $status === $tab)
             <a href="{{ route('admin.projects.index', $query(['status' => $tab?->value])) }}" @if ($active) aria-current="page" @endif @class([
                 'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition',
-                'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => $active,
+                'bg-blue-600 text-white shadow-sm' => $active,
                 'bg-white text-slate-600 ring-1 ring-slate-200 ring-inset hover:bg-slate-50 hover:text-slate-900' => ! $active,
             ])>
                 {{ $tab?->label() ?? 'All' }}

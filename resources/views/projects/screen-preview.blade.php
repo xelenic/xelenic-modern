@@ -12,8 +12,7 @@
 @endphp
 
 <div data-kiosk-preview data-px-per-inch="{{ $scale }}">
-    <div class="relative flex h-64 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
-        style="background-image: radial-gradient(circle, rgb(148 163 184 / 0.35) 1px, transparent 1px); background-size: 16px 16px;">
+    <div class="relative flex h-64 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
         <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
             @foreach ($chips as $setting => [$icon, $label])
                 <span data-chip="{{ $setting }}" class="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-blue-700 shadow-xs ring-1 ring-blue-100" @unless ($preview[$setting]) hidden @endunless>
@@ -28,7 +27,7 @@
                 data-preview-screen
                 data-orientation="{{ $preview['orientation'] }}"
                 @class([
-                    'group relative overflow-hidden rounded-md border-[3px] border-slate-800 bg-blue-600 shadow-xl shadow-blue-900/20 transition-all duration-300',
+                    'group relative overflow-hidden rounded-md border-[3px] border-slate-800 bg-blue-600 shadow-xl transition-all duration-300',
                     'kiosk-webgl' => $preview['webgl'],
                 ])
                 style="width: {{ round($dimensions['width_in'] * $scale, 1) }}px; height: {{ round($dimensions['height_in'] * $scale, 1) }}px;"

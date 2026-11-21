@@ -12,7 +12,7 @@ function portsOf(sc) {
   const out = [];
   if (sc.type === 'game') {
     const g = sc.game;
-    const isWheel = baseKind(g.kind) === 'wheel';
+    const isWheel = PRIZE_GAMES.indexOf(baseKind(g.kind)) >= 0;
     out.push({ key: 'win:' + sc.id, label: isWheel ? '🏆 Prize won' : '🏆 Win · score ≥ ' + (g.threshold || 0), target: g.win || '' });
     out.push({ key: 'lose:' + sc.id, label: isWheel ? '💔 No prize' : '💔 Lose', target: g.lose || '' });
   } else {

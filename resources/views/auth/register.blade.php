@@ -4,8 +4,8 @@
 
         <x-form.input name="name" label="Name" placeholder="Your full name" autocomplete="name" required autofocus />
         <x-form.input name="email" type="email" label="Email" placeholder="you@company.com" autocomplete="email" required />
-        <x-form.input name="password" type="password" label="Password" autocomplete="new-password" hint="At least 8 characters." required />
-        <x-form.input name="password_confirmation" type="password" label="Confirm password" autocomplete="new-password" required />
+        <x-form.input name="password" type="password" label="Password" autocomplete="new-password" hint="At least 8 characters." required strength />
+        <x-form.input name="password_confirmation" type="password" label="Confirm password" autocomplete="new-password" required confirms="password" />
 
         <x-button class="w-full">Create account</x-button>
     </form>

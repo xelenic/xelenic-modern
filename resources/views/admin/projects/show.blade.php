@@ -3,9 +3,11 @@
         <x-button variant="secondary" :href="route('admin.projects.index')">All projects</x-button>
     </x-slot:actions>
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        <div class="space-y-6 lg:col-span-2">
-            @include('projects.partials.overview')
+    @include('projects.partials.header')
+
+    <div class="mt-8 grid gap-6 lg:grid-cols-3 lg:items-start">
+        <div class="min-w-0 lg:col-span-2">
+            @include('projects.partials.tabs')
         </div>
 
         <div class="space-y-6">

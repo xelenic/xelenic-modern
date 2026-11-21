@@ -1,4 +1,5 @@
-/* Startup: wire the top bar, tabs, menus, keyboard shortcuts, then load the project. */
+/* Startup: wire the top bar, tabs, keyboard shortcuts, then load the project.
+   The menu bar wires itself (editor-menubar.js). */
 
 (function init() {
   $$('[data-icon]').forEach(function (el) { el.insertAdjacentHTML('afterbegin', icon(el.dataset.icon)); });
@@ -24,20 +25,7 @@
   nameInput.addEventListener('input', function () { project.name = nameInput.value; save(); });
   nameInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') nameInput.blur(); });
 
-  $('#btnFile').addEventListener('click', function (e) { e.stopPropagation(); $('#fileMenu').hidden = !$('#fileMenu').hidden; });
-  document.addEventListener('click', function (e) { if (!e.target.closest('.menu-wrap')) closeMenus(); });
-  $$('#fileMenu button').forEach(function (b) {
-    b.addEventListener('click', function () {
-      closeMenus();
-      const cmd = b.dataset.cmd;
-      if (cmd === 'new') newProjectDialog();
-      else if (cmd === 'open') $('#fileOpen').click();
-      else if (cmd === 'save') saveJson();
-      else if (cmd === 'export') exportKiosk();
-      else if (cmd === 'importTemplate') $('#fileTemplate').click();
-      else if (cmd === 'sampleTemplate') downloadSampleTemplate();
-    });
-  });
+  document.addEventListener('click', function (e) { if (!e.target.closest('#menubar, #mbDropdown')) closeMenus(); });
   $('#fileOpen').addEventListener('change', function (e) { if (e.target.files[0]) openJson(e.target.files[0]); e.target.value = ''; });
   $('#fileImage').addEventListener('change', function (e) { if (e.target.files.length) uploadImages(e.target.files); e.target.value = ''; });
   $('#fileTemplate').addEventListener('change', function (e) { if (e.target.files[0]) importTemplateFile(e.target.files[0]); e.target.value = ''; });
@@ -62,7 +50,7 @@
     if (e.key === 'Escape') {
       if (!$('#preview').hidden) closePreview();
       else if (!$('#modal').hidden) closeModal();
-      else if (!$('#fileMenu').hidden) closeMenus();
+      else if (menusOpen()) closeMenus();
       else if (typing) e.target.blur();
       else if (selId) selectObject(null);
       return;

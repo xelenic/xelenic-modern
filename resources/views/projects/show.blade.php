@@ -3,34 +3,60 @@
         <x-button variant="secondary" :href="route('projects.index')">All projects</x-button>
     </x-slot:actions>
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        <div class="space-y-6 lg:col-span-2">
-            @include('projects.partials.overview')
+    @php
+        $designEditable = $project->canChangeKioskDesign();
+    @endphp
+
+    @include('projects.partials.header')
+
+    <div class="mt-8 grid gap-6 lg:grid-cols-3 lg:items-start">
+        <div class="min-w-0 lg:col-span-2">
+            @include('projects.partials.tabs')
         </div>
 
-        <div class="space-y-6">
-            <x-card title="Status">
-                <x-badge :color="$project->status->color()">{{ $project->status->label() }}</x-badge>
-                <p class="mt-3 text-sm text-slate-500">{{ $project->status->description() }}</p>
+        <aside class="space-y-6">
+            @if ($project->canBeShared())
+                @include('projects.partials.play-link')
+            @endif
 
-                <dl class="mt-6 space-y-4 border-t border-slate-100 pt-5 text-sm">
-                    <div>
-                        <dt class="text-slate-500">Submitted</dt>
-                        <dd class="mt-1 text-slate-900">{{ $project->created_at->format('j F Y') }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-slate-500">Last updated</dt>
-                        <dd class="mt-1 text-slate-900">{{ $project->updated_at->diffForHumans() }}</dd>
-                    </div>
-                </dl>
+            <x-card title="What happens next">
+                <div class="flex items-start gap-3">
+                    <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                        <x-icon name="chat" class="size-4" />
+                    </span>
+                    <p class="text-sm text-slate-600">{{ $project->status->description() }}</p>
+                </div>
 
                 @if ($project->status->canBeCancelled())
-                    <form method="POST" action="{{ route('projects.cancel', $project) }}" data-confirm="Cancel this project? You can always start a new one." class="mt-6">
+                    <form method="POST" action="{{ route('projects.cancel', $project) }}" data-confirm="Cancel this project? You can always start a new one." class="mt-6 border-t border-slate-100 pt-5">
                         @csrf
                         <x-button variant="danger" class="w-full">Cancel project</x-button>
                     </form>
                 @endif
             </x-card>
-        </div>
+
+            <x-card title="Questions?">
+                <p class="text-sm text-slate-600">Talk to the Xelenic team about anything in this project.</p>
+                <x-button variant="secondary" :href="route('home').'#contact'" class="mt-4 w-full">Contact us</x-button>
+            </x-card>
+        </aside>
     </div>
+
+    {{-- Changing the kiosk design: Kiosk Studio opens with the saved design
+         (data-studio-source), and Save design sends it here in the background
+         without leaving the studio (data-studio-stay). --}}
+    @if ($project->canChangeKioskDesign())
+        <form method="POST" action="{{ route('projects.kiosk-design.update', $project) }}" data-kiosk-studio data-studio-stay
+            data-studio-url="{{ asset('nignest/index.html') }}?embed=1"
+            data-studio-max="{{ \App\Support\KioskDesign::MAX_LENGTH }}"
+            data-studio-orientation="{{ $project->kioskSettings()['orientation'] ?? $project->kioskDesign()['orientation'] ?? 'portrait' }}"
+            @if (\App\Support\KioskDesign::exists($project)) data-studio-source="{{ route('projects.kiosk-design', $project) }}" @endif>
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="kiosk_design" data-studio-input>
+            <input type="hidden" name="kiosk_data" data-studio-entries>
+        </form>
+
+        <x-kiosk-studio :title="'Design for '.$project->name" action="Save design" back="Back to the project" />
+    @endif
 </x-layouts.app>

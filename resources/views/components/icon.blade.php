@@ -98,11 +98,41 @@
         @case('eye')
             <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>
             @break
+        @case('chevron-down')
+            <path d="M6 9l6 6 6-6"/>
+            @break
+        @case('table')
+            <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10"/>
+            @break
+        @case('cloud')
+            <path d="M7.5 18.5h9.75a4.25 4.25 0 0 0 .6-8.46A6 6 0 0 0 6.3 9.2a4.75 4.75 0 0 0 1.2 9.3z"/>
+            @break
+        @case('eye-off')
+            <path d="M3 3l18 18"/><path d="M10.6 5.6c.5-.1.9-.1 1.4-.1 6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-3 3.8M6.6 6.6C4 8.4 2.5 12 2.5 12S6 18.5 12 18.5c1.8 0 3.4-.6 4.7-1.4"/><path d="M9.9 9.9a2.8 2.8 0 0 0 4.2 4.2"/>
+            @break
         @case('switch')
             <path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/>
             @break
         @case('wallet')
             <path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v10a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z"/><circle cx="16" cy="14" r="1.2"/>
+            @break
+        @case('link')
+            <path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>
+            @break
+        @case('play')
+            <path d="M7 4.5v15l12.5-7.5z"/>
+            @break
+        @case('copy')
+            <rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+            @break
+        @case('flag')
+            <path d="M5 21V4M5 4h11l-2 4 2 4H5"/>
+            @break
+        @case('clock')
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+            @break
+        @case('share')
+            <path d="M12 3v12M7.5 7.5 12 3l4.5 4.5"/><path d="M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>
             @break
     @endswitch
 </svg>

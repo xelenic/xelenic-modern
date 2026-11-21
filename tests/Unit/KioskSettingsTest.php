@@ -44,3 +44,14 @@ test('switching a section off drops its choices', function () {
         ->payment_methods->toBe(['Cash'])
         ->add_ons->toBe([]);
 });
+
+test('the summary leaves out features that are off', function () {
+    $screenOnly = KioskSettings::fromInput(['screen_size' => '32', 'orientation' => 'landscape', 'resolution' => '1920x1080']);
+
+    expect(array_keys(KioskSettings::summary($screenOnly)))->toBe(['Screen', 'Resolution']);
+
+    $withPayments = KioskSettings::fromInput([...$screenOnly, 'payments' => '1', 'payment_methods' => ['Cash']]);
+
+    expect(KioskSettings::summary($withPayments))->toHaveKey('Payments', 'Cash')
+        ->not->toHaveKey('WebGL rendering');
+});

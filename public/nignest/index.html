@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kiosk Studio</title>
-  <link rel="icon" href="data:,">
+  <title>Kiosk Studio · Xelenic</title>
+  <link rel="icon" type="image/png" href="img/xelenic-mark.png">
   <link rel="stylesheet" href="css/studio.css">
   <script>
     /* Apply the saved editor theme before first paint. */
@@ -17,8 +17,15 @@
   </script>
 </head>
 <body>
+  <nav id="menubar" role="menubar" aria-label="Kiosk Studio">
+    <div class="mb-right" id="menubarRight"></div>
+  </nav>
+
   <header id="topbar">
-    <div class="brand"><span class="logo"></span><span>Kiosk Studio</span></div>
+    <div class="brand" title="Kiosk Studio by Xelenic">
+      <img class="brand-logo" src="img/xelenic-mark.png" alt="Xelenic" width="30" height="30">
+      <span class="brand-name">Kiosk Studio<small>by Xelenic</small></span>
+    </div>
     <input id="projName" class="proj-name" spellcheck="false" title="Project name">
     <div class="seg" id="viewSeg">
       <button data-view="flow" data-icon="flow">Flow Map</button>
@@ -35,19 +42,6 @@
     </select>
     <button id="btnTheme" class="icon-btn" title="Editor theme"></button>
     <button id="btnData" class="tb-btn" data-icon="table">Data</button>
-    <div class="menu-wrap">
-      <button id="btnFile" class="tb-btn" data-icon="file">File</button>
-      <div class="menu" id="fileMenu" hidden>
-        <button data-cmd="new" data-icon="plus">New project…</button>
-        <button data-cmd="open" data-icon="upload">Open project (.json)…</button>
-        <button data-cmd="save" data-icon="download">Save project (.json)</button>
-        <div class="menu-sep"></div>
-        <button data-cmd="export" data-icon="kiosk">Export kiosk app (.html)</button>
-        <div class="menu-sep"></div>
-        <button data-cmd="importTemplate" data-icon="upload">Import game template (.zip)…</button>
-        <button data-cmd="sampleTemplate" data-icon="download">Download sample template</button>
-      </div>
-    </div>
     <button id="btnPlayHere" class="tb-btn" data-icon="play" title="Play from the current screen">This screen</button>
     <button id="btnPlay" class="play-btn" data-icon="play" title="Play from the start screen (P)">Play</button>
   </header>
@@ -131,6 +125,7 @@
     <div class="pv-body"><div class="pv-device" id="pvDevice"><div id="pvScreen"></div></div></div>
   </div>
 
+  <div id="mbDropdown" class="menu mb-dropdown" role="menu" hidden></div>
   <div id="modal" hidden><div class="modal-card" id="modalCard"></div></div>
   <div id="toast"></div>
   <input type="file" id="fileOpen" accept=".json,application/json" hidden>
@@ -147,6 +142,8 @@
   <script src="js/editor-flow.js"></script>
   <script src="js/editor-inspector.js"></script>
   <script src="js/editor-timeline.js"></script>
+  <script src="js/editor-menubar.js"></script>
+  <script src="js/embed.js"></script>
   <script src="js/editor-main.js"></script>
 </body>
 </html>

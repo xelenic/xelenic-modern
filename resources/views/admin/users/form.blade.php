@@ -11,8 +11,8 @@
 
     <div class="grid gap-5 sm:grid-cols-2">
         <x-form.input name="password" type="password" :label="$user ? 'New password' : 'Password'" autocomplete="new-password"
-            :required="! $user" :hint="$user ? 'Leave blank to keep the current password.' : 'At least 8 characters.'" />
-        <x-form.input name="password_confirmation" type="password" label="Confirm password" autocomplete="new-password" :required="! $user" />
+            :required="! $user" :hint="$user ? 'Leave blank to keep the current password.' : 'At least 8 characters.'" strength />
+        <x-form.input name="password_confirmation" type="password" label="Confirm password" autocomplete="new-password" :required="! $user" confirms="password" />
     </div>
 
     @can('manage roles')

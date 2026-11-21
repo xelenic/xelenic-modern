@@ -50,6 +50,21 @@ enum ProjectStatus: string
     }
 
     /**
+     * How far along the road to launch this is, from 1 (submitted) to 4
+     * (completed), for the dashboard's progress track. Cancelled isn't on it.
+     */
+    public function step(): ?int
+    {
+        return match ($this) {
+            self::Submitted => 1,
+            self::InReview => 2,
+            self::InProgress => 3,
+            self::Completed => 4,
+            self::Cancelled => null,
+        };
+    }
+
+    /**
      * Clients can still cancel a project nobody has started on.
      */
     public function canBeCancelled(): bool

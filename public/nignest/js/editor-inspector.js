@@ -295,6 +295,30 @@ const GAME_FIELDS = {
     ['bombEnds', 'A bomb ends the game', 'check'], ['waveStart', 'Wave gap start (s)', 'num'], ['waveEnd', 'Wave gap end (s)', 'num'],
     ['h', 'Look'], ['fruits', 'Fruits', 'text'], ['bomb', 'Bomb', 'text'], ['itemSize', 'Item size', 'num'], ['trail', 'Swipe trail', 'color'],
     ['bgTop', 'Background top', 'color'], ['bgBottom', 'Background bottom', 'color']],
+  runner: [['h', 'Rules'], ['duration', 'Duration (s)', 'num'], ['points', 'Points / coin', 'num'], ['clearPoints', 'Points / obstacle cleared', 'num'],
+    ['penalty', 'Crash penalty', 'num'], ['crashEnds', 'A crash ends the game', 'check'], ['doubleJump', 'Double jump', 'check'], ['coinChance', 'Coins %', 'num'],
+    ['speedStart', 'Speed at start', 'num'], ['speedEnd', 'Speed at end', 'num'], ['gapStart', 'Obstacle gap start (s)', 'num'], ['gapEnd', 'Obstacle gap end (s)', 'num'],
+    ['h', 'Look'], ['runner', 'Runner', 'text'], ['faceRight', 'Mirror the runner (face right)', 'check'], ['obstacles', 'Obstacles', 'text'], ['coins', 'Coins', 'text'],
+    ['runnerSize', 'Runner size', 'num'], ['itemSize', 'Obstacle size', 'num'], ['bgTop', 'Sky top', 'color'], ['bgBottom', 'Sky bottom', 'color'], ['ground', 'Ground', 'color']],
+  memory: [['h', 'Rules'], ['duration', 'Duration (s)', 'num'], ['pairs', 'Pairs (2–18)', 'num'], ['points', 'Points / pair', 'num'], ['penalty', 'Wrong guess penalty', 'num'],
+    ['timeBonus', 'Bonus / second left', 'num'], ['peek', 'Show the cards first (s)', 'num'], ['flipBack', 'Wrong pair stays (s)', 'num'],
+    ['h', 'Look'], ['symbols', 'Card pictures', 'text'], ['cardBack', 'Card back', 'text'], ['backColor', 'Card back colour', 'color'], ['faceColor', 'Card front colour', 'color'],
+    ['matchColor', 'Matched colour', 'color'], ['textColor', 'Text', 'color']],
+  whack: [['h', 'Rules'], ['duration', 'Duration (s)', 'num'], ['points', 'Points / hit', 'num'], ['penalty', 'Bad item penalty', 'num'], ['bonusPoints', 'Bonus item points', 'num'],
+    ['badChance', 'Bad items %', 'num'], ['bonusChance', 'Bonus items %', 'num'], ['rateStart', 'Pop-ups/s at start', 'num'], ['rateEnd', 'Pop-ups/s at end', 'num'],
+    ['upStart', 'Stay up at start (s)', 'num'], ['upEnd', 'Stay up at end (s)', 'num'],
+    ['h', 'Look'], ['critters', 'Critters', 'text'], ['bad', 'Bad items', 'text'], ['bonus', 'Bonus items', 'text'], ['hammer', 'Hammer', 'text'], ['itemSize', 'Critter size', 'num'],
+    ['bgTop', 'Grass top', 'color'], ['bgBottom', 'Grass bottom', 'color'], ['holeColor', 'Hole', 'color'], ['moundColor', 'Dirt', 'color']],
+  stack: [['h', 'Rules'], ['duration', 'Duration (s)', 'num'], ['points', 'Points / block', 'num'], ['perfectBonus', 'Perfect drop bonus', 'num'],
+    ['speedStart', 'Slide speed at start', 'num'], ['speedEnd', 'Slide speed at end', 'num'], ['startWidth', 'First block width', 'num'], ['blockHeight', 'Block height', 'num'],
+    ['missEnds', 'A missed block ends the game', 'check'],
+    ['h', 'Look'], ['colors', 'Block colours', 'text'], ['bgTop', 'Sky top', 'color'], ['bgBottom', 'Sky bottom', 'color']],
+  hoop: [['h', 'Rules'], ['duration', 'Duration (s)', 'num'], ['points', 'Points / basket', 'num'], ['swishBonus', 'Clean shot bonus', 'num'], ['hoopMoves', 'Hoop moves later on', 'check'],
+    ['h', 'Look'], ['ball', 'Ball', 'text'], ['ballSize', 'Ball size', 'num'], ['bgTop', 'Background top', 'color'], ['bgBottom', 'Background bottom', 'color'],
+    ['boardColor', 'Backboard', 'color'], ['rimColor', 'Rim', 'color'], ['netColor', 'Net', 'color'], ['floor', 'Floor', 'color']],
+  scratch: [['h', 'Text'], ['title', 'Title', 'text'], ['subtitle', 'Subtitle', 'text'], ['foilText', 'Foil text', 'text'], ['winText', 'Win message', 'text'], ['loseText', 'No-prize message', 'text'],
+    ['h', 'Scratching'], ['revealAt', 'Reveal after (% scratched)', 'num'], ['brush', 'Finger size', 'num'], ['resultTime', 'Show result (s)', 'num'],
+    ['h', 'Look'], ['textColor', 'Text', 'color'], ['foilColor', 'Foil', 'color'], ['cardBorder', 'Card border', 'color']],
   wheel: [['h', 'Text'], ['title', 'Title', 'text'], ['subtitle', 'Subtitle', 'text'], ['buttonText', 'Button text', 'text'], ['winText', 'Win message', 'text'], ['loseText', 'No-prize message', 'text'],
     ['h', 'Spin'], ['spinTime', 'Spin time (s)', 'num'], ['turns', 'Full turns', 'num'], ['resultTime', 'Show result (s)', 'num'],
     ['h', 'Look'], ['textColor', 'Text', 'color'], ['buttonColor', 'Button', 'color'], ['buttonTextColor', 'Button text', 'color'],
@@ -306,7 +330,7 @@ function inspectScreen(box, sc) {
   const isGame = sc.type === 'game';
   const gi = isGame ? gameInfo(sc.game.kind) : null;
   const sub = isGame ? gi.name + ' game' + (gi.custom ? ' · custom template' : '') : 'Page screen';
-  const showsBg = !isGame || ['quiz', 'wheel', null].indexOf(baseKind(sc.game.kind)) >= 0;
+  const showsBg = !isGame || ['quiz', 'wheel', 'memory', 'scratch', null].indexOf(baseKind(sc.game.kind)) >= 0;
   box.append(h('div', { class: 'insp-head' }, h('div', { class: 'ic' }, isGame ? gi.icon : '📄'),
     h('div', { style: 'flex:1' }, h('b', {}, sc.name), h('small', {}, sub)), isStart ? h('span', { class: 'badge' }, 'START') : null));
 
@@ -395,26 +419,30 @@ function inspectGame(box, sc) {
         s.append(row(f[1], fSelect(opts, function () { return c[key] == null ? '' : String(c[key]); }, function (v) { c[key] = v; })));
       } else s.append(row(f[1], fText(get, function (v) { c[key] = v; })));
     });
-    if (base === 'catch' || base === 'slice') s.append(h('div', { class: 'note' }, 'Items are emoji. Separate them with spaces.'));
+    if (['catch', 'slice', 'runner', 'whack'].indexOf(base) >= 0) s.append(h('div', { class: 'note' }, 'Items are emoji. Separate them with spaces.'));
+    if (base === 'stack') s.append(h('div', { class: 'note' }, 'Block colours are hex codes such as #ff006e, separated by spaces. The tower uses them in turn.'));
+    if (base === 'memory') s.append(h('div', { class: 'note' }, 'Card pictures are emoji, separated by spaces. Each one is used for a pair, so list at least as many as there are pairs.'));
   }
 
-  const isWheel = base === 'wheel';
-  if (isWheel) inspectSegments(box, c);
+  const isWheel = PRIZE_GAMES.indexOf(base) >= 0;
+  const scratchy = base === 'scratch';
+  if (isWheel) inspectSegments(box, c, scratchy);
 
-  const e = sec(box, isWheel ? 'After the spin' : 'When the game ends');
+  const e = sec(box, isWheel ? (scratchy ? 'After the reveal' : 'After the spin') : 'When the game ends');
   if (!isWheel) e.append(row('Win at score', fNum(function () { return g.threshold; }, function (v) { g.threshold = +v || 0; }, {}, { min: 0 })));
   e.append(row(isWheel ? 'Prize → go to' : 'Win → go to', screenSelect(function () { return g.win; }, function (v) { g.win = v; }, { rerender: true })));
   e.append(row(isWheel ? 'No prize → go to' : 'Lose → go to', screenSelect(function () { return g.lose; }, function (v) { g.lose = v; }, { rerender: true })));
   e.append(h('div', { class: 'note' }, isWheel
-    ? 'Slices marked "Counts as a prize" go to the prize screen. Show the result with {{prize}} and its points with {{score}}.'
+    ? (scratchy ? 'Prizes' : 'Slices') + ' marked "Counts as a prize" go to the prize screen. Show the result with {{prize}} and its points with {{score}}.'
     : 'The final score is available as {{score}} on the next screen.'));
 
   if (base === 'quiz') inspectQuestions(box, c);
 }
 
-function inspectSegments(box, c) {
+function inspectSegments(box, c, scratchy) {
+  const item = scratchy ? 'Prize' : 'Slice';
   const segs = c.segments = c.segments || [];
-  const s = sec(box, 'Wheel slices (' + segs.length + ')', segs.length < 16 ? btn('Add', function () {
+  const s = sec(box, (scratchy ? 'Prizes (' : 'Wheel slices (') + segs.length + ')', segs.length < 16 ? btn('Add', function () {
     commit(function () { segs.push({ label: 'New prize', color: WHEEL_COLORS[segs.length % WHEEL_COLORS.length], textColor: '#ffffff', weight: 1, points: 10, win: true }); });
   }, '', 'plus') : null);
   const pctEls = [];
@@ -427,14 +455,14 @@ function inspectSegments(box, c) {
   };
   segs.forEach(function (g, i) {
     const card = h('div', { class: 'q-card' });
-    const pct = h('span', { class: 'link-chip', title: 'Chance of landing here' });
+    const pct = h('span', { class: 'link-chip', title: scratchy ? 'Chance of this prize' : 'Chance of landing here' });
     pctEls.push(pct);
     card.append(h('div', { class: 'q-top' },
       h('span', { style: 'width:14px;height:14px;border-radius:4px;flex:none;background:' + esc(g.color || '#888') }),
-      h('span', {}, 'Slice ' + (i + 1)), pct, h('span', { class: 'grow' }),
+      h('span', {}, item + ' ' + (i + 1)), pct, h('span', { class: 'grow' }),
       i > 0 ? h('button', { class: 'btn small', title: 'Move up', html: icon('up'), onclick: function () { commit(function () { segs.splice(i - 1, 0, segs.splice(i, 1)[0]); }); } }) : null,
-      h('button', { class: 'btn small', title: 'Duplicate slice', html: icon('copy'), onclick: function () { commit(function () { segs.splice(i + 1, 0, JSON.parse(JSON.stringify(g))); }); } }),
-      segs.length > 2 ? h('button', { class: 'btn small danger', title: 'Delete slice', html: icon('trash'), onclick: function () { commit(function () { segs.splice(i, 1); }); } }) : null));
+      h('button', { class: 'btn small', title: 'Duplicate ' + item.toLowerCase(), html: icon('copy'), onclick: function () { commit(function () { segs.splice(i + 1, 0, JSON.parse(JSON.stringify(g))); }); } }),
+      segs.length > 2 ? h('button', { class: 'btn small danger', title: 'Delete ' + item.toLowerCase(), html: icon('trash'), onclick: function () { commit(function () { segs.splice(i, 1); }); } }) : null));
     card.append(row('Label', fText(function () { return g.label; }, function (v) { g.label = v; })));
     card.append(row('Fill', fColor(function () { return g.color; }, function (v) { g.color = v; })));
     card.append(row('Text', fColor(function () { return g.textColor || '#ffffff'; }, function (v) { g.textColor = v; })));
@@ -444,7 +472,9 @@ function inspectSegments(box, c) {
     s.append(card);
   });
   updatePct();
-  s.append(h('div', { class: 'note' }, 'Chance is relative: a slice with 2 lands twice as often as a slice with 1. Use 0 for a slice that should never land.'));
+  s.append(h('div', { class: 'note' }, scratchy
+    ? 'Chance is relative: a prize with 2 comes up twice as often as a prize with 1. Use 0 for a prize that should never come up.'
+    : 'Chance is relative: a slice with 2 lands twice as often as a slice with 1. Use 0 for a slice that should never land.'));
 }
 
 function inspectQuestions(box, c) {

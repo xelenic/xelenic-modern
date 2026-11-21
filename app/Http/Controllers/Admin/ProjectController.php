@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\ActivityType;
 use App\Enums\ProjectStatus;
 use App\Enums\ProjectType;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Support\KioskDesign;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProjectController extends Controller implements HasMiddleware
 {
@@ -62,6 +65,26 @@ class ProjectController extends Controller implements HasMiddleware
     }
 
     /**
+     * The Kiosk Studio design a client attached to their kiosk project.
+     */
+    public function kioskDesign(Project $project): StreamedResponse
+    {
+        abort_unless(KioskDesign::exists($project), 404);
+
+        return KioskDesign::download($project);
+    }
+
+    /**
+     * The form entries collected by a client's kiosk app, as a spreadsheet.
+     */
+    public function kioskData(Project $project): StreamedResponse
+    {
+        abort_unless(KioskDesign::entries($project) !== [], 404);
+
+        return KioskDesign::entriesCsv($project);
+    }
+
+    /**
      * Move a project along; the client sees the new status on their project.
      */
     public function updateStatus(Request $request, Project $project): RedirectResponse
@@ -70,7 +93,14 @@ class ProjectController extends Controller implements HasMiddleware
             'status' => ['required', Rule::enum(ProjectStatus::class)],
         ]);
 
+        $was = $project->status;
         $project->update($validated);
+
+        if ($was !== $project->status) {
+            $project->log(ActivityType::Status, "Moved the project to {$project->status->label()}", $request->user(), [
+                ['tone' => 'edited', 'label' => 'Status', 'items' => ["{$was->label()} → {$project->status->label()}"]],
+            ]);
+        }
 
         return to_route('admin.projects.show', $project)
             ->with('success', "The project is now {$project->status->label()}.");

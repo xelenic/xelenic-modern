@@ -9,6 +9,7 @@
             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" icon="dashboard">Overview</x-nav-link>
             @can('manage projects')
                 <x-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')" icon="folder">Projects</x-nav-link>
+                <x-nav-link :href="route('admin.game-templates.index')" :active="request()->routeIs('admin.game-templates.*')" icon="gamepad">Game templates</x-nav-link>
             @endcan
             @can('manage clients')
                 <x-nav-link :href="route('admin.clients.index')" :active="request()->routeIs('admin.clients.*')" icon="star">Clients</x-nav-link>

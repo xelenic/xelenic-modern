@@ -219,7 +219,7 @@ function KioskRuntime() {
   }
   const FX_COLORS = ['#ffd166', '#ef476f', '#06d6a0', '#118ab2', '#ffffff', '#f72585', '#8338ec'];
   function hasFx(sc) {
-    return !!(sc.effect && sc.effect !== 'none' && !(sc.type === 'game' && sc.game && (sc.game.kind === 'catch' || sc.game.kind === 'slice')));
+    return !!(sc.effect && sc.effect !== 'none' && !(sc.type === 'game' && sc.game && ['catch', 'slice', 'runner', 'whack', 'stack', 'hoop'].indexOf(sc.game.kind) >= 0));
   }
   function renderFx(kind, seed, W, H) {
     if (!kind || kind === 'none') return null;
@@ -407,7 +407,7 @@ function KioskRuntime() {
      A package is { manifest, code, assets }. Its game.js calls
        KioskGame.define({ start: function (ctx) { ...; return { stop: function () {} }; } })
      or, for a preset of a built-in game, the manifest has "extends": "catch" (etc.). */
-  const BUILTIN_GAMES = ['quiz', 'catch', 'slice', 'wheel'];
+  const BUILTIN_GAMES = ['quiz', 'catch', 'slice', 'wheel', 'runner', 'memory', 'whack', 'stack', 'scratch', 'hoop'];
   function loadTemplate(pkg) {
     const m = pkg.manifest;
     if (m.extends && BUILTIN_GAMES.indexOf(m.extends) >= 0) return { run: GAMES[m.extends], pkg: pkg };

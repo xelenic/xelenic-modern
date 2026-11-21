@@ -25,12 +25,12 @@
                 <span class="font-display text-xl font-semibold text-slate-900">Xelenic</span>
             </a>
 
-            <div class="relative">
-                <img src="{{ asset('moderning_xelenic/assets/img/robot-still.webp') }}" alt="" width="615" height="640" class="mx-auto w-64 drop-shadow-[0_30px_40px_rgba(37,99,235,0.25)] xl:w-72">
-                <h2 class="mt-10 font-display text-3xl leading-tight font-semibold text-slate-900">
+            <div class="relative text-center">
+                <x-auth.brand-scene />
+                <h2 class="bs-rise mt-10 font-display text-3xl leading-tight font-semibold text-slate-900">
                     Grow your business with <span class="text-blue-600">Xelenic</span>
                 </h2>
-                <p class="mt-3 max-w-md text-slate-600">
+                <p class="bs-rise mx-auto mt-3 max-w-md text-slate-600" style="--rise-delay: 2.25s">
                     AI middleware, connected business systems and the tools to run them, all in one place.
                 </p>
             </div>

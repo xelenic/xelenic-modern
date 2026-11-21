@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\KioskMachine;
 use App\Enums\ProjectType;
 use App\Models\Project;
+use App\Support\KioskDesign;
 use App\Support\KioskSettings;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -42,10 +43,12 @@ class StoreProjectRequest extends FormRequest
         }
 
         // Kiosk projects also say which machine was picked on the first step,
-        // and fill in the kiosk settings panel.
+        // fill in the kiosk settings panel and may attach a Kiosk Studio design.
         if ($this->isKioskProject()) {
             $rules['details.machine'] = ['nullable', Rule::enum(KioskMachine::class)];
             $rules += KioskSettings::rules();
+            $rules += KioskDesign::rules();
+            $rules += KioskDesign::entryRules();
         }
 
         return $rules;
@@ -74,6 +77,14 @@ class StoreProjectRequest extends FormRequest
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return KioskDesign::messages();
+    }
+
+    /**
      * Name each question in error messages after its label.
      *
      * @return array<string, string>
@@ -89,7 +100,8 @@ class StoreProjectRequest extends FormRequest
 
     /**
      * The answered questions for the chosen type (numbers as integers) and,
-     * for kiosks, the machine and settings, ignoring anything else sent.
+     * for kiosks, the machine, settings and a summary of any Kiosk Studio
+     * design, ignoring anything else sent.
      *
      * @return array<string, mixed>
      */
@@ -105,6 +117,10 @@ class StoreProjectRequest extends FormRequest
         if ($this->isKioskProject()) {
             $details->put('machine', $this->validated('details.machine'));
             $details->put('settings', KioskSettings::fromInput($this->validated('settings')));
+
+            if ($design = KioskDesign::decode($this->validated('kiosk_design'))) {
+                $details->put('design', KioskDesign::summary($design));
+            }
         }
 
         return $details->filter(fn (mixed $answer) => filled($answer))->all();

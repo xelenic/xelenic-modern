@@ -1,10 +1,23 @@
 <?php
 
+use App\Models\Project;
 use App\Models\User;
 
 test('the login and sign-up pages render', function () {
-    $this->get('/login')->assertOk()->assertSee('Welcome back');
-    $this->get('/register')->assertOk()->assertSee('Create your account');
+    $this->get('/login')->assertOk()->assertSee('Welcome back')->assertSee('data-brand-scene', false);
+    $this->get('/register')->assertOk()->assertSee('Create your account')->assertSee('data-brand-scene', false);
+});
+
+test('password fields can be shown, and new ones get a strength meter and a match check', function () {
+    $this->get('/login')
+        ->assertSee('data-password-toggle="password"', false)
+        ->assertDontSee('data-password-strength', false);
+
+    $this->get('/register')
+        ->assertSee('data-password-toggle="password"', false)
+        ->assertSee('data-password-toggle="password_confirmation"', false)
+        ->assertSee('data-password-strength="password"', false)
+        ->assertSee('data-password-match="password"', false);
     $this->get('/forgot-password')->assertOk()->assertSee('Forgot your password?');
 });
 
@@ -50,6 +63,9 @@ test('guests are sent to the login page', function () {
 test('signed-in users see their dashboard and profile', function () {
     $user = User::factory()->create(['name' => 'Sam Rivera']);
 
+    // Someone with no projects yet is welcomed in; after that, welcomed back.
+    $this->actingAs($user)->get('/dashboard')->assertOk()->assertSee('Welcome to Xelenic, Sam');
+    Project::factory()->for($user)->create();
     $this->actingAs($user)->get('/dashboard')->assertOk()->assertSee('Welcome back, Sam');
     $this->actingAs($user)->get('/profile')->assertOk()->assertSee('Profile information');
 });

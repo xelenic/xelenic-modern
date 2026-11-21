@@ -29,8 +29,8 @@
                 @method('PUT')
 
                 <x-form.input name="current_password" type="password" label="Current password" bag="updatePassword" autocomplete="current-password" required />
-                <x-form.input name="password" type="password" label="New password" bag="updatePassword" autocomplete="new-password" required />
-                <x-form.input name="password_confirmation" type="password" label="Confirm new password" bag="updatePassword" autocomplete="new-password" required />
+                <x-form.input name="password" type="password" label="New password" bag="updatePassword" autocomplete="new-password" required strength />
+                <x-form.input name="password_confirmation" type="password" label="Confirm new password" bag="updatePassword" autocomplete="new-password" required confirms="password" />
 
                 <div class="flex justify-end">
                     <x-button>Update password</x-button>

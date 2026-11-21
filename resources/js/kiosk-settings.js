@@ -1,6 +1,5 @@
 // Kiosk project form (resources/views/projects/kiosk-form.blade.php):
-// redraws every screen preview (step 3's, and the summary on step 4) with
-// its measurements, and shows the choices under each switch, as the
+// redraws step 3's screen preview with its measurements as the screen
 // settings change. The sums match App\Support\KioskSettings::dimensions()
 // so nothing jumps on load.
 const form = document.querySelector('[data-kiosk-settings]');
@@ -10,7 +9,6 @@ if (form) {
     const orientations = { portrait: 'Portrait', landscape: 'Landscape' };
 
     const field = (name) => form.querySelector(`[name="settings[${name}]"]`);
-    const isOn = (name) => form.querySelector(`[name="settings[${name}]"][type="checkbox"]`)?.checked ?? false;
     const cm = (inches) => (inches * 2.54).toFixed(1);
 
     const update = () => {
@@ -40,21 +38,12 @@ if (form) {
             screen.style.width = `${(width * pxPerInch).toFixed(1)}px`;
             screen.style.height = `${(height * pxPerInch).toFixed(1)}px`;
             screen.dataset.orientation = orientation;
-            screen.classList.toggle('kiosk-webgl', isOn('webgl'));
 
             Object.entries(text).forEach(([name, value]) => {
                 preview.querySelectorAll(`[data-preview-${name}]`).forEach((element) => {
                     element.textContent = value;
                 });
             });
-
-            preview.querySelectorAll('[data-chip]').forEach((chip) => {
-                chip.hidden = !isOn(chip.dataset.chip);
-            });
-        });
-
-        form.querySelectorAll('[data-reveal]').forEach((section) => {
-            section.hidden = !isOn(section.dataset.reveal);
         });
     };
 
