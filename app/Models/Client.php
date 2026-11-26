@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
- * A client shown in the home page's logo marquee, with an optional story
- * page (summary, image, video and article) that opens from its logo.
- * Files live on the "public" disk.
+ * A client shown in the home page's logo marquee, with a page that opens from
+ * its logo: their story (summary, featured image and video, article, and a
+ * gallery of photos and videos) once there's one to tell. Files live on the
+ * "public" disk.
  */
 #[Fillable(['name', 'slug', 'logo_path', 'dark_logo', 'summary', 'image_path', 'video_path', 'video_url', 'article', 'is_published', 'sort_order'])]
 class Client extends Model
@@ -36,13 +38,28 @@ class Client extends Model
     }
 
     /**
-     * Uploaded files go with the client.
+     * Uploaded files go with the client, the gallery's too (its rows go by
+     * foreign key, so its files are found before they do).
      */
     protected static function booted(): void
     {
+        static::deleting(function (Client $client) {
+            Storage::disk('public')->delete($client->media()->whereNotNull('path')->pluck('path')->all());
+        });
+
         static::deleted(function (Client $client) {
             Storage::disk('public')->delete(array_filter([$client->logo_path, $client->image_path, $client->video_path]));
         });
+    }
+
+    /**
+     * The story page's gallery, in order.
+     *
+     * @return HasMany<ClientMedia, $this>
+     */
+    public function media(): HasMany
+    {
+        return $this->hasMany(ClientMedia::class)->orderBy('sort_order')->orderBy('id');
     }
 
     /**
@@ -73,6 +90,21 @@ class Client extends Model
         return $this->image_path ? Storage::disk('public')->url($this->image_path) : null;
     }
 
+    /**
+     * Whether the featured image is taller than it is wide: the story page
+     * shows such a photo whole, beside the article, instead of as a banner.
+     */
+    public function imageIsPortrait(): bool
+    {
+        if (! $this->image_path || ! Storage::disk('public')->exists($this->image_path)) {
+            return false;
+        }
+
+        $size = @getimagesize(Storage::disk('public')->path($this->image_path));
+
+        return $size !== false && $size[1] > $size[0];
+    }
+
     public function videoUrl(): ?string
     {
         return $this->video_path ? Storage::disk('public')->url($this->video_path) : null;
@@ -92,7 +124,17 @@ class Client extends Model
      */
     public function hasStory(): bool
     {
-        return filled($this->summary) || filled($this->article) || $this->image_path || $this->video_path || $this->videoEmbedUrl();
+        return filled($this->summary) || filled($this->article) || $this->image_path || $this->video_path || $this->videoEmbedUrl()
+            || $this->hasGallery();
+    }
+
+    /**
+     * Whether the gallery has anything in it. Load withExists('media') (or the
+     * media) first when checking many clients.
+     */
+    public function hasGallery(): bool
+    {
+        return (bool) ($this->media_exists ?? ($this->relationLoaded('media') ? $this->media->isNotEmpty() : $this->media()->exists()));
     }
 
     /**
@@ -101,7 +143,16 @@ class Client extends Model
      */
     public function articleHtml(): string
     {
-        return Str::markdown((string) $this->article, [
+        return self::markdownToHtml($this->article);
+    }
+
+    /**
+     * Article Markdown as HTML, as the story page shows it (and the editor's
+     * preview): raw HTML dropped, unsafe links removed.
+     */
+    public static function markdownToHtml(?string $markdown): string
+    {
+        return Str::markdown((string) $markdown, [
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
         ]);

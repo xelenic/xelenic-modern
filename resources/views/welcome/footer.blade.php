@@ -34,6 +34,8 @@
         <li><a href="{{ $sectionBase }}#why-us">Why Xelenic</a></li>
         <li><a href="{{ $sectionBase }}#process">Our Process</a></li>
         <li><a href="{{ $sectionBase }}#technology">Technology</a></li>
+        <li><a href="{{ route('clients.index') }}">Our Clients</a></li>
+        <li><a href="{{ route('careers') }}">Careers</a></li>
         <li><a href="{{ $sectionBase }}#contact">Contact</a></li>
       </ul>
     </div>

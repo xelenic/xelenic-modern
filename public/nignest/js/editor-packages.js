@@ -69,8 +69,15 @@ function pkgInfo(pkg) {
 function gameInfo(kind) {
   if (GAME_INFO[kind]) return Object.assign({ color: BUILTIN_TINT[kind] }, GAME_INFO[kind]);
   const t = findTemplate(kind);
-  if (!t) return { name: kind, icon: '⚠️', blurb: 'Template missing. Import its .zip to play it.', missing: true, custom: true, color: '#5a2a2a' };
+  if (!t) return { name: kind, icon: '❓', blurb: 'Template missing. Import its .zip to play it.', missing: true, custom: true, color: '#5a2a2a' };
   return pkgInfo(t);
+}
+/* A game's icon in the editor: its package picture, its illustration, or a
+   game controller for an icon there's no illustration of. */
+function gameIcon(kind, cls) { return infoIcon(gameInfo(kind), cls); }
+function infoIcon(info, cls) {
+  if (info.iconSrc) return h('img', { src: info.iconSrc, alt: '', class: 'art' + (cls ? ' ' + cls : '') });
+  return artEl(ART.has(info.icon) ? info.icon : '🎮', cls);
 }
 function settingsDefaults(settings) {
   const c = {};
@@ -179,7 +186,7 @@ function showTemplateError(name, msg) {
 }
 function templateIconBox(info, size) {
   return h('div', { class: 'ci', style: 'width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * 0.55) + 'px;background:' + (info.color || '#3b3f5c') },
-    info.iconSrc ? h('img', { src: info.iconSrc, alt: '', style: 'width:72%;height:72%;object-fit:contain' }) : info.icon);
+    info.iconSrc ? h('img', { src: info.iconSrc, alt: '', style: 'width:72%;height:72%;object-fit:contain' }) : infoIcon(info));
 }
 function confirmTemplateInstall(pkg) {
   const m = pkg.manifest;
@@ -197,7 +204,7 @@ function confirmTemplateInstall(pkg) {
     h('div', { class: 'tpl-install-head' }, templateIconBox(pkgInfo(pkg), 56),
       h('div', {}, h('h2', {}, m.name), h('p', {}, m.description || ''))),
     h('table', { class: 'data-table' }, h('tbody', {}, rows.map(function (r) { return h('tr', {}, h('th', {}, r[0]), h('td', {}, r[1])); }))),
-    m.extends ? null : h('div', { class: 'warn' }, '⚠️ This template contains program code (game.js). It runs when you press Play and on the kiosk, with the same access as this editor. Only install templates from people you trust.'),
+    m.extends ? null : h('div', { class: 'warn', html: icon('warn') }, ' This template contains program code (game.js). It runs when you press Play and on the kiosk, with the same access as this editor. Only install templates from people you trust.'),
     h('div', { class: 'modal-actions' },
       h('button', { class: 'btn', onclick: closeModal }, 'Cancel'),
       h('button', { class: 'btn primary', onclick: function () { closeModal(); installTemplate(pkg); } }, existing ? 'Update template' : 'Install template'))));
@@ -416,7 +423,7 @@ function refreshTemplateSummary() {
 function renderTemplateSection(body) {
   body.append(h('div', { class: 'lp-title', style: 'margin-top:14px' }, 'Game templates'));
   body.append(h('button', { class: 'card', onclick: function () { openTemplateMarket(null, false, 'games'); } },
-    h('div', { class: 'ci', style: 'background:' + BUILTIN_TINT.quiz + ';color:#fff' }, '🎮'),
+    h('div', { class: 'ci', style: 'background:' + BUILTIN_TINT.quiz + ';color:#fff' }, artEl('🎮')),
     h('div', {}, h('b', {}, 'Browse game templates'), h('small', { class: 'tpl-count' }, templateSummary()))));
 }
 
@@ -428,7 +435,7 @@ let marketSearch = '';
 let marketScroll = 0;
 let marketSection = 'games';
 let screenFilter = 'all';
-const SCREEN_GROUPS = [['all', 'All'], ['welcome', 'Welcome'], ['howto', 'How to play'], ['result', 'Results']];
+const SCREEN_GROUPS = [['all', 'All'], ['welcome', 'Welcome'], ['howto', 'How to play'], ['result', 'Results'], ['ads', 'Advertising']];
 
 function openTemplateMarket(highlight, restore, section) {
   closeMenus();
@@ -475,7 +482,7 @@ function openTemplateMarket(highlight, restore, section) {
 
     if (marketSection === 'screens') {
       search.placeholder = 'Search screens';
-      intro.textContent = 'Ready-made animated screens to start from: welcome, how to play and results.';
+      intro.textContent = 'Ready-made animated screens to start from: welcome, how to play, results and ads.';
       SCREEN_GROUPS.forEach(function (gr) {
         const n = SCREEN_TEMPLATES.filter(function (t) { return gr[0] === 'all' || t.group === gr[0]; }).length;
         chips.append(chip(gr, screenFilter, n, function () { screenFilter = gr[0]; render(); }));
@@ -581,7 +588,7 @@ function screenCard(t) {
   const land = project.width > project.height;
   const linked = screenTemplateLink(t);
   const art = h('div', { class: 'mk-art live', style: '--tint:' + (sc.bg || '#3b3f5c') },
-    h('span', { class: 'mk-art-icon', 'aria-hidden': 'true' }, t.icon));
+    h('span', { class: 'mk-art-icon', 'aria-hidden': 'true' }, artEl(t.icon)));
   const draw = function (animated) {
     const old = art.querySelector('.mk-phone');
     if (old) old.remove();
@@ -639,7 +646,7 @@ function openScreenTemplateDetails(t) {
 
   // One row per animated object: when it comes in, and whether it keeps moving.
   const label = function (o) {
-    if (o.type === 'emoji') return o.emoji + '  Sticker';
+    if (o.type === 'emoji') return ART.label(o.emoji) + ' sticker';
     if (o.type === 'text' || o.type === 'button') {
       const txt = String(o.text || '').replace(/\{\{(\w+)\}\}/g, '[$1]').replace(/\s+/g, ' ').trim();
       return (o.type === 'button' ? 'Button: ' : '') + (txt.length > 26 ? txt.slice(0, 25) + '…' : txt || o.type);
@@ -662,7 +669,8 @@ function openScreenTemplateDetails(t) {
   const links = t.kind
     ? (linked ? 'Its PLAY button opens your "' + linked.name + '" screen.' : 'Add the ' + GAME_INFO[t.kind].name + ' game to your design first, and its PLAY button will open it. You can also link it later in the Flow Map.')
     : t.group === 'welcome' ? 'Link its button to the next screen in the Flow Map, and set it as the start screen for an attract loop.'
-      : 'Use it after a game: it shows the player\'s {{score}}. Link its buttons in the Flow Map.';
+      : t.group === 'ads' ? 'It moves on by itself after ' + AD_SECONDS + ' seconds: choose the next ad in Auto advance (or in the Flow Map) and a few ads become a rotating loop. Link its button to an offer or form screen.'
+        : 'Use it after a game: it shows the player\'s {{score}}. Link its buttons in the Flow Map.';
 
   const add = function (cls) { return h('button', { class: 'btn primary ' + cls, onclick: function () { addScreenFromMarket(t); } }, 'Add to project'); };
   const view = h('div', { class: 'mk sd', style: '--tint:' + (sc.bg || '#3b3f5c') },
@@ -672,7 +680,7 @@ function openScreenTemplateDetails(t) {
       h('button', { class: 'icon-btn', title: 'Close (Esc)', 'aria-label': 'Close', html: icon('close'), onclick: closeModal })),
     h('div', { class: 'mk-body sd-body' },
       h('div', { class: 'sd-hero' },
-        h('span', { class: 'sd-hero-emoji', 'aria-hidden': 'true' }, t.icon),
+        h('span', { class: 'sd-hero-emoji', 'aria-hidden': 'true' }, artEl(t.icon)),
         stage,
         h('div', { class: 'sd-hero-info' },
           h('div', { class: 'sd-kicker' }, h('span', { class: 'sd-chip' }, screenGroupName(t)), h('span', { class: 'sd-chip' }, 'Animated')),
@@ -739,10 +747,10 @@ function cardArt(x) {
   const shot = gameShot(x.kind, 'game', land ? 220 : 120, land ? 124 : 148);
   if (shot) {
     art.classList.add('live');
-    art.append(h('span', { class: 'mk-art-icon', 'aria-hidden': 'true' }, x.info.iconSrc ? '' : x.info.icon), phoneFrame(shot));
+    art.append(h('span', { class: 'mk-art-icon', 'aria-hidden': 'true' }, x.info.iconSrc ? '' : infoIcon(x.info)), phoneFrame(shot));
     return art;
   }
-  art.append(x.info.iconSrc ? h('img', { src: x.info.iconSrc, alt: '', class: 'mk-icon-img' }) : h('span', {}, x.info.icon));
+  art.append(x.info.iconSrc ? h('img', { src: x.info.iconSrc, alt: '', class: 'mk-icon-img' }) : h('span', {}, infoIcon(x.info)));
   return art;
 }
 function ratingLine(r) {
@@ -868,14 +876,14 @@ function openTemplateDetails(x) {
     if (r && r.thumbnail) cover = h('img', { class: 'sd-photo', src: r.thumbnail, alt: x.info.name });
     else {
       const shot = gameShot(x.kind, 'game', land ? 380 : 200, land ? 214 : 356);
-      cover = shot ? phoneFrame(shot) : h('div', { class: 'sd-icon-art' }, x.info.iconSrc ? h('img', { src: x.info.iconSrc, alt: '' }) : x.info.icon);
+      cover = shot ? phoneFrame(shot) : h('div', { class: 'sd-icon-art' }, x.info.iconSrc ? h('img', { src: x.info.iconSrc, alt: '' }) : infoIcon(x.info));
     }
     const rating = r ? h('button', { type: 'button', class: 'sd-rating', onclick: function () { const s = main.querySelector('#sd-reviews'); if (s) s.scrollIntoView({ behavior: 'smooth' }); } },
       starsEl(r.rating, true),
       h('b', {}, r.reviews_count ? (+r.rating).toFixed(1) : ''),
       h('span', {}, r.reviews_count ? plural(r.reviews_count, 'review') : 'No reviews yet · be the first')) : null;
     return h('div', { class: 'sd-hero' + (r && r.thumbnail ? ' has-photo' : '') },
-      h('span', { class: 'sd-hero-emoji', 'aria-hidden': 'true' }, x.info.icon),
+      h('span', { class: 'sd-hero-emoji', 'aria-hidden': 'true' }, infoIcon(x.info)),
       h('div', { class: 'sd-hero-art' }, cover),
       h('div', { class: 'sd-hero-info' },
         h('div', { class: 'sd-kicker' }, h('span', { class: 'sd-chip' }, f.tag), f.based ? h('span', { class: 'sd-chip' }, 'Based on ' + GAME_INFO[f.based].name) : null),

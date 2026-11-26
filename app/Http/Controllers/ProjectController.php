@@ -41,6 +41,11 @@ class ProjectController extends Controller
             return redirect()->route('projects.create.type', $type);
         }
 
+        // Cloud services are ordered in Cloud, not as a project.
+        if ($request->query('type') === 'cloud') {
+            return redirect()->route('cloud.index');
+        }
+
         return view('projects.create', [
             'types' => ProjectType::cases(),
         ]);

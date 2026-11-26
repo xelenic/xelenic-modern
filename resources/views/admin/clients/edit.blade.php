@@ -1,9 +1,9 @@
 <x-layouts.admin :title="'Edit '.$client->name">
-    @if ($client->is_published && $client->hasStory())
+    @if ($client->is_published)
         <x-slot:actions>
             <x-button variant="secondary" :href="route('clients.show', $client)" target="_blank">
                 <x-icon name="eye" class="size-4" />
-                View story
+                View page
             </x-button>
         </x-slot:actions>
     @endif

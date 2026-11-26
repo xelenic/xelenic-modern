@@ -61,10 +61,32 @@ const ICONS = {
   eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.8 10.8 0 0112 5c6.5 0 10 7 10 7a17.7 17.7 0 01-3.2 4.2M6.1 6.1C3.4 7.9 2 12 2 12s3.5 7 10 7a9.7 9.7 0 005.9-2.1"/><path d="M9.9 9.9a3 3 0 004.2 4.2"/>',
   lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>',
-  unlock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 017.5-2"/>'
+  unlock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 017.5-2"/>',
+  trophy: '<path d="M7 4h10v5a5 5 0 01-10 0z"/><path d="M7 6H4v1a3 3 0 003 3M17 6h3v1a3 3 0 01-3 3M12 14v3M8.5 20h7M9.5 17h5"/>',
+  miss: '<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>',
+  send: '<path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/>',
+  clock: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/>',
+  warn: '<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5v.5"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  sparkle: '<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>'
 };
 function icon(name) {
   return '<svg class="i" viewBox="0 0 24 24">' + (ICONS[name] || '') + '</svg>';
+}
+
+/* Kiosk Studio's illustrations (art.js) stand in for emoji everywhere in the
+   editor: a sticker, a game's icon, a template's. */
+const ART = KioskArt();
+/* An illustration as an element (or the character, if there's none). */
+function artEl(ch, cls) {
+  const u = ART.url(ch);
+  if (!u) return h('span', { class: cls || '' }, ch || '');
+  return h('img', { src: u, alt: '', class: 'art' + (cls ? ' ' + cls : ''), draggable: 'false' });
+}
+/* The same, as HTML. */
+function artHtml(ch, css) {
+  const u = ART.url(ch);
+  return u ? '<img src="' + u + '" alt="" class="art" draggable="false" style="' + (css || '') + '">' : esc(ch || '');
 }
 
 /* ---------- Editor theme (dark / light / system) ---------- */
@@ -186,6 +208,14 @@ function normalize(p) {
     if (s.type === 'game') {
       s.game = s.game || { kind: 'quiz', config: {} };
       s.game.config = Object.assign(templateConfigDefaults(s.game.kind, p), s.game.config || {});
+      // Prizes used to carry their picture as an emoji in the label
+      // ("☕ Free coffee"); it's a picture of its own now.
+      (s.game.config.segments || []).forEach(function (g) {
+        if (!g || g.icon) return;
+        const parts = ART.split(g.label);
+        const pic = parts.filter(function (x) { return typeof x !== 'string'; })[0];
+        if (pic) { g.icon = pic.ch; g.label = ART.strip(g.label) || g.label; }
+      });
     }
   });
   if (!p.screens.find(function (s) { return s.id === p.startScreen; })) p.startScreen = p.screens[0].id;
@@ -492,14 +522,14 @@ function renderLeft() {
     const eg = h('div', { class: 'emoji-grid' });
     EMOJI_LIBRARY.forEach(function (em) {
       eg.append(h('button', {
-        draggable: 'true', title: 'Add sticker',
+        draggable: 'true', title: ART.label(em), 'aria-label': ART.label(em) + ' sticker',
         ondragstart: function (e) { e.dataTransfer.setData('text/kiosk-emoji', em); },
         onclick: function () {
           const o = selObj();
           if (o && o.type === 'emoji') commit(function () { o.emoji = em; });
           else addObject('emoji', null, null, { emoji: em });
         }
-      }, em));
+      }, artEl(em)));
     });
     body.append(eg);
     body.append(h('p', { class: 'note' }, 'Tip: use {{score}}, {{best}} or {{name}} in any text to show live values.'));
@@ -511,19 +541,19 @@ function renderLeft() {
     renderTemplateSection(body);
     body.append(h('div', { class: 'lp-title', style: 'margin-top:14px' }, 'Animated screen templates'));
     body.append(h('button', { class: 'card', onclick: function () { openTemplateMarket(null, false, 'screens'); } },
-      h('div', { class: 'ci', style: 'background:linear-gradient(135deg,#5b21b6,#f72585);color:#fff' }, '✨'),
-      h('div', {}, h('b', {}, 'Browse screen templates'), h('small', {}, SCREEN_TEMPLATES.length + ' animated screens · welcome, how to play, results'))));
+      h('div', { class: 'ci', style: 'background:linear-gradient(135deg,#5b21b6,#f72585);color:#fff' }, artEl('✨')),
+      h('div', {}, h('b', {}, 'Browse screen templates'), h('small', {}, SCREEN_TEMPLATES.length + ' animated screens · welcome, how to play, results, ads'))));
     body.append(h('div', { class: 'lp-title', style: 'margin-top:14px' }, 'All screens'));
     project.screens.forEach(function (s) {
       body.append(h('button', { class: 'card', style: 'padding:7px 10px' + (s.id === curId ? ';border-color:var(--accent)' : ''), onclick: function () { openScreen(s.id); } },
-        h('span', { style: 'font-size:16px' }, s.type === 'game' ? gameInfo(s.game.kind).icon : '📄'),
+        s.type === 'game' ? gameIcon(s.game.kind, 'art-sm') : h('span', { class: 'art-sm', html: icon('page') }),
         h('span', { style: 'flex:1;font-weight:600' }, s.name),
         s.id === project.startScreen ? h('span', { class: 'badge' }, 'START') : null));
     });
   } else {
     body.append(h('button', { class: 'btn-wide', html: icon('upload') + ' Upload images', onclick: function () { $('#fileImage').click(); } }));
     if (!(project.assets || []).some(function (a) { return a.id === 'a_logo'; })) {
-      body.append(h('button', { class: 'btn-wide', onclick: addSampleLogo }, '✨ Add sample logo'));
+      body.append(h('button', { class: 'btn-wide', html: icon('sparkle') + ' Add sample logo', onclick: addSampleLogo }));
     }
     if (!(project.assets || []).length) {
       body.append(h('p', { class: 'note' }, 'No images yet. Upload logos, backgrounds or product photos. They are stored inside the project file.'));
@@ -570,33 +600,185 @@ function closePreview() {
 /* opts.wide: the large dialog (80% of the window), as for the game templates. */
 function openModal(content, opts) {
   const card = $('#modalCard');
-  card.className = 'modal-card' + (opts && opts.wide ? ' wide' : '');
+  card.className = 'modal-card' + (opts && opts.wide ? ' wide' : '') + (opts && opts.cls ? ' ' + opts.cls : '');
   card.innerHTML = '';
   card.append(content);
   $('#modal').hidden = false;
 }
 function closeModal() { $('#modal').hidden = true; }
 
+/* ---------- New project ----------
+   Starting points: featured starter projects, a kiosk around any one game,
+   or a blank one. Each card previews the real thing (its screens drawn by the
+   player), choosing one selects it, and Create (or a double click) makes it.
+   It replaces the current project, so the footer offers to save that first. */
+const NEW_PROJECT_GAMES = [
+  ['quiz', 'Quiz kiosk'], ['catch', 'Catch game'], ['slice', 'Slice game'], ['wheel', 'Prize wheel'], ['runner', 'Runner game'],
+  ['memory', 'Memory match'], ['whack', 'Whack attack'], ['stack', 'Tower stack'], ['hoop', 'Hoop shot'], ['scratch', 'Scratch card']
+];
+let newProjectLandscape = false;
+
+/* A screen of project p drawn small (the editor draws in the current project's
+   size and pictures, so p stands in for it while it's drawn). */
+function previewOf(p, sc, w, hgt, animated) {
+  const keep = project;
+  project = p;
+  try { return animated ? screenThumb(sc, w, hgt, true) : makeThumb(sc, w, hgt); } finally { project = keep; }
+}
+
 function newProjectDialog() {
-  const pickT = function (fn) { return function () { closeModal(); setProject(fn()); toast('New project created'); }; };
-  const grid = h('div', { class: 'tpl-grid' },
-    h('button', { class: 'tpl', onclick: pickT(demoProject) }, h('div', { class: 'te' }, '🎮'), h('b', {}, 'Play & Win demo'), h('small', {}, 'Attract loop, game menu, all three games, prize form')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('quiz'); }) }, h('div', { class: 'te' }, '🧠'), h('b', {}, 'Quiz kiosk'), h('small', {}, 'Start screen, quiz, result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('catch'); }) }, h('div', { class: 'te' }, '🧺'), h('b', {}, 'Catch game'), h('small', {}, 'Start screen, catch game, result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('slice'); }) }, h('div', { class: 'te' }, '🍉'), h('b', {}, 'Slice game'), h('small', {}, 'Start screen, slice game, result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('wheel'); }) }, h('div', { class: 'te' }, '🎡'), h('b', {}, 'Prize wheel'), h('small', {}, 'Start screen, spin wheel, prize result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('runner'); }) }, h('div', { class: 'te' }, '🏃'), h('b', {}, 'Runner game'), h('small', {}, 'Start screen, runner game, result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('memory'); }) }, h('div', { class: 'te' }, '🃏'), h('b', {}, 'Memory match'), h('small', {}, 'Start screen, memory game, result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('whack'); }) }, h('div', { class: 'te' }, '🔨'), h('b', {}, 'Whack attack'), h('small', {}, 'Start screen, whack game, result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('stack'); }) }, h('div', { class: 'te' }, '🧱'), h('b', {}, 'Tower stack'), h('small', {}, 'Start screen, stacking game, result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('hoop'); }) }, h('div', { class: 'te' }, '🏀'), h('b', {}, 'Hoop shot'), h('small', {}, 'Start screen, basketball game, result')),
-    h('button', { class: 'tpl', onclick: pickT(function () { return singleGameProject('scratch'); }) }, h('div', { class: 'te' }, '🎟️'), h('b', {}, 'Scratch card'), h('small', {}, 'Start screen, scratch card, prize result')),
-    h('button', { class: 'tpl', onclick: pickT(blankProject) }, h('div', { class: 'te' }, '📄'), h('b', {}, 'Blank project'), h('small', {}, 'One empty screen')));
-  openModal(h('div', {},
-    h('h2', {}, 'New project'),
-    h('p', {}, 'Pick a starting point. This replaces the current project, so save it first if you need it.'),
-    grid,
-    h('div', { class: 'modal-actions' }, h('button', { class: 'btn', onclick: closeModal }, 'Cancel'))));
+  closeMenus();
+  const starters = [
+    { id: 'demo', make: demoProject, name: 'Play & Win demo', badge: 'Most popular', icon: '🎮', color: '#5b21b6', color2: '#f72585',
+      blurb: 'A complete prize kiosk: an attract loop, a menu of four games, prizes and a details form.', chips: ['4 games', 'Prizes', 'Details form'] },
+    { id: 'ads', make: adLoopProject, name: 'Advertising kiosk', badge: 'New', icon: '📣', color: '#b80000', color2: '#ff7b00',
+      blurb: 'Four animated ads take turns on their own, each with an offer form and a thank-you.', chips: ['4 ads', 'Rotating loop', 'Lead form'] }
+  ];
+  const games = NEW_PROJECT_GAMES.map(function (g) {
+    const kind = g[0];
+    return { id: kind, kind: kind, make: function () { return singleGameProject(kind); }, name: g[1], icon: GAME_INFO[kind].icon, color: BUILTIN_TINT[kind],
+      blurb: GAME_INFO[kind].blurb, prize: PRIZE_GAMES.indexOf(kind) >= 0 };
+  });
+  const blank = { id: 'blank', make: blankProject, name: 'Blank project', blurb: 'One empty screen. Build it your way.' };
+  const all = starters.concat(games, [blank]);
+  let chosen = starters[0];
+  const cards = [];
+
+  const create = function (item) {
+    closeModal();
+    setProject(item.make());
+    if (newProjectLandscape) setOrientation('landscape');
+    toast('"' + project.name + '" created');
+  };
+  const choose = function (item) {
+    chosen = item;
+    cards.forEach(function (c) {
+      const on = c.item === item;
+      c.el.classList.toggle('on', on);
+      c.el.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    createBtn.innerHTML = icon('plus') + ' Create ' + esc(item.name);
+  };
+  const card = function (item, cls, children) {
+    const el = h('button', { type: 'button', class: 'np-card ' + cls, 'aria-pressed': 'false', style: item.color ? '--tint:' + item.color + ';--tint2:' + (item.color2 || item.color) : '',
+      onclick: function () { choose(item); }, ondblclick: function () { create(item); },
+      onkeydown: function (e) { if (e.key === 'Enter') { e.preventDefault(); create(item); } } },
+    h('span', { class: 'np-check', html: icon('check'), 'aria-hidden': 'true' }), children);
+    el.dataset.search = (item.name + ' ' + item.blurb + ' ' + (item.chips || []).join(' ') + (item.prize ? ' prize' : ' score')).toLowerCase();
+    cards.push({ item: item, el: el });
+    return el;
+  };
+
+  // Featured: the start screen playing, a strip of the other screens.
+  const featured = h('div', { class: 'np-featured' }, starters.map(function (st) {
+    const p = normalize(st.make());
+    const startSc = p.screens.find(function (x) { return x.id === p.startScreen; }) || p.screens[0];
+    const stage = h('div', { class: 'np-kiosk' }, previewOf(p, startSc, 132, 234, true));
+    const strip = h('div', { class: 'np-strip' }, p.screens.filter(function (x) { return x !== startSc; }).slice(0, 5).map(function (x) {
+      return h('span', { class: 'np-mini', title: x.name }, previewOf(p, x, 44, 78, false));
+    }));
+    const el = card(st, 'np-feature', [
+      h('span', { class: 'np-feature-art' }, stage),
+      h('span', { class: 'np-feature-body' },
+        h('span', { class: 'np-badge' }, st.badge),
+        h('span', { class: 'np-title' }, artEl(st.icon), st.name),
+        h('span', { class: 'np-blurb' }, st.blurb),
+        h('span', { class: 'np-chips' }, [plural(p.screens.length, 'screen')].concat(st.chips).map(function (c) { return h('span', { class: 'np-chip' }, c); })),
+        strip)
+    ]);
+    // Point at it to play its welcome again.
+    el.addEventListener('mouseenter', function () {
+      stage.innerHTML = '';
+      stage.append(previewOf(p, startSc, 132, 234, true));
+    });
+    return el;
+  }));
+
+  // One card per game: its game screen, as the player draws it.
+  const gameGrid = h('div', { class: 'np-games' }, games.map(function (g) {
+    const p = normalize(g.make());
+    const gameSc = p.screens.find(function (x) { return x.type === 'game'; });
+    return card(g, 'np-game', [
+      h('span', { class: 'np-game-art' },
+        h('span', { class: 'np-game-icon' }, artEl(g.icon)),
+        h('span', { class: 'np-phone' }, previewOf(p, gameSc, 74, 132, false)),
+        g.prize ? h('span', { class: 'np-pill' }, 'Prize') : null),
+      h('span', { class: 'np-game-body' },
+        h('span', { class: 'np-title' }, g.name),
+        h('span', { class: 'np-blurb' }, g.blurb),
+        h('span', { class: 'np-meta' }, 'Start · game · ' + (g.prize ? 'prize' : 'result')))
+    ]);
+  }));
+
+  const blankCard = card(blank, 'np-blank', [
+    h('span', { class: 'np-blank-icon', html: icon('plus') }),
+    h('span', { class: 'np-game-body' }, h('span', { class: 'np-title' }, blank.name), h('span', { class: 'np-blurb' }, blank.blurb))
+  ]);
+
+  // Search and filters.
+  let filter = 'all';
+  const sections = [];
+  const section = function (title, note, body) {
+    const sec = h('section', { class: 'np-section' }, h('div', { class: 'np-section-head' }, h('h3', {}, title), note ? h('span', {}, note) : null), body);
+    sections.push({ el: sec });
+    return sec;
+  };
+  const search = h('input', { type: 'search', class: 'np-search', placeholder: 'Search starting points', 'aria-label': 'Search starting points', 'data-focus': '' });
+  const apply = function () {
+    const q = search.value.trim().toLowerCase();
+    cards.forEach(function (c) {
+      const kind = c.item.make === blankProject ? 'blank' : starters.indexOf(c.item) >= 0 ? 'featured' : c.item.prize ? 'prize' : 'score';
+      const okFilter = filter === 'all' || filter === kind || (filter === 'games' && (kind === 'prize' || kind === 'score'));
+      c.el.hidden = !(okFilter && (!q || c.el.dataset.search.indexOf(q) >= 0));
+    });
+    sections.forEach(function (sc) { sc.el.hidden = !sc.el.querySelector('.np-card:not([hidden])'); });
+    empty.hidden = cards.some(function (c) { return !c.el.hidden; });
+  };
+  search.addEventListener('input', apply);
+  const filters = [['all', 'All'], ['featured', 'Featured'], ['games', 'Games'], ['prize', 'Prize games'], ['blank', 'Blank']];
+  const chipRow = h('div', { class: 'np-filters', role: 'group', 'aria-label': 'Show' }, filters.map(function (f) {
+    return h('button', { type: 'button', class: 'np-filter' + (f[0] === filter ? ' on' : ''), 'aria-pressed': f[0] === filter ? 'true' : 'false',
+      onclick: function (e) {
+        filter = f[0];
+        chipRow.querySelectorAll('.np-filter').forEach(function (b) { const on = b === e.currentTarget; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+        apply();
+      } }, f[1]);
+  }));
+  const empty = h('div', { class: 'np-empty', hidden: true }, 'Nothing matches. Try another word.');
+
+  // Portrait or landscape.
+  const orient = h('div', { class: 'np-orient', role: 'group', 'aria-label': 'Kiosk screen' }, [['portrait', 'Portrait', '1080 × 1920'], ['landscape', 'Landscape', '1920 × 1080']].map(function (o) {
+    const on = (o[0] === 'landscape') === newProjectLandscape;
+    return h('button', { type: 'button', class: on ? 'on' : '', 'aria-pressed': on ? 'true' : 'false', title: o[2],
+      onclick: function (e) {
+        newProjectLandscape = o[0] === 'landscape';
+        orient.querySelectorAll('button').forEach(function (b) { const is = b === e.currentTarget; b.classList.toggle('on', is); b.setAttribute('aria-pressed', is ? 'true' : 'false'); });
+      } }, h('i', { class: 'np-orient-shape ' + o[0] }), o[1]);
+  }));
+
+  const createBtn = h('button', { class: 'btn primary np-create', onclick: function () { create(chosen); } });
+  const view = h('div', { class: 'np' },
+    h('header', { class: 'np-head' },
+      h('div', { class: 'np-head-row' },
+        h('span', { class: 'np-logo' }, artEl('✨')),
+        h('div', { class: 'np-head-text' }, h('h2', {}, 'Start a new kiosk'), h('p', {}, 'Pick a starting point. Every screen, game and word can be changed afterwards.')),
+        h('button', { class: 'icon-btn np-close', title: 'Close (Esc)', 'aria-label': 'Close', html: icon('close'), onclick: closeModal })),
+      h('div', { class: 'np-tools' }, search, chipRow, h('span', { class: 'grow' }), h('span', { class: 'np-orient-wrap' }, h('span', { class: 'np-orient-label' }, 'Kiosk screen'), orient))),
+    h('div', { class: 'np-body' },
+      section('Featured', 'Complete kiosks, ready to play', featured),
+      section('Start from a game', 'A start screen, the game and a result', gameGrid),
+      section('Start from scratch', null, h('div', { class: 'np-games' }, blankCard)),
+      empty),
+    h('footer', { class: 'np-foot' },
+      h('span', { class: 'np-warn' }, h('span', { html: icon('warn') }), 'This replaces “' + project.name + '”.',
+        h('button', { type: 'button', class: 'np-link', onclick: saveJson }, 'Save it first')),
+      h('span', { class: 'grow' }),
+      h('button', { class: 'btn', onclick: closeModal }, 'Cancel'),
+      createBtn));
+
+  openModal(view, { cls: 'np-card-wrap' });
+  choose(chosen);
+  setTimeout(function () { const first = view.querySelector('.np-card.on'); if (first) first.focus(); }, 30);
 }
 
 function singleGameProject(kind) {
@@ -632,7 +814,7 @@ function openData() {
   rows.forEach(function (r) { Object.keys(r).forEach(function (c) { if (cols.indexOf(c) < 0) cols.push(c); }); });
   const body = h('div', {}, h('h2', {}, 'Collected data'),
     h('p', {}, 'Form submissions captured while playing in this browser. An exported kiosk keeps its own data on each device.'));
-  if (!rows.length) body.append(h('div', { class: 'empty' }, h('div', { class: 'big' }, '🗂️'), 'No submissions yet. Play the project and submit a form.'));
+  if (!rows.length) body.append(h('div', { class: 'empty' }, h('div', { class: 'big', html: icon('table') }), 'No submissions yet. Play the project and submit a form.'));
   else {
     const tbl = h('table', { class: 'data-table' },
       h('thead', {}, h('tr', {}, cols.map(function (c) { return h('th', {}, c); }))),
@@ -677,7 +859,7 @@ function exportKiosk() {
     '<title>' + esc(project.name) + '</title>' +
     '<style>html,body{margin:0;height:100%;background:#000;overflow:hidden;overscroll-behavior:none}#app{position:fixed;inset:0}</style>' +
     '</head><body><div id="app"></div><script>\n' +
-    KioskGames.toString() + '\n' + KioskRuntime.toString() + '\n' +
+    KioskArt.toString() + '\n' + KioskGames.toString() + '\n' + KioskRuntime.toString() + '\n' +
     'KioskRuntime().createPlayer(document.getElementById("app"), ' + json + ', { kiosk: true });\n' +
     '<' + '/script></body></html>';
   download(slug(project.name) + '-kiosk.html', html, 'text/html');

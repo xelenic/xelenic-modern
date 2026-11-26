@@ -17,7 +17,7 @@ test('a dashboard with no projects offers Xelenic’s services to choose from', 
         ->assertOk()
         ->assertSeeInOrder(['Kiosk Engine', 'Cloud Services', 'Hire Our Engineers', 'Custom Development'])
         ->assertSee('action="'.route('projects.create').'"', false)
-        ->assertSeeInOrder(['value="kiosk-app"', 'value=""', 'value="hire-engineers"', 'value="software-solution"'], false)
+        ->assertSeeInOrder(['value="kiosk-app"', 'value="cloud"', 'value="hire-engineers"', 'value="software-solution"'], false)
         ->assertDontSee('All projects');
 });
 
@@ -26,7 +26,8 @@ test('choosing a service on the dashboard opens that service’s form', function
 
     $this->actingAs($user)->get('/projects/create?type=kiosk-app')->assertRedirect('/projects/create/kiosk-app');
     $this->actingAs($user)->get('/projects/create?type=hire-engineers')->assertRedirect('/projects/create/hire-engineers');
-    // Cloud services has no form of its own yet, so it's the picker; so is anything unknown.
+    // Cloud services are ordered in Cloud; anything unknown gets the picker.
+    $this->actingAs($user)->get('/projects/create?type=cloud')->assertRedirect(route('cloud.index'));
     $this->actingAs($user)->get('/projects/create?type=')->assertOk()->assertSee('What would you like to build?');
     $this->actingAs($user)->get('/projects/create?type=nonsense')->assertOk()->assertSee('What would you like to build?');
 });
@@ -42,7 +43,8 @@ test('a dashboard with projects counts them by status and keeps the services to 
         ->assertOk()
         ->assertSeeInOrder(['All projects', '4', 'Under review', '2', 'In progress', '1', 'Completed', '1'])
         ->assertSee('More from Xelenic')
-        ->assertSee(route('projects.create.type', ProjectType::KioskApp));
+        ->assertSee(route('projects.create.type', ProjectType::KioskApp))
+        ->assertSee(route('cloud.index'));
 });
 
 test('each status has a place on the progress track, except cancelled', function () {

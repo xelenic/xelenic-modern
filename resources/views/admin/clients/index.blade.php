@@ -8,7 +8,7 @@
 
     <p class="mb-6 max-w-2xl text-sm text-slate-500">
         Published clients scroll across the <a href="{{ route('home') }}#clients" class="font-medium text-blue-600 hover:text-blue-700">home page</a>
-        in this order, split over two rows. A logo opens the client's story page once it has a description, image, video or article.
+        in this order, split over two rows. Each logo opens the client's page; add a description, image, video or article to tell their story there.
     </p>
 
     @if ($clients->isEmpty())
@@ -60,17 +60,23 @@
                             @if (filled($client->article))
                                 <li class="flex items-center gap-1"><x-icon name="article" class="size-3.5 text-slate-400" /> Article</li>
                             @endif
+                            @if ($client->photos_count)
+                                <li class="flex items-center gap-1"><x-icon name="image" class="size-3.5 text-slate-400" /> {{ $client->photos_count }} {{ Str::plural('photo', $client->photos_count) }}</li>
+                            @endif
+                            @if ($client->videos_count)
+                                <li class="flex items-center gap-1"><x-icon name="video" class="size-3.5 text-slate-400" /> {{ $client->videos_count }} gallery {{ Str::plural('video', $client->videos_count) }}</li>
+                            @endif
                             @unless ($client->hasStory())
-                                <li>Logo only, no story page yet</li>
+                                <li>Logo only, no story yet</li>
                             @endunless
                         </ul>
 
                         <div class="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4">
                             <x-button variant="secondary" size="sm" :href="route('admin.clients.edit', $client)">Edit</x-button>
-                            @if ($client->is_published && $client->hasStory())
+                            @if ($client->is_published)
                                 <x-button variant="secondary" size="sm" :href="route('clients.show', $client)" target="_blank">
                                     <x-icon name="eye" class="size-3.5" />
-                                    View story
+                                    View page
                                 </x-button>
                             @endif
                             <form method="POST" action="{{ route('admin.clients.destroy', $client) }}" data-confirm="Delete {{ $client->name }}? Their logo, image, video and story are removed too." class="ml-auto">

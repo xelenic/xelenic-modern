@@ -39,7 +39,7 @@ function layerName(o) {
     case 'text': return txt.slice(0, 28) || 'Text';
     case 'button': return 'Button · ' + (txt.slice(0, 20) || 'untitled');
     case 'image': return 'Image';
-    case 'emoji': return (o.emoji || '') + ' Sticker';
+    case 'emoji': return ART.label(o.emoji) + ' sticker';
     case 'shape': return o.shape === 'circle' ? 'Circle' : 'Box';
     case 'input': return 'Input · ' + (o.field || 'field');
   }

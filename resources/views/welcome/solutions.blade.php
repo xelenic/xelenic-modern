@@ -43,7 +43,7 @@
     </div>
 
     <div class="solutions-grid">
-      <article class="solution-card reveal">
+      <article class="solution-card reveal" id="ai-middleware">
         <div class="card-inner">
           <div class="card-icon" data-shape="layers">
             <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
@@ -69,7 +69,7 @@
         </div>
       </article>
 
-      <article class="solution-card reveal">
+      <article class="solution-card reveal" id="kiosk-apps">
         <div class="card-inner">
           <div class="card-icon" data-shape="kiosk">
             <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 18h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="9" r="2.3" stroke="currentColor" stroke-width="1.6"/></svg>
@@ -80,7 +80,7 @@
         </div>
       </article>
 
-      <article class="solution-card reveal">
+      <article class="solution-card reveal" id="marketing">
         <div class="card-inner">
           <div class="card-icon" data-shape="target">
             <svg viewBox="0 0 24 24" fill="none"><path d="M3 11l18-7-7 18-2.5-7.5L3 11z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>

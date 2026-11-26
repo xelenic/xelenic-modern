@@ -14,6 +14,18 @@ return [
     |
     */
 
+    /*
+    | InterServer (my.interserver.net), whose VPS, web hosting, domains and
+    | Rapid Deploy dedicated servers clients order under Cloud. The API key
+    | comes from Account Security on my.interserver.net; orders are paid
+    | from the account's prepay balance.
+    */
+    'interserver' => [
+        'key' => env('INTERSERVER_API_KEY'),
+        'url' => env('INTERSERVER_API_URL', 'https://my.interserver.net/apiv2'),
+        'timeout' => (int) env('INTERSERVER_TIMEOUT', 30),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

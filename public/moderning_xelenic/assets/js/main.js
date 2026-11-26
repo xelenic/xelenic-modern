@@ -30,16 +30,74 @@
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.getElementById('navLinks');
 
+  // Mega menus (KioskStudio): on wide screens they open on hover, with a short
+  // grace period so the pointer can cross to the panel, and a click keeps
+  // them open; on touch and narrow screens (an accordion in the menu) a tap
+  // toggles. Escape, a click elsewhere or focus moving away closes them.
+  const megas = [...document.querySelectorAll('[data-mega]')];
+  const hoverable = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1001px)');
+
+  const setMega = (item, open) => {
+    clearTimeout(item.megaTimer);
+    item.classList.toggle('is-open', open);
+    item.querySelector('.mega-toggle')?.setAttribute('aria-expanded', String(open));
+    header?.classList.toggle('mega-open', megas.some((m) => m.classList.contains('is-open')) && hoverable.matches);
+  };
+  const closeMegas = () => megas.forEach((item) => item.classList.contains('is-open') && setMega(item, false));
+
+  megas.forEach((item) => {
+    const button = item.querySelector('.mega-toggle');
+    let pointer = '';
+    const later = (open, delay) => {
+      clearTimeout(item.megaTimer);
+      item.megaTimer = setTimeout(() => setMega(item, open), delay);
+    };
+
+    button?.addEventListener('pointerdown', (event) => { pointer = event.pointerType; });
+    button?.addEventListener('click', () => {
+      const viaHover = pointer === 'mouse' && hoverable.matches;
+      pointer = '';
+      megas.forEach((other) => other !== item && setMega(other, false));
+      setMega(item, viaHover ? true : !item.classList.contains('is-open'));
+    });
+
+    item.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse' && hoverable.matches) later(true, 70);
+    });
+    item.addEventListener('pointerleave', (event) => {
+      if (event.pointerType === 'mouse' && hoverable.matches) later(false, 220);
+    });
+    item.addEventListener('focusout', (event) => {
+      if (hoverable.matches && !item.contains(event.relatedTarget)) setMega(item, false);
+    });
+    item.querySelectorAll('.mega a').forEach((link) => link.addEventListener('click', () => setMega(item, false)));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const open = megas.find((item) => item.classList.contains('is-open'));
+    if (event.key === 'Escape' && open) {
+      setMega(open, false);
+      open.querySelector('.mega-toggle')?.focus();
+    }
+  });
+  document.addEventListener('click', (event) => {
+    megas.forEach((item) => !item.contains(event.target) && item.classList.contains('is-open') && setMega(item, false));
+  });
+  // Crossing between the wide and narrow layouts starts afresh.
+  hoverable.addEventListener?.('change', closeMegas);
+
   const closeNav = () => {
     navToggle?.classList.remove('open');
     navLinks?.classList.remove('open');
     navToggle?.setAttribute('aria-expanded', 'false');
+    closeMegas();
   };
 
   navToggle?.addEventListener('click', () => {
     const isOpen = navLinks?.classList.toggle('open');
     navToggle.classList.toggle('open', !!isOpen);
     navToggle.setAttribute('aria-expanded', String(!!isOpen));
+    if (!isOpen) closeMegas();
   });
 
   navLinks?.querySelectorAll('a').forEach((link) => {

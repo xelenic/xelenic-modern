@@ -38,6 +38,25 @@ class GameTemplate extends Model
     public const MAX_SCREENSHOTS = 8;
 
     /**
+     * How each built-in game plays, for its page in the website's
+     * marketplace: the controls, whether it ends in a score or a prize, the
+     * steps (as the game's own how-to-play screen has them, START_INFO in
+     * Kiosk Studio's js/templates.js), and what it suits.
+     */
+    public const GUIDES = [
+        'quiz' => ['controls' => 'Tap', 'ends' => 'score', 'steps' => ['Answer 5 quick questions', 'Tap the right answer before time runs out', 'Score 300 or more to win'], 'good_for' => ['Product launches', 'Brand trivia']],
+        'catch' => ['controls' => 'Drag', 'ends' => 'score', 'steps' => ['Drag the basket left and right', 'Catch fruit for +10 points', 'Avoid the bombs!'], 'good_for' => ['Malls and events', 'Families']],
+        'slice' => ['controls' => 'Swipe', 'ends' => 'score', 'steps' => ['Swipe across fruit to slice it', 'Slice 3 at once for a combo bonus', 'Don’t slice the bombs!'], 'good_for' => ['Food and drink brands', 'Quick play']],
+        'wheel' => ['controls' => 'Tap', 'ends' => 'prize', 'steps' => ['Tap SPIN to turn the wheel', 'Wherever it stops is your prize', 'One spin per player'], 'good_for' => ['Prize giveaways', 'Lead capture']],
+        'runner' => ['controls' => 'Tap', 'ends' => 'score', 'steps' => ['Tap anywhere to jump', 'Tap again in the air to double jump', 'Grab coins and dodge the obstacles!'], 'good_for' => ['Leaderboards', 'Repeat play']],
+        'memory' => ['controls' => 'Tap', 'ends' => 'score', 'steps' => ['Remember where the pictures are', 'Tap two cards to find a pair', 'Match them all before time runs out!'], 'good_for' => ['Product showcases', 'All ages']],
+        'whack' => ['controls' => 'Tap', 'ends' => 'score', 'steps' => ['Critters pop out of the holes', 'Tap them before they hide', 'Leave the bombs alone!'], 'good_for' => ['Events', 'Fast fun']],
+        'stack' => ['controls' => 'Tap', 'ends' => 'score', 'steps' => ['A block slides across the top', 'Tap to drop it on the tower', 'Line it up perfectly for a bonus!'], 'good_for' => ['Leaderboards', 'Skill challenges']],
+        'scratch' => ['controls' => 'Scratch', 'ends' => 'prize', 'steps' => ['Rub the silver foil with your finger', 'Your prize appears underneath', 'One card per player'], 'good_for' => ['Instant prizes', 'Retail promotions']],
+        'hoop' => ['controls' => 'Swipe', 'ends' => 'score', 'steps' => ['Swipe up to throw the ball', 'Sink as many baskets as you can', 'Miss the rim for a bonus!'], 'good_for' => ['Sports brands', 'Events']],
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -101,6 +120,54 @@ class GameTemplate extends Model
     public function isBuiltin(): bool
     {
         return $this->kind === 'builtin';
+    }
+
+    /**
+     * How it plays (see GUIDES): a preset plays like the game it's based on.
+     * Null for a game of its own.
+     *
+     * @return array{controls: string, ends: string, steps: list<string>, good_for: list<string>}|null
+     */
+    public function guide(): ?array
+    {
+        return self::GUIDES[$this->isBuiltin() ? $this->slug : (string) $this->extends] ?? null;
+    }
+
+    /**
+     * Whether the website can run it as a demo: the built-in games, which
+     * Kiosk Studio's player has.
+     */
+    public function hasDemo(): bool
+    {
+        return $this->isBuiltin() && in_array($this->slug, self::BUILTIN, true);
+    }
+
+    /**
+     * Its icon on the website (resources/views/components/site/icon.blade.php):
+     * a built-in game's own, the one a preset is based on, else a controller.
+     * The website shows these rather than the emoji Kiosk Studio uses.
+     */
+    public function siteIcon(): string
+    {
+        $kind = $this->isBuiltin() ? $this->slug : (string) $this->extends;
+
+        return in_array($kind, self::BUILTIN, true) ? $kind : 'gamepad';
+    }
+
+    /**
+     * Its colour, as a CSS value (stored colours are #rrggbb or #rrggbbaa).
+     */
+    public function cssColor(): string
+    {
+        return preg_match('/^#[0-9a-f]{6}([0-9a-f]{2})?$/i', (string) $this->color) ? $this->color : '#3b3f5c';
+    }
+
+    /**
+     * Its icon picture, if it has one (a data URL from its package).
+     */
+    public function iconImage(): ?string
+    {
+        return str_starts_with((string) $this->icon_image, 'data:image/') ? $this->icon_image : null;
     }
 
     /**

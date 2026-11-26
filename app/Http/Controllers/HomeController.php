@@ -13,7 +13,7 @@ class HomeController extends Controller
     public function __invoke(): View
     {
         return view('welcome', [
-            'clients' => Client::published()->ordered()->get(),
+            'clients' => Client::published()->ordered()->withExists('media')->get(),
         ]);
     }
 }

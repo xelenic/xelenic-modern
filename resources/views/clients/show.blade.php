@@ -6,7 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ $client->name }} · Xelenic</title>
-  <meta name="description" content="{{ $client->summary ?: "How Xelenic works with {$client->name}." }}" />
+  <meta name="description" content="{{ $client->summary ?: "{$client->name} is one of the brands that trust Xelenic." }}" />
   <link rel="icon" href="{{ asset('moderning_xelenic/assets/img/favicon.png') }}" type="image/png" />
   <link rel="apple-touch-icon" href="{{ asset('moderning_xelenic/assets/img/apple-touch-icon.png') }}" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,17 +26,19 @@
 
   <main class="story">
     <article class="container">
-      <a href="{{ route('home') }}#clients" class="story-back">
+      <a href="{{ route('clients.index') }}" class="story-back">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
         All clients
       </a>
 
       <header class="story-hero">
         <div>
-          <span class="eyebrow">Client story</span>
+          <span class="eyebrow">{{ $client->hasStory() ? 'Client story' : 'Our client' }}</span>
           <h1>{{ $client->name }}</h1>
           @if (filled($client->summary))
             <p class="story-summary">{{ $client->summary }}</p>
+          @else
+            <p class="story-summary">{{ $client->name }} is one of the brands that trust Xelenic with their kiosks, software and digital growth.</p>
           @endif
         </div>
         <div @class(['story-logo', 'is-dark' => $client->dark_logo])>
@@ -44,10 +46,27 @@
         </div>
       </header>
 
-      @if ($client->imageUrl() || $client->videoUrl() || $client->videoEmbedUrl())
+      @php
+        // A portrait featured photo is shown whole beside the article (or on
+        // its own, centred); a landscape one runs wide above it.
+        $portrait = $client->imageUrl() && $client->imageIsPortrait();
+        $beside = $portrait && filled($client->article);
+      @endphp
+
+      @if ($beside)
+        <div class="story-split">
+          <figure class="story-figure is-portrait">
+            <img src="{{ $client->imageUrl() }}" alt="" />
+          </figure>
+          {{-- Markdown rendered with raw HTML stripped (Client::articleHtml()) --}}
+          <div class="story-body">{!! $client->articleHtml() !!}</div>
+        </div>
+      @endif
+
+      @if ((! $beside && $client->imageUrl()) || $client->videoUrl() || $client->videoEmbedUrl())
         <div class="story-media">
-          @if ($client->imageUrl())
-            <figure class="story-figure">
+          @if (! $beside && $client->imageUrl())
+            <figure @class(['story-figure', 'is-portrait' => $portrait])>
               <img src="{{ $client->imageUrl() }}" alt="" />
             </figure>
           @endif
@@ -71,9 +90,66 @@
         </div>
       @endif
 
-      @if (filled($client->article))
+      @if (! $beside && filled($client->article))
         {{-- Markdown rendered with raw HTML stripped (Client::articleHtml()) --}}
         <div class="story-body">{!! $client->articleHtml() !!}</div>
+      @endif
+
+      {{-- The gallery, in its order: photos (they open large, see
+           client-story.js), then videos and YouTube or Vimeo links. --}}
+      @php
+        $photos = $client->media->filter->isImage()->values();
+        $videos = $client->media->reject->isImage()->values();
+      @endphp
+      @if ($photos->isNotEmpty())
+        <section class="story-gallery" aria-labelledby="story-photos">
+          <h2 id="story-photos">Photos</h2>
+          <ul class="story-photos">
+            @foreach ($photos as $photo)
+              <li>
+                <figure>
+                  <a href="{{ $photo->fileUrl() }}" class="story-photo" data-lightbox @if ($photo->caption) data-caption="{{ $photo->caption }}" @endif aria-label="{{ $photo->caption ?: 'Photo '.($loop->iteration) }}: view larger">
+                    <img src="{{ $photo->fileUrl() }}" alt="{{ $photo->caption ?? '' }}" loading="lazy" />
+                  </a>
+                  @if ($photo->caption)
+                    <figcaption>{{ $photo->caption }}</figcaption>
+                  @endif
+                </figure>
+              </li>
+            @endforeach
+          </ul>
+        </section>
+      @endif
+
+      @if ($videos->isNotEmpty())
+        <section class="story-gallery" aria-labelledby="story-videos">
+          <h2 id="story-videos">Videos</h2>
+          <ul class="story-videos">
+            @foreach ($videos as $video)
+              <li>
+                <figure>
+                  <div class="story-video">
+                    @if ($video->isVideo())
+                      <video src="{{ $video->fileUrl() }}" controls playsinline preload="metadata"></video>
+                    @else
+                      <iframe
+                        src="{{ $video->embedUrl() }}"
+                        title="{{ $video->caption ?: $client->name.' video' }}"
+                        loading="lazy"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                      ></iframe>
+                    @endif
+                  </div>
+                  @if ($video->caption)
+                    <figcaption>{{ $video->caption }}</figcaption>
+                  @endif
+                </figure>
+              </li>
+            @endforeach
+          </ul>
+        </section>
       @endif
 
       <aside class="story-cta">
@@ -85,12 +161,12 @@
       </aside>
 
       @if ($others->isNotEmpty())
-        <nav class="story-others" aria-label="More client stories">
-          <h2>More client stories</h2>
+        <nav class="story-others" aria-label="More of our clients">
+          <h2>More of our clients</h2>
           <ul>
             @foreach ($others as $other)
               <li>
-                <a href="{{ route('clients.show', $other) }}" @class(['story-other', 'is-dark' => $other->dark_logo])>
+                <a href="{{ route('clients.show', $other) }}" @class(['story-other', 'is-dark' => $other->dark_logo]) aria-label="{{ $other->name }}">
                   <img src="{{ $other->logoUrl() }}" alt="{{ $other->name }}" loading="lazy" />
                 </a>
               </li>
@@ -104,5 +180,6 @@
   @include('welcome.footer')
 
   <script src="{{ asset('moderning_xelenic/assets/js/main.js') }}" defer></script>
+  <script src="{{ asset('moderning_xelenic/assets/js/client-story.js') }}" defer></script>
 </body>
 </html>

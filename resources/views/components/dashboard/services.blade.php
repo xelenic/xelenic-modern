@@ -1,7 +1,7 @@
 {{-- What Xelenic offers. On a dashboard with no projects yet it's a row of
      options to choose from, then Continue opens that service's form (the
-     project picker reads ?type=…). Once there are projects, a compact row of
-     links instead. --}}
+     project picker reads ?type=…; "cloud" goes to Cloud). Once there are
+     projects, a compact row of links instead. --}}
 @props(['compact' => false])
 
 @use('App\Enums\ProjectType')
@@ -11,8 +11,8 @@
     $services = [
         ['title' => 'Kiosk Engine', 'summary' => 'Self-service kiosks', 'icon' => 'kiosk', 'type' => ProjectType::KioskApp,
             'tint' => 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-has-checked/option:bg-blue-600'],
-        // No project type of its own yet, so it goes to the picker.
-        ['title' => 'Cloud Services', 'summary' => 'Hosting and integrations', 'icon' => 'cloud', 'type' => null,
+        // Not a project: servers, hosting and domains are ordered in Cloud.
+        ['title' => 'Cloud Services', 'summary' => 'Servers, hosting and domains', 'icon' => 'cloud', 'type' => 'cloud',
             'tint' => 'bg-sky-50 text-sky-600 group-hover:bg-sky-600 group-has-checked/option:bg-sky-600'],
         ['title' => 'Hire Our Engineers', 'summary' => 'Engineers for your team', 'icon' => 'users', 'type' => ProjectType::HireEngineers,
             'tint' => 'bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-has-checked/option:bg-amber-500'],
@@ -24,7 +24,7 @@
 @if ($compact)
     <div {{ $attributes->class('grid gap-3 sm:grid-cols-2') }}>
         @foreach ($services as $service)
-            <a href="{{ $service['type'] ? route('projects.create.type', $service['type']) : route('projects.create') }}" class="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs transition hover:border-slate-300 hover:bg-slate-50">
+            <a href="{{ $service['type'] === 'cloud' ? route('cloud.index') : route('projects.create.type', $service['type']) }}" class="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs transition hover:border-slate-300 hover:bg-slate-50">
                 <span class="flex size-10 shrink-0 items-center justify-center rounded-lg transition group-hover:text-white {{ $service['tint'] }}">
                     <x-icon :name="$service['icon']" class="size-5" />
                 </span>
@@ -43,7 +43,7 @@
             <div class="grid gap-3 sm:grid-cols-2">
                 @foreach ($services as $service)
                     <label class="group/option flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 pr-4 shadow-xs transition hover:border-slate-300 has-checked:border-blue-600 has-checked:ring-1 has-checked:ring-blue-600 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-blue-600">
-                        <input type="radio" name="type" value="{{ $service['type']?->value }}" class="sr-only" required>
+                        <input type="radio" name="type" value="{{ $service['type'] instanceof ProjectType ? $service['type']->value : $service['type'] }}" class="sr-only" required>
                         <span class="flex size-10 shrink-0 items-center justify-center rounded-lg transition group-has-checked/option:text-white {{ $service['tint'] }}">
                             <x-icon :name="$service['icon']" class="size-5" />
                         </span>
@@ -63,7 +63,7 @@
         <div class="mt-4 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center">
             <p class="flex-1 text-sm text-slate-500">
                 <span class="group-has-checked/services:hidden">Choose a service to continue.</span>
-                <span class="hidden group-has-checked/services:inline">Next, a few quick questions about your project.</span>
+                <span class="hidden group-has-checked/services:inline">Next, a few quick questions, or Cloud's options.</span>
             </p>
             <x-button>
                 Continue

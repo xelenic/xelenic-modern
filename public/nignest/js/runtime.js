@@ -13,6 +13,44 @@ function KioskRuntime() {
   };
   const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
   const GAMES = KioskGames();
+  // Kiosk Studio's illustrations (art.js): stickers, and emoji in text, are
+  // drawn with these rather than the device's emoji font.
+  const ART = GAMES.art;
+
+  /* A small picture to sit in a line of text, standing for emoji ch. */
+  function inlineArt(ch) {
+    const img = document.createElement('img');
+    img.src = ART.url(ch);
+    img.alt = '';
+    img.draggable = false;
+    img.dataset.ch = ch;
+    img.style.cssText = 'display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.2em;object-fit:contain;pointer-events:none;';
+    return img;
+  }
+
+  /* Text with any illustrated emoji in it shown as small pictures. */
+  function setText(el, str) {
+    const parts = ART.split(str);
+    if (parts.length === 1 && typeof parts[0] === 'string') { el.textContent = parts[0]; return; }
+    el.textContent = '';
+    // In a flex box the words and pictures would become separate items.
+    const line = document.createElement('span');
+    parts.forEach(function (p) { line.appendChild(typeof p === 'string' ? document.createTextNode(p) : inlineArt(p.ch)); });
+    el.appendChild(line);
+  }
+
+  /* The text setText() showed, with each picture back as its emoji. */
+  function textOf(el) {
+    let out = '';
+    (function walk(n) {
+      n.childNodes.forEach(function (c) {
+        if (c.nodeType === 3) out += c.nodeValue;
+        else if (c.dataset && c.dataset.ch) out += c.dataset.ch;
+        else walk(c);
+      });
+    })(el);
+    return out;
+  }
 
   function injectStyle() {
     if (document.getElementById('kp-style')) return;
@@ -149,7 +187,7 @@ function KioskRuntime() {
   /* Letter-by-letter and typewriter effects: one span per character, each with its own delay.
      Letters are grouped per word so words never break in the middle. */
   function splitChars(el, mode, delay, dur) {
-    const chars = segChars(el.textContent);
+    const chars = segChars(textOf(el));
     el.textContent = '';
     const wrap = document.createElement('span');
     wrap.style.cssText = 'display:block;width:100%';
@@ -161,7 +199,8 @@ function KioskRuntime() {
       if (!c.trim()) { word = null; wrap.appendChild(document.createTextNode(c)); return; }
       if (!word) { word = document.createElement('span'); word.style.whiteSpace = 'nowrap'; wrap.appendChild(word); }
       const s = document.createElement('span');
-      s.textContent = c;
+      if (ART.has(c)) s.appendChild(inlineArt(c));
+      else s.textContent = c;
       const d = (delay + i * step).toFixed(3) + 's';
       if (mode === 'letters') {
         s.style.display = 'inline-block';
@@ -181,7 +220,7 @@ function KioskRuntime() {
     const list = [];
     let loopAt = 0;
     if (enter === 'letters' || enter === 'typewriter') {
-      if ((o.type === 'text' || o.type === 'button') && el.textContent) {
+      if ((o.type === 'text' || o.type === 'button') && textOf(el)) {
         loopAt = splitChars(el, enter, delay, dur);
         if (o.type === 'button') list.push('kp-e-fade .3s ease-out ' + delay + 's backwards');
         enter = '';
@@ -332,7 +371,7 @@ function KioskRuntime() {
       case 'text':
         textLike();
         if (o.shadow) s.textShadow = '0 4px 16px rgba(0,0,0,.35)';
-        el.textContent = interp(o.text, ctx.vars);
+        setText(el, interp(o.text, ctx.vars));
         break;
       case 'button':
         textLike();
@@ -342,7 +381,7 @@ function KioskRuntime() {
         s.cursor = 'pointer';
         if (o.borderWidth) s.border = o.borderWidth + 'px solid ' + (o.borderColor || '#ffffff');
         if (o.shadow !== false) s.boxShadow = '0 10px 0 rgba(0,0,0,.22), 0 18px 34px rgba(0,0,0,.25)';
-        el.textContent = interp(o.text, ctx.vars);
+        setText(el, interp(o.text, ctx.vars));
         if (mode === 'play') el.classList.add('kp-press');
         break;
       case 'image': {
@@ -365,7 +404,16 @@ function KioskRuntime() {
         }
         break;
       }
-      case 'emoji':
+      case 'emoji': {
+        // A sticker: its illustration, filling its box.
+        const art = ART.url(o.emoji || '⭐');
+        if (art) {
+          s.backgroundImage = 'url("' + art + '")';
+          s.backgroundSize = 'contain';
+          s.backgroundPosition = 'center';
+          s.backgroundRepeat = 'no-repeat';
+          break;
+        }
         s.display = 'flex';
         s.alignItems = 'center';
         s.justifyContent = 'center';
@@ -374,6 +422,7 @@ function KioskRuntime() {
         s.fontFamily = EMOJI_FONT;
         el.textContent = o.emoji || '⭐';
         break;
+      }
       case 'shape':
         s.background = o.bg2 ? 'linear-gradient(180deg,' + (o.bg || '#fff') + ',' + o.bg2 + ')' : (o.bg || '#ffffff');
         s.borderRadius = o.shape === 'circle' ? '50%' : (o.radius || 0) + 'px';
@@ -637,6 +686,6 @@ function KioskRuntime() {
 
   return {
     FONTS: FONTS, EMOJI_FONT: EMOJI_FONT, injectStyle: injectStyle, interp: interp, resolve: resolve, bgCss: bgCss,
-    renderObj: renderObj, renderFx: renderFx, hasFx: hasFx, animEnd: animEnd, phases: phases, createPlayer: createPlayer
+    renderObj: renderObj, renderFx: renderFx, hasFx: hasFx, animEnd: animEnd, phases: phases, createPlayer: createPlayer, art: ART, setText: setText
   };
 }

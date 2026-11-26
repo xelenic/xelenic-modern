@@ -47,7 +47,7 @@ function gamePreview(sc, withLabel) {
     return d;
   };
   const emoji = function (ch, x, y, size, rot) {
-    return add(esc(ch), 'left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;width:' + size + 'px;height:' + size + 'px;font-size:' + size * 0.85 +
+    return add(ART.has(ch) ? artHtml(ch, 'width:100%;height:100%;display:block') : esc(ch), 'left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;width:' + size + 'px;height:' + size + 'px;font-size:' + size * 0.85 +
       'px;line-height:' + size + 'px;text-align:center;font-family:' + RT.EMOJI_FONT + ';rotate:' + (rot || 0) + 'deg');
   };
   const pill = function (title, val, right) {
@@ -226,7 +226,7 @@ function gamePreview(sc, withLabel) {
     else {
       if (c.bgTop || c.bgBottom) root.style.background = 'linear-gradient(180deg,' + (c.bgTop || 'transparent') + ',' + (c.bgBottom || 'transparent') + ')';
       if (info.iconSrc) add('<img src="' + info.iconSrc + '" style="width:100%;height:100%;object-fit:contain">', 'left:' + (W / 2 - 170 * k) + 'px;top:' + (H * 0.3) + 'px;width:' + 340 * k + 'px;height:' + 340 * k + 'px');
-      else add(esc(info.icon), 'left:0;right:0;top:' + H * 0.3 + 'px;text-align:center;font-size:' + 300 * k + 'px;line-height:1;font-family:' + RT.EMOJI_FONT);
+      else add(artHtml(ART.has(info.icon) ? info.icon : '🎮', 'width:' + 300 * k + 'px;height:' + 300 * k + 'px;display:block;margin:0 auto'), 'left:0;right:0;top:' + H * 0.3 + 'px;text-align:center');
       add(esc(info.name), 'left:0;right:0;top:' + (H * 0.3 + 390 * k) + 'px;text-align:center;color:#fff;font:900 ' + 90 * k + 'px system-ui;text-shadow:0 6px 20px rgba(0,0,0,.3)');
       add(info.missing ? 'Template missing: import its .zip' : 'Custom game template', 'left:0;right:0;top:' + (H * 0.3 + 510 * k) + 'px;text-align:center;color:rgba(255,255,255,.85);font:600 ' + 44 * k + 'px system-ui');
     }
@@ -234,7 +234,7 @@ function gamePreview(sc, withLabel) {
     pill('TIME', +c.duration || 30, true);
   }
   if (withLabel) {
-    add('<b>' + esc(info.icon) + ' ' + esc(info.name) + ' game</b><br><span style="opacity:.75;font-weight:500">Set it up in Properties · press Play to test</span>',
+    add('<b>' + artHtml(ART.has(info.icon) ? info.icon : '🎮', 'width:1.2em;height:1.2em;vertical-align:-0.25em;margin-right:.25em') + esc(info.name) + ' game</b><br><span style="opacity:.75;font-weight:500">Set it up in Properties · press Play to test</span>',
       'left:50%;' + (kind === 'wheel' || kind === 'scratch' ? 'bottom:' + 50 * k : 'top:' + 250 * k) + 'px;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font:600 ' + 34 * k + 'px/1.35 system-ui;padding:' + 18 * k + 'px ' + 34 * k + 'px;border-radius:' + 20 * k + 'px;text-align:center;white-space:nowrap');
   }
   return root;
@@ -533,7 +533,7 @@ function renderStrip() {
     th.classList.add('strip-thumb');
     if (sc.id === project.startScreen) th.appendChild(h('span', { class: 'badge strip-start' }, 'START'));
     strip.appendChild(h('div', { class: 'strip-item' + (sc.id === curId ? ' on' : ''), title: sc.name, onclick: function () { if (sc.id !== curId) openScreen(sc.id); } },
-      th, h('span', {}, (sc.type === 'game' ? gameInfo(sc.game.kind).icon + ' ' : '') + sc.name)));
+      th, h('span', {}, sc.type === 'game' ? gameIcon(sc.game.kind, 'art-inline') : null, sc.name)));
   });
   strip.appendChild(h('button', { class: 'strip-add', title: 'Add a page screen', html: icon('plus'), onclick: function () { addScreen('page'); } }));
   strip.scrollLeft = scroll;

@@ -32,3 +32,32 @@ test('the source model is kept out of the public folder', function () {
     expect(resource_path('models/cute-robot/scene.gltf'))->toBeFile()
         ->and(public_path('moderning_xelenic/assets/cute_robot_gltf'))->not->toBeDirectory();
 });
+
+test('the top menu has KioskStudio’s mega menu, Clouds and the solution links', function () {
+    $this->get('/')
+        ->assertOk()
+        ->assertSeeInOrder(['>Home<', 'KioskStudio', 'Clouds', 'Solutions', 'AI Middlewares'], false)
+        ->assertSee('aria-controls="kioskStudioMenu"', false)
+        ->assertSeeInOrder([
+            'Kiosk Game Templates', 'Explore Animation Templates', 'Xelenic Kiosk Studios',
+            'Trending Kiosk App', 'Advertisements', 'Sales and Marketing Promotions',
+            'Developer Career', 'Hire Our Engineers', 'Our Clients',
+        ])
+        ->assertSee('href="'.route('cloud.index').'"', false)
+        ->assertSee('href="'.route('studio').'"', false)
+        ->assertSee('href="'.route('marketplace.games.index').'"', false)
+        ->assertSee('href="'.route('marketplace.animations.index').'"', false)
+        ->assertSee('href="'.route('projects.create.type', 'hire-engineers').'"', false)
+        // Each section link has somewhere to land.
+        ->assertSee('href="#ai-middleware"', false)->assertSee('id="ai-middleware"', false)
+        ->assertSee('href="'.route('trending.index').'"', false)
+        ->assertSee('href="#marketing"', false)->assertSee('id="marketing"', false)
+        ->assertSee('href="'.route('clients.index').'"', false);
+});
+
+test('the contact section shows the phone number, tap to call', function () {
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('<a href="tel:094752751499">09475 275 1499</a>', false)
+        ->assertDontSee('000-0000');
+});

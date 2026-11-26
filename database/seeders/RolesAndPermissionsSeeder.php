@@ -21,6 +21,10 @@ class RolesAndPermissionsSeeder extends Seeder
         'manage roles',
         'manage projects',
         'manage clients',
+        // Approve clients' cloud orders, which are paid from the InterServer balance.
+        'manage cloud',
+        // Read job applications from the Developer Careers page, CVs included.
+        'manage careers',
     ];
 
     /**

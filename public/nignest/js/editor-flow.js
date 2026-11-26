@@ -13,24 +13,25 @@ function portsOf(sc) {
   if (sc.type === 'game') {
     const g = sc.game;
     const isWheel = PRIZE_GAMES.indexOf(baseKind(g.kind)) >= 0;
-    out.push({ key: 'win:' + sc.id, label: isWheel ? '🏆 Prize won' : '🏆 Win · score ≥ ' + (g.threshold || 0), target: g.win || '' });
-    out.push({ key: 'lose:' + sc.id, label: isWheel ? '💔 No prize' : '💔 Lose', target: g.lose || '' });
+    out.push({ key: 'win:' + sc.id, ic: 'trophy', label: isWheel ? 'Prize won' : 'Win · score ≥ ' + (g.threshold || 0), target: g.win || '' });
+    out.push({ key: 'lose:' + sc.id, ic: 'miss', label: isWheel ? 'No prize' : 'Lose', target: g.lose || '' });
   } else {
     sc.objects.forEach(function (o) {
       const a = o.action || { type: 'none' };
       if (o.type !== 'button' && (!a.type || a.type === 'none')) return;
-      let label = String(o.text || o.emoji || o.type).replace(/\{\{.*?\}\}/g, '…').replace(/\s+/g, ' ').trim();
+      let label = (o.type === 'emoji' ? ART.label(o.emoji) : ART.strip(o.text || '') || o.type).replace(/\{\{.*?\}\}/g, '…').replace(/\s+/g, ' ').trim();
       if (label.length > 22) label = label.slice(0, 21) + '…';
       const linkable = a.type === 'goto' || a.type === 'submit' || a.type === 'none' || !a.type;
       out.push({
         key: 'obj:' + sc.id + ':' + o.id,
-        label: (a.type === 'submit' ? '📨 ' : '▸ ') + label,
+        ic: a.type === 'submit' ? 'send' : '',
+        label: (a.type === 'submit' ? '' : '▸ ') + label,
         target: linkable ? (a.target || '') : '',
         fixed: a.type === 'back' ? '← back' : a.type === 'restart' ? '⟲ start' : ''
       });
     });
   }
-  if (sc.timer && sc.timer.seconds > 0) out.push({ key: 'timer:' + sc.id, label: '⏱ After ' + sc.timer.seconds + 's', target: sc.timer.target || '' });
+  if (sc.timer && sc.timer.seconds > 0) out.push({ key: 'timer:' + sc.id, ic: 'clock', label: 'After ' + sc.timer.seconds + 's', target: sc.timer.target || '' });
   return out;
 }
 
@@ -43,7 +44,7 @@ function renderFlow() {
     const n = h('div', { class: 'node' + (sc.id === curId ? ' sel' : ''), style: 'left:' + sc.fx + 'px;top:' + sc.fy + 'px' });
     n.dataset.id = sc.id;
     const head = h('div', { class: 'node-head' },
-      h('span', { class: 'ty' }, sc.type === 'game' ? gameInfo(sc.game.kind).icon : '📄'),
+      sc.type === 'game' ? h('span', { class: 'ty' }, gameIcon(sc.game.kind)) : h('span', { class: 'ty', html: icon('page') }),
       h('span', { class: 'nm' }, sc.name),
       isStart ? h('span', { class: 'badge' }, 'START') : null,
       sc.type === 'game' ? h('span', { class: 'badge game' }, 'GAME') : null);
@@ -55,7 +56,7 @@ function renderFlow() {
     list.forEach(function (p) {
       const t = p.target ? screenById(p.target) : null;
       const row = h('div', { class: 'port-row' },
-        h('span', { class: 'pl' }, p.label),
+        h('span', { class: 'pl' }, p.ic ? h('span', { class: 'pl-ic', html: icon(p.ic) }) : null, p.label),
         p.fixed ? h('span', { class: 'to' }, p.fixed) : t ? h('span', { class: 'to' }, t.name) : null);
       if (!p.fixed) {
         const dot = h('i', { class: 'port' + (t ? ' linked' : ''), title: 'Drag onto a screen to link' });

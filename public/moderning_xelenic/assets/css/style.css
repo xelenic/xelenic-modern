@@ -441,6 +441,320 @@ section { position: relative; z-index: 1; padding: 110px 0; }
 .nav-toggle.open span:nth-child(2) { opacity: 0; }
 .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* While a menu is open the header gets its solid backing, as when scrolled. */
+.site-header.mega-open { background: rgba(5, 7, 13, 0.96); border-bottom-color: var(--border); }
+@media (prefers-color-scheme: light) {
+  .site-header.mega-open { background: rgba(255, 255, 255, 0.97); }
+}
+
+/* ==========================================================================
+   Mega menu (KioskStudio): three groups of links and a featured card. It
+   hangs from the header, centred on the page; main.js opens it on hover,
+   click and from the keyboard. On narrow screens it's an accordion inside
+   the menu (see the max-width: 1000px block).
+   ========================================================================== */
+
+.mega-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.mega-chevron { width: 14px; height: 14px; transition: transform 0.3s var(--ease); }
+.has-mega.is-open .mega-toggle { color: var(--text); }
+.has-mega.is-open .mega-toggle::after { width: 100%; }
+.has-mega.is-open .mega-chevron { transform: rotate(180deg); }
+.mega-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+
+.mega {
+  position: absolute;          /* from the fixed header */
+  top: 100%;
+  left: 50%;
+  width: min(1180px, calc(100vw - 32px));
+  padding-top: 10px;           /* a bridge, so the pointer can cross to it */
+  transform: translate(-50%, -10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s var(--ease), transform 0.35s var(--ease), visibility 0s linear 0.35s;
+}
+.has-mega.is-open .mega {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition: opacity 0.2s var(--ease), transform 0.35s var(--ease), visibility 0s;
+}
+
+.mega-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 24px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+@media (prefers-color-scheme: light) {
+  .mega-panel { box-shadow: 0 40px 90px -30px rgba(20, 30, 60, 0.28), 0 2px 6px rgba(20, 30, 60, 0.04); }
+}
+
+.mega-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 14px 6px 4px;
+}
+
+.mega-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.mega-group-title::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--group-tone);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--group-tone) 22%, transparent);
+}
+.mega-group ul { display: grid; gap: 2px; }
+
+.mega-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 26px 12px 12px;   /* room on the right for the arrow */
+  border-radius: 16px;
+  transition: background 0.2s var(--ease);
+}
+.mega-item:hover { background: var(--surface-strong); }
+.mega-item:focus-visible { outline: 2px solid var(--tone); outline-offset: -2px; background: var(--surface-strong); }
+
+.mega-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 28%, transparent);
+  transition: transform 0.35s var(--ease), background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.mega-icon svg { width: 21px; height: 21px; }
+.mega-item:hover .mega-icon,
+.mega-item:focus-visible .mega-icon {
+  color: #fff;
+  background: var(--tone);
+  box-shadow: 0 10px 20px -8px color-mix(in srgb, var(--tone) 70%, transparent);
+  transform: translateY(-2px) rotate(-6deg);
+}
+
+.mega-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding-top: 1px; }
+.mega-title {
+  display: block;
+  font-size: 0.94rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+.mega-desc { font-size: 0.82rem; line-height: 1.45; color: var(--text-dim); }
+.mega-badge {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: 2px;
+  padding: 2px 7px;
+  line-height: 1.4;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+}
+.mega-arrow {
+  position: absolute;
+  top: 15px;
+  right: 8px;
+  width: 15px;
+  height: 15px;
+  color: var(--tone);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.2s, transform 0.3s var(--ease);
+}
+.mega-item:hover .mega-arrow,
+.mega-item:focus-visible .mega-arrow { opacity: 1; transform: translateX(0); }
+
+.mega-foot {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--surface);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.mega-foot-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  font-weight: 600;
+  color: var(--accent-soft);
+}
+.mega-foot-link svg { width: 15px; height: 15px; transition: transform 0.3s var(--ease); }
+.mega-foot-link:hover svg { transform: translateX(3px); }
+
+/* The featured card: Kiosk Studio, with a small kiosk playing its games. */
+.mega-feature {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border-radius: 18px;
+  background: #1d4ed8;
+  color: #fff;
+  transition: transform 0.35s var(--ease);
+}
+.mega-feature::before {          /* dot grid */
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1.4px);
+  background-size: 14px 14px;
+  -webkit-mask-image: linear-gradient(#000, transparent 75%);
+  mask-image: linear-gradient(#000, transparent 75%);
+}
+.mega-feature:hover { transform: translateY(-2px); }
+.mega-feature:focus-visible { outline: 2px solid #fff; outline-offset: -5px; }
+
+/* The art fills the space above the words, the kiosk centred in it. */
+.mega-art { display: flex; flex: 1; min-height: 168px; margin-bottom: 14px; }
+.mega-stage { position: relative; display: block; width: 100%; height: 168px; margin: auto 0; }
+.mega-kiosk { position: absolute; left: 50%; top: 4px; width: 96px; transform: translateX(-50%); }
+.mega-kiosk-screen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  height: 120px;
+  padding: 8px;
+  border: 4px solid #e2e8f0;
+  border-radius: 14px;
+  background: #0b1220;
+  box-shadow: 0 18px 30px -12px rgba(2, 6, 23, 0.7);
+}
+.mega-tile { border-radius: 6px; opacity: 0.7; animation: mega-tile 3.2s var(--ease) infinite; }
+.mega-tile:nth-child(1) { background: #f59e0b; }
+.mega-tile:nth-child(2) { background: #ec4899; animation-delay: 0.8s; }
+.mega-tile:nth-child(3) { background: #10b981; animation-delay: 2.4s; }
+.mega-tile:nth-child(4) { background: #8b5cf6; animation-delay: 1.6s; }
+.mega-kiosk-neck { display: block; width: 14px; height: 24px; margin: 0 auto; background: #cbd5e1; }
+.mega-kiosk-base { display: block; width: 60px; height: 8px; margin: 0 auto; border-radius: 6px; background: #e2e8f0; }
+
+.mega-wheel {
+  position: absolute;
+  top: 18px;
+  right: 6px;
+  width: 54px;
+  height: 54px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: conic-gradient(#f59e0b 0 25%, #ec4899 0 50%, #10b981 0 75%, #8b5cf6 0);
+  box-shadow: 0 10px 20px -8px rgba(2, 6, 23, 0.6);
+  animation: mega-spin 7s linear infinite;
+}
+.mega-wheel::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%, -50%);
+}
+.mega-coin {
+  position: absolute;
+  left: 14px;
+  top: 64px;
+  width: 26px;
+  height: 26px;
+  border: 3px solid #fde68a;
+  border-radius: 50%;
+  background: #f59e0b;
+  animation: mega-float 3s ease-in-out infinite;
+}
+.mega-spark { position: absolute; width: 8px; height: 8px; border-radius: 2px; background: #bfdbfe; transform: rotate(45deg); animation: mega-twinkle 2.4s ease-in-out infinite; }
+.mega-spark-1 { left: 42px; top: 20px; }
+.mega-spark-2 { right: 24px; top: 104px; animation-delay: 1.2s; }
+
+/* Only while it's open. */
+.mega-tile, .mega-wheel, .mega-coin, .mega-spark { animation-play-state: paused; }
+.has-mega.is-open :is(.mega-tile, .mega-wheel, .mega-coin, .mega-spark) { animation-play-state: running; }
+
+@keyframes mega-tile { 0%, 60%, 100% { opacity: 0.7; transform: scale(1); } 15% { opacity: 1; transform: scale(1.12); } }
+@keyframes mega-spin { to { transform: rotate(360deg); } }
+@keyframes mega-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes mega-twinkle { 0%, 100% { opacity: 0.25; transform: rotate(45deg) scale(0.7); } 50% { opacity: 1; transform: rotate(45deg) scale(1); } }
+
+.mega-feature-eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #bfdbfe; }
+.mega-feature-title { margin-top: 6px; font-family: var(--font-display); font-size: 1.28rem; font-weight: 600; line-height: 1.2; }
+.mega-feature-text { margin-top: 8px; font-size: 0.84rem; line-height: 1.5; color: #dbeafe; }
+.mega-feature-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: 18px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: #fff;
+  color: #1d4ed8;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.mega-feature-cta svg { width: 15px; height: 15px; transition: transform 0.3s var(--ease); }
+.mega-feature:hover .mega-feature-cta svg { transform: translateX(3px); }
+
+/* Linked cards on the home page clear the fixed header. */
+.solution-card[id] { scroll-margin-top: 110px; }
+
+@media (max-width: 1140px) {
+  .mega-panel { grid-template-columns: minmax(0, 1fr); }
+  .mega-feature { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mega, .has-mega.is-open .mega { transition: opacity 0.15s, visibility 0s; transform: translate(-50%, 0); }
+  .mega-tile, .mega-wheel, .mega-coin, .mega-spark { animation: none; }
+}
+
 /* ==========================================================================
    Hero
    ========================================================================== */
@@ -1924,6 +2238,11 @@ section { position: relative; z-index: 1; padding: 110px 0; }
   color: var(--text-dim);
 }
 .contact-info svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--accent); }
+.clients-all { display: inline-flex; gap: 6px; margin-top: 14px; font-weight: 600; color: var(--accent-soft); }
+.clients-all span { transition: transform 0.3s var(--ease); }
+.clients-all:hover span { transform: translateX(4px); }
+.contact-info a { transition: color 0.2s; }
+.contact-info a:hover { color: var(--accent); }
 
 .contact-form {
   background: var(--surface);
@@ -2127,20 +2446,23 @@ section { position: relative; z-index: 1; padding: 110px 0; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 
-@media (max-width: 720px) {
-  section { padding: 80px 0; }
-  .hero { padding: 150px 0 70px; min-height: unset; }
-
+/* The menu folds behind the toggle; KioskStudio's mega menu becomes an
+   accordion inside it. */
+@media (max-width: 1000px) {
   .nav-links {
     position: fixed;
     top: 68px; left: 16px; right: 16px;
+    max-height: calc(100vh - 88px);
+    max-height: calc(100dvh - 88px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background: var(--bg-alt);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     flex-direction: column;
-    align-items: flex-start;
-    padding: 20px;
-    gap: 16px;
+    align-items: stretch;
+    padding: 12px;
+    gap: 2px;
     box-shadow: var(--shadow-glow);
     transform: translateY(-12px);
     opacity: 0;
@@ -2148,8 +2470,40 @@ section { position: relative; z-index: 1; padding: 110px 0; }
     transition: all 0.3s var(--ease);
   }
   .nav-links.open { transform: translateY(0); opacity: 1; visibility: visible; }
+  .nav-links > li > .nav-link { display: flex; width: 100%; padding: 12px; border-radius: 12px; font-size: 1rem; color: var(--text); }
+  .nav-links > li > .nav-link::after { display: none; }
+  .nav-links > li > .nav-link:hover { background: var(--surface-strong); }
+  .mega-toggle { justify-content: space-between; }
+  .has-mega.is-open .mega-toggle { background: var(--surface-strong); }
   .nav-toggle { display: flex; }
   .nav-cta { display: none; }
+
+  .mega,
+  .has-mega.is-open .mega {
+    position: static;
+    width: auto;
+    padding: 4px 0 8px;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    transition: none;
+  }
+  .mega { display: none; }
+  .has-mega.is-open .mega { display: block; }
+  .mega-panel { display: block; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+  .mega-groups { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 0; }
+  .mega-group-title { padding: 10px 12px 4px; }
+  .mega-item { align-items: center; gap: 12px; padding: 9px 12px; }
+  .mega-icon { width: 36px; height: 36px; border-radius: 11px; }
+  .mega-icon svg { width: 18px; height: 18px; }
+  .mega-desc { display: none; }
+  .mega-arrow { display: none; }
+  .mega-foot { margin: 8px 4px 0; padding: 12px 14px; flex-wrap: wrap; gap: 6px 12px; }
+}
+
+@media (max-width: 720px) {
+  section { padding: 80px 0; }
+  .hero { padding: 150px 0 70px; min-height: unset; }
 
   .value-strip { padding: 36px 0; }
   .value-strip-inner { gap: 14px 12px; }

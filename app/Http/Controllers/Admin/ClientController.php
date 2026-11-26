@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientRequest;
 use App\Models\Client;
+use App\Models\ClientMedia;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Arr;
@@ -27,7 +30,13 @@ class ClientController extends Controller implements HasMiddleware
     public function index(): View
     {
         return view('admin.clients.index', [
-            'clients' => Client::ordered()->get(),
+            'clients' => Client::ordered()
+                ->withExists('media')
+                ->withCount([
+                    'media as photos_count' => fn ($query) => $query->where('kind', ClientMedia::IMAGE),
+                    'media as videos_count' => fn ($query) => $query->where('kind', '!=', ClientMedia::IMAGE),
+                ])
+                ->get(),
         ]);
     }
 
@@ -43,6 +52,7 @@ class ClientController extends Controller implements HasMiddleware
         $client = new Client($this->attributes($request));
         $this->storeFiles($request, $client);
         $client->save();
+        $this->saveGallery($request, $client);
 
         return to_route('admin.clients.index')->with('success', "{$client->name} was added.");
     }
@@ -50,7 +60,7 @@ class ClientController extends Controller implements HasMiddleware
     public function edit(Client $client): View
     {
         return view('admin.clients.edit', [
-            'client' => $client,
+            'client' => $client->load('media'),
         ]);
     }
 
@@ -59,6 +69,7 @@ class ClientController extends Controller implements HasMiddleware
         $client->fill($this->attributes($request));
         $this->storeFiles($request, $client);
         $client->save();
+        $this->saveGallery($request, $client);
 
         return to_route('admin.clients.index')->with('success', "{$client->name} was updated.");
     }
@@ -69,6 +80,53 @@ class ClientController extends Controller implements HasMiddleware
         $client->delete();
 
         return to_route('admin.clients.index')->with('success', "{$client->name} was deleted.");
+    }
+
+    /**
+     * The article editor's preview: Markdown as the story page shows it.
+     */
+    public function previewArticle(Request $request): JsonResponse
+    {
+        $request->validate(['article' => ['nullable', 'string', 'max:50000']]);
+
+        return response()->json(['html' => Client::markdownToHtml($request->input('article'))]);
+    }
+
+    /**
+     * The gallery: captions, positions and removals for what's there, then
+     * new uploads and links at the end.
+     */
+    private function saveGallery(ClientRequest $request, Client $client): void
+    {
+        foreach ($client->media()->get() as $item) {
+            $input = $request->input("media.{$item->id}");
+            if (! is_array($input)) {
+                continue;
+            }
+            if (! empty($input['remove'])) {
+                // The model deletes its file (see ClientMedia::booted()).
+                $item->delete();
+
+                continue;
+            }
+            $item->update([
+                'caption' => trim((string) ($input['caption'] ?? '')) ?: null,
+                'sort_order' => (int) ($input['sort_order'] ?? $item->sort_order),
+            ]);
+        }
+
+        $next = (int) $client->media()->max('sort_order') + 1;
+        foreach ($request->file('new_media', []) as $file) {
+            $video = str_starts_with((string) $file->getMimeType(), 'video/') || in_array(strtolower($file->getClientOriginalExtension()), ['mp4', 'webm'], true);
+            $client->media()->create([
+                'kind' => $video ? ClientMedia::VIDEO : ClientMedia::IMAGE,
+                'path' => $file->store("clients/{$client->slug}/gallery", 'public'),
+                'sort_order' => $next++,
+            ]);
+        }
+        foreach ($request->links() as $url) {
+            $client->media()->create(['kind' => ClientMedia::LINK, 'url' => $url, 'sort_order' => $next++]);
+        }
     }
 
     /**

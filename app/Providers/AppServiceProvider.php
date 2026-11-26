@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Services\InterServer\InterServer;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -11,14 +12,15 @@ class AppServiceProvider extends ServiceProvider
     /**
      * The permissions that each open a part of the admin panel.
      */
-    public const ADMIN_PERMISSIONS = ['view users', 'manage roles', 'manage projects', 'manage clients'];
+    public const ADMIN_PERMISSIONS = ['view users', 'manage roles', 'manage projects', 'manage clients', 'manage cloud', 'manage careers'];
 
     /**
      * Register any application services.
      */
     public function register(): void
     {
-        //
+        // The InterServer reseller account behind Cloud (App\Cloud).
+        $this->app->singleton(InterServer::class, fn () => InterServer::fromConfig());
     }
 
     /**

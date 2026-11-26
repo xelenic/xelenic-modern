@@ -63,6 +63,7 @@
     <div id="toast" role="status" aria-live="polite"></div>
 
     <script type="application/json" id="design">@json($design)</script>
+    <script src="{{ $script('art.js') }}"></script>
     <script src="{{ $script('games.js') }}"></script>
     <script src="{{ $script('runtime.js') }}"></script>
     <script>

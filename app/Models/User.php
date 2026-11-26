@@ -44,6 +44,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Cloud services the user ordered (see App\Cloud).
+     *
+     * @return HasMany<CloudService, $this>
+     */
+    public function cloudServices(): HasMany
+    {
+        return $this->hasMany(CloudService::class);
+    }
+
+    /**
      * The first letters of the first two words of the user's name, for avatars.
      */
     public function initials(): string

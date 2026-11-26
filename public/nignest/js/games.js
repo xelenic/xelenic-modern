@@ -5,6 +5,13 @@
  */
 function KioskGames() {
   const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  // Game pieces are drawn from Kiosk Studio's illustrations (art.js), not
+  // emoji; a piece with no illustration falls back to its character.
+  const ART = KioskArt();
+  // An illustration as HTML, or the character itself.
+  const artHtml = function (ch, size, css) {
+    return ART.html(ch, size, css) || '<div style="font-size:' + size + 'px;line-height:1;font-family:' + EMOJI_FONT + '">' + escXml(ch) + '</div>';
+  };
   const UI_FONT = 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
   const JUICE = {
     '🍎': '#e53935', '🍊': '#fb8c00', '🍌': '#fdd835', '🍓': '#e53935', '🍇': '#8e24aa', '🍉': '#ff5470',
@@ -21,6 +28,9 @@ function KioskGames() {
     const pad = Math.ceil(size * 0.25);
     c.width = c.height = size + pad * 2;
     const x = c.getContext('2d');
+    spriteCache[key] = c;
+    // Drawn when its illustration has loaded (a moment, the first time).
+    if (ART.ready(ch, function (img) { x.clearRect(0, 0, c.width, c.height); x.drawImage(img, pad, pad, size, size); })) return c;
     x.font = size + 'px ' + EMOJI_FONT;
     x.textAlign = 'center';
     x.textBaseline = 'middle';
@@ -303,7 +313,7 @@ function KioskGames() {
       const card = document.createElement('div');
       card.className = 'kp-in';
       card.style.cssText = 'margin:auto;text-align:center;font-weight:800;';
-      card.innerHTML = '<div style="font-size:' + 220 * k + 'px;line-height:1;font-family:' + EMOJI_FONT + '">' + (right >= qs.length / 2 ? '🎉' : '🙂') + '</div>' +
+      card.innerHTML = artHtml(right >= qs.length / 2 ? '🎉' : '🙂', 220 * k) +
         '<div style="font-size:' + 70 * k + 'px;margin-top:' + 40 * k + 'px">' + right + ' of ' + qs.length + ' correct</div>' +
         '<div style="font-size:' + 54 * k + 'px;margin-top:' + 20 * k + 'px;color:' + accent + '">Score ' + score + '</div>';
       root.appendChild(card);
@@ -529,6 +539,31 @@ function KioskGames() {
     { label: 'Prize', color: '#ef476f', weight: 1, points: 10, win: true },
     { label: 'Try again', color: '#118ab2', weight: 1, points: 0, win: false }
   ];
+  /* The first illustrated emoji in a prize label ("☕ Free coffee"), if any. */
+  function labelArt(label) {
+    const parts = ART.split(label);
+    for (let i = 0; i < parts.length; i++) if (typeof parts[i] !== 'string') return parts[i].ch;
+    return null;
+  }
+  /* A prize's picture: its own, or an emoji in its label (older designs). */
+  function segArt(g) { return (g.icon && ART.has(g.icon)) ? g.icon : labelArt(g.label); }
+  /* The prize for {{prize}}: its picture (shown as an illustration) and words. */
+  function prizeText(g) {
+    const pic = g.icon && ART.has(g.icon) ? g.icon : '';
+    return (pic ? pic + ' ' : '') + String(g.label || '').trim();
+  }
+  /* A memory card face: its illustration, or the character. */
+  function setFace(el, sym, scale) {
+    const u = ART.url(sym);
+    if (!u) { el.textContent = sym; return; }
+    el.textContent = '';
+    const img = document.createElement('img');
+    img.src = u;
+    img.alt = '';
+    img.draggable = false;
+    img.style.cssText = 'width:' + scale * 100 + '%;height:' + scale * 100 + '%;object-fit:contain;pointer-events:none;';
+    el.appendChild(img);
+  }
   function escXml(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
   }
@@ -558,7 +593,16 @@ function KioskGames() {
       s += '<path d="M' + cx + ' ' + cy + 'L' + p0[0] + ' ' + p0[1] + 'A' + R + ' ' + R + ' 0 ' + (a > Math.PI ? 1 : 0) + ' 1 ' + p1[0] + ' ' + p1[1] + 'Z" fill="' + escXml(g.color || '#888') + '"/>';
     });
     segs.forEach(function (g, i) {
-      const lines = splitLabel(g.label);
+      // A label's emoji becomes its picture, between the words and the hub.
+      const pic = segArt(g);
+      const words = ART.strip(g.label);
+      if (pic) {
+        const sz = Math.min(D * 0.11, 2 * R * 0.42 * Math.sin(Math.min(a, Math.PI) / 2) * 0.8);
+        s += '<g transform="rotate(' + (i * 360 / n) + ' ' + cx + ' ' + cy + ')"><image href="' + ART.url(pic) + '" x="' + (cx - sz / 2) + '" y="' + (cy - R * (words ? 0.44 : 0.62) - sz / 2) +
+          '" width="' + sz + '" height="' + sz + '"/></g>';
+      }
+      if (!words) return;
+      const lines = splitLabel(words);
       const longest = Math.max.apply(null, lines.map(function (l) { return Array.from(l).length; }));
       const chord = 2 * R * 0.6 * Math.sin(Math.min(a, Math.PI) / 2);
       const fs = Math.min(D * 0.062, chord / (longest * 0.62 + 0.6), R * 0.2);
@@ -687,13 +731,14 @@ function KioskGames() {
       card.className = 'kp-in';
       card.style.cssText = 'text-align:center;color:#fff;font-weight:900;padding:' + 60 * k + 'px ' + 70 * k + 'px;border-radius:' + 50 * k + 'px;max-width:' + W * 0.8 + 'px;' +
         'background:' + (g.color || '#222') + ';box-shadow:0 ' + 30 * k + 'px ' + 80 * k + 'px rgba(0,0,0,.45);border:' + 8 * k + 'px solid #fff;';
-      card.innerHTML = '<div style="font-size:' + 180 * k + 'px;line-height:1;font-family:' + EMOJI_FONT + '">' + (win ? '🎉' : '😅') + '</div>' +
+      const pic = segArt(g);
+      card.innerHTML = artHtml(pic || (win ? '🎉' : '😅'), 180 * k) +
         '<div style="font-size:' + 64 * k + 'px;margin-top:' + 30 * k + 'px;color:' + escXml(g.textColor || '#fff') + '">' + escXml(win ? (cfg.winText || 'YOU WON!') : (cfg.loseText || 'SO CLOSE!')) + '</div>' +
-        '<div style="font-size:' + 100 * k + 'px;margin-top:' + 16 * k + 'px;line-height:1.1;color:' + escXml(g.textColor || '#fff') + '">' + escXml(g.label) + '</div>';
+        '<div style="font-size:' + 100 * k + 'px;margin-top:' + 16 * k + 'px;line-height:1.1;color:' + escXml(g.textColor || '#fff') + '">' + escXml(ART.strip(g.label) || g.label) + '</div>';
       ov.appendChild(card);
       ui.root.appendChild(ov);
       if (win) confetti(ui.root, W, H, segs.map(function (s) { return s.color; }).concat(['#ffffff', '#ffd166']));
-      timers.push(setTimeout(function () { onEnd(num(g.points, 0), { win: win, vars: { prize: g.label } }); }, num(cfg.resultTime, 3) * 1000));
+      timers.push(setTimeout(function () { onEnd(num(g.points, 0), { win: win, vars: { prize: prizeText(g) } }); }, num(cfg.resultTime, 3) * 1000));
     }
     ui.button.addEventListener('click', spin);
     ui.box.addEventListener('click', spin);
@@ -955,10 +1000,10 @@ function KioskGames() {
       const back = document.createElement('div');
       back.style.cssText = face + 'font-size:' + L.cw * 0.42 + 'px;background:' + (cfg.backColor || '#4361ee') +
         ' repeating-linear-gradient(45deg, rgba(255,255,255,.1) 0 ' + 14 * k + 'px, transparent ' + 14 * k + 'px ' + 28 * k + 'px);';
-      back.textContent = list(cfg.cardBack, [''])[0] || '';
+      setFace(back, list(cfg.cardBack, [''])[0] || '', 0.5);
       const front = document.createElement('div');
       front.style.cssText = face + 'transform:rotateY(180deg);font-size:' + L.cw * 0.58 + 'px;background:' + (cfg.faceColor || '#ffffff') + ';transition:background .3s,border-color .3s;';
-      front.textContent = sym;
+      setFace(front, sym, 0.66);
       inner.appendChild(back);
       inner.appendChild(front);
       el.appendChild(inner);
@@ -1055,7 +1100,7 @@ function KioskGames() {
       const card = document.createElement('div');
       card.className = 'kp-in';
       card.style.cssText = 'text-align:center;color:#fff;font-weight:900;font-family:' + UI_FONT + ';';
-      card.innerHTML = '<div style="font-size:' + 200 * k + 'px;line-height:1;font-family:' + EMOJI_FONT + '">' + (all ? '🎉' : '⏰') + '</div>' +
+      card.innerHTML = artHtml(all ? '🎉' : '⏰', 200 * k) +
         '<div style="font-size:' + 96 * k + 'px;margin-top:' + 30 * k + 'px;color:#ffe14d">' + (all ? 'ALL PAIRS FOUND!' : "TIME'S UP!") + '</div>' +
         (bonus ? '<div style="font-size:' + 48 * k + 'px;margin-top:' + 16 * k + 'px;opacity:.9">Time bonus +' + bonus + '</div>' : '') +
         '<div style="font-size:' + 90 * k + 'px;margin-top:' + 20 * k + 'px">Score ' + score + '</div>';
@@ -1554,7 +1599,7 @@ function KioskGames() {
         if (!inHoop) drawBall();
         if (!ball.flying && shots < 2) {
           ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 5);
-          label(ctx, '⬆', ball.x, L.startY - L.bsize * 0.95 - Math.abs(Math.sin(t * 3)) * 30 * k, 90 * k, '#ffffff');
+          drawSprite(ctx, sprite('⬆', 84 * k), ball.x, L.startY - L.bsize * 0.95 - Math.abs(Math.sin(t * 3)) * 30 * k);
           label(ctx, 'SWIPE UP', ball.x, L.startY + L.bsize * 0.85, 44 * k, '#ffffff');
           ctx.globalAlpha = 1;
         }
@@ -1593,8 +1638,8 @@ function KioskGames() {
     const prize = document.createElement('div');
     prize.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:' + 30 * k + 'px;' +
       'font-weight:900;color:' + (seg.textColor || '#ffffff') + ';';
-    prize.innerHTML = '<div style="font-size:' + 110 * k + 'px;line-height:1;font-family:' + EMOJI_FONT + '">' + (seg.win !== false ? '🎉' : '🙈') + '</div>' +
-      '<div style="font-size:' + 92 * k + 'px;line-height:1.1;margin-top:' + 18 * k + 'px">' + escXml(seg.label) + '</div>';
+    prize.innerHTML = artHtml(segArt(seg) || (seg.win !== false ? '🎉' : '🙈'), 130 * k) +
+      '<div style="font-size:' + 92 * k + 'px;line-height:1.1;margin-top:' + 18 * k + 'px">' + escXml(ART.strip(seg.label) || seg.label) + '</div>';
     card.appendChild(prize);
     const foil = document.createElement('canvas');
     foil.width = Math.round(cw - 24 * k);
@@ -1624,8 +1669,10 @@ function KioskGames() {
     fc.fillText(cfg.foilText || 'SCRATCH HERE', fw / 2 + 3 * k, fh / 2 + 3 * k);
     fc.fillStyle = 'rgba(0,0,0,.32)';
     fc.fillText(cfg.foilText || 'SCRATCH HERE', fw / 2, fh / 2);
-    fc.font = 54 * k + 'px ' + EMOJI_FONT;
-    [[0.12, 0.2], [0.88, 0.2], [0.12, 0.8], [0.88, 0.8]].forEach(function (p) { fc.fillText('✨', fw * p[0], fh * p[1]); });
+    ART.ready('✨', function (img) {
+      const s = 64 * k;
+      [[0.12, 0.2], [0.88, 0.2], [0.12, 0.8], [0.88, 0.8]].forEach(function (p) { fc.drawImage(img, fw * p[0] - s / 2, fh * p[1] - s / 2, s, s); });
+    });
     const caption = put('left:' + 60 * k + 'px;right:' + 60 * k + 'px;top:' + (top + ch + 60 * k) + 'px;text-align:center;font-weight:900;font-size:' + 76 * k + 'px;' +
       'text-shadow:0 ' + 6 * k + 'px ' + 24 * k + 'px rgba(0,0,0,.3);visibility:hidden;');
     return { root: root, card: card, foil: foil, caption: caption, left: left, top: top, cw: cw, ch: ch, k: k };
@@ -1643,8 +1690,8 @@ function KioskGames() {
     let down = false, last = null, moves = 0, done = false;
 
     const hand = document.createElement('div');
-    hand.textContent = '👆';
-    hand.style.cssText = 'position:absolute;left:' + (ui.left + ui.cw / 2 - 70 * k) + 'px;top:' + (ui.top + ui.ch * 0.55) + 'px;font-size:' + 140 * k +
+    hand.innerHTML = artHtml('👆', 150 * k);
+    hand.style.cssText = 'position:absolute;left:' + (ui.left + ui.cw / 2 - 70 * k) + 'px;top:' + (ui.top + ui.ch * 0.55) + 'px;width:' + 150 * k + 'px;font-size:' + 140 * k +
       'px;line-height:1;pointer-events:none;font-family:' + EMOJI_FONT + ';filter:drop-shadow(0 ' + 8 * k + 'px ' + 14 * k + 'px rgba(0,0,0,.35));';
     ui.root.appendChild(hand);
     if (hand.animate) {
@@ -1708,7 +1755,7 @@ function KioskGames() {
       ui.caption.className = 'kp-in';
       ui.caption.style.visibility = 'visible';
       if (win) confetti(ui.root, W, H, [seg.color || '#ffd166', '#ffffff', '#ffd166', '#ef476f', '#06d6a0']);
-      timers.push(setTimeout(function () { onEnd(num(seg.points, 0), { win: win, vars: { prize: seg.label } }); }, num(cfg.resultTime, 3) * 1000 + 600));
+      timers.push(setTimeout(function () { onEnd(num(seg.points, 0), { win: win, vars: { prize: prizeText(seg) } }); }, num(cfg.resultTime, 3) * 1000 + 600));
     }
     ui.foil.addEventListener('pointerdown', function (e) {
       if (done) return;
@@ -1771,5 +1818,5 @@ function KioskGames() {
 
   return { quiz: quiz, catch: catchGame, slice: slice, wheel: wheel, runner: runner, memory: memory, whack: whack, stack: stack, scratch: scratch, hoop: hoop,
     wheelUI: wheelUI, memoryBoard: memoryBoard, memorySymbols: memorySymbols, whackLayout: whackLayout, drawHole: drawHole,
-    stackColors: stackColors, stackBlock: stackBlock, hoopLayout: hoopLayout, drawHoop: drawHoop, scratchUI: scratchUI, wheelSegments: wheelSegments, sprite: sprite, list: list, sdk: sdk };
+    stackColors: stackColors, stackBlock: stackBlock, hoopLayout: hoopLayout, drawHoop: drawHoop, scratchUI: scratchUI, wheelSegments: wheelSegments, sprite: sprite, list: list, sdk: sdk, art: ART };
 }

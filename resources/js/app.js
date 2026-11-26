@@ -4,6 +4,8 @@ import './password-fields';
 import './kiosk-studio';
 import './tabs';
 import './play-link';
+import './markdown-editor';
+import './cloud-order';
 
 // Panel sidebar on small screens: any [data-sidebar-toggle] opens/closes it,
 // and Escape closes it.

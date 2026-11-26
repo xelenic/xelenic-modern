@@ -64,14 +64,14 @@ GAME_DEFAULTS.wheel = {
     textColor: '#ffffff', buttonColor: '#ffd166', buttonTextColor: '#3a0ca3',
     pointerColor: '#ffd166', rimColor: '#ffffff', hubColor: '#ffffff',
     segments: [
-      { label: '🎁 Gift', color: '#ef476f', textColor: '#ffffff', weight: 1, points: 100, win: true },
-      { label: '10% OFF', color: '#ffd166', textColor: '#5a3e00', weight: 3, points: 50, win: true },
+      { label: 'Gift', icon: '🎁', color: '#ef476f', textColor: '#ffffff', weight: 1, points: 100, win: true },
+      { label: '10% OFF', icon: '🏷️', color: '#ffd166', textColor: '#5a3e00', weight: 3, points: 50, win: true },
       { label: 'Try again', color: '#118ab2', textColor: '#ffffff', weight: 3, points: 0, win: false },
-      { label: '☕ Free coffee', color: '#06d6a0', textColor: '#063b2e', weight: 2, points: 80, win: true },
+      { label: 'Free coffee', icon: '☕', color: '#06d6a0', textColor: '#063b2e', weight: 2, points: 80, win: true },
       { label: '5% OFF', color: '#8338ec', textColor: '#ffffff', weight: 3, points: 30, win: true },
       { label: 'Try again', color: '#073b4c', textColor: '#ffffff', weight: 3, points: 0, win: false },
-      { label: '🍦 Ice cream', color: '#fb5607', textColor: '#ffffff', weight: 2, points: 80, win: true },
-      { label: 'JACKPOT', color: '#ff006e', textColor: '#ffffff', weight: 0.5, points: 500, win: true }
+      { label: 'Ice cream', icon: '🍦', color: '#fb5607', textColor: '#ffffff', weight: 2, points: 80, win: true },
+      { label: 'JACKPOT', icon: '💰', color: '#ff006e', textColor: '#ffffff', weight: 0.5, points: 500, win: true }
     ]
   }
 };
@@ -129,12 +129,12 @@ GAME_DEFAULTS.scratch = {
     winText: 'YOU WON!', loseText: 'NOT THIS TIME', revealAt: 55, brush: 80, resultTime: 3,
     textColor: '#ffffff', foilColor: '#c0c4cc', cardBorder: '#ffd166',
     segments: [
-      { label: '🎁 Free gift', color: '#ef476f', textColor: '#ffffff', weight: 1, points: 100, win: true },
-      { label: '10% OFF', color: '#ffd166', textColor: '#5a3e00', weight: 3, points: 50, win: true },
-      { label: '☕ Free coffee', color: '#06d6a0', textColor: '#063b2e', weight: 2, points: 80, win: true },
+      { label: 'Free gift', icon: '🎁', color: '#ef476f', textColor: '#ffffff', weight: 1, points: 100, win: true },
+      { label: '10% OFF', icon: '🏷️', color: '#ffd166', textColor: '#5a3e00', weight: 3, points: 50, win: true },
+      { label: 'Free coffee', icon: '☕', color: '#06d6a0', textColor: '#063b2e', weight: 2, points: 80, win: true },
       { label: 'Try again', color: '#118ab2', textColor: '#ffffff', weight: 3, points: 0, win: false },
-      { label: '🍦 Ice cream', color: '#fb5607', textColor: '#ffffff', weight: 2, points: 80, win: true },
-      { label: 'JACKPOT', color: '#8338ec', textColor: '#ffffff', weight: 0.5, points: 500, win: true }
+      { label: 'Ice cream', icon: '🍦', color: '#fb5607', textColor: '#ffffff', weight: 2, points: 80, win: true },
+      { label: 'JACKPOT', icon: '💰', color: '#8338ec', textColor: '#ffffff', weight: 0.5, points: 500, win: true }
     ]
   }
 };
@@ -288,6 +288,120 @@ function winnerScreen(claimTarget, againTarget) {
   };
 }
 
+/* ---------- Advertising screens ----------
+   Animated ads for advertising kiosks and signage. Each moves on by itself
+   after AD_SECONDS once its "Go to" is set (Auto advance), so a few of them
+   make a rotating loop; its button is left for an offer or form screen. The
+   words, prices and stickers are placeholders to replace. */
+const AD_SECONDS = 8;
+
+/* A box, optionally with words on it (they share its entrance). */
+function Rect(x, y, w, h, bg, extra) {
+  return Object.assign({ id: uid('o'), type: 'shape', shape: 'rect', x: x, y: y, w: w, h: h, bg: bg, radius: Math.round(h / 2), opacity: 1 }, extra || {});
+}
+function adScreen(name, bg, bg2, effect, transition, objects) {
+  return { id: uid('s'), name: name, type: 'page', bg: bg, bg2: bg2, effect: effect, transition: transition, timer: { seconds: AD_SECONDS, target: '' }, objects: objects };
+}
+
+function brandSpotlightAd() {
+  return adScreen('Brand Spotlight', '#0b1437', '#3b1d8f', 'aurora', 'fade', [
+    A(C(240, 200, 600, '#ffffff', 0.08), 'zoom', 0, 1.2, 'breathe'),
+    A({ id: uid('o'), type: 'image', x: 315, y: 255, w: 450, h: 450, src: 'asset:a_logo', fit: 'contain' }, 'pop', 0.2, 0.9, 'float'),
+    A(T('YOUR BRAND', 860, 124, { shadow: true }), 'letters', 0.9, 0.7),
+    A(T('Your tagline goes here', 1060, 58, { bold: false, color: 'rgba(255,255,255,0.85)' }), 'typewriter', 1.8, 1.2),
+    A(B('Find out more', 1420, '', { bg: '#ffd166', color: '#1b1446' }), 'up', 3.0, 0.7, 'shine'),
+    A(T('Tap the screen', 1700, 36, { bold: false, color: 'rgba(255,255,255,0.6)' }), 'fade', 3.6, 0.6, 'blink')
+  ]);
+}
+
+function megaSaleAd() {
+  return adScreen('Mega Sale', '#b80000', '#ff7b00', 'rays', 'zoom', [
+    A(Rect(300, 190, 480, 110, '#ffd166', { rotation: -4 }), 'pop', 0.1, 0.6),
+    A(T('LIMITED TIME', 190, 52, { x: 300, w: 480, h: 110, color: '#7a0000', rotation: -4 }), 'pop', 0.1, 0.6),
+    A(T('MEGA', 390, 240, { font: 'display', shadow: true, h: 300 }), 'zoom', 0.5, 0.6),
+    A(T('SALE', 640, 300, { font: 'display', color: '#ffd166', shadow: true, h: 360 }), 'pop', 0.8, 0.6, 'pulse'),
+    A(C(330, 1000, 420, '#ffffff', 1), 'bounce', 1.4, 0.9, 'heartbeat'),
+    A(T('UP TO\n50%\nOFF', 1000, 84, { x: 330, w: 420, h: 420, color: '#b80000', font: 'display' }), 'bounce', 1.4, 0.9, 'heartbeat'),
+    A(T('This weekend only, in store and online', 1470, 44, { bold: false, x: 90, w: 900, h: 90 }), 'fade', 2.2, 0.6),
+    A(B('Shop the sale', 1620, '', { bg: '#ffffff', color: '#b80000' }), 'up', 2.6, 0.6, 'shine')
+  ]);
+}
+
+function newArrivalAd() {
+  return adScreen('New Arrival', '#0f172a', '#1e3a8a', 'sparkles', 'slide', [
+    A(T('NEW ARRIVAL', 190, 52, { color: '#93c5fd' }), 'letters', 0.1, 0.6),
+    A(C(240, 330, 600, '#3b82f6', 0.22), 'zoom', 0.3, 1, 'breathe'),
+    A(E('👟', 360, 540), 'bounce', 0.5, 1, 'float'),
+    A(T('Air Runner 2', 980, 110, { shadow: true }), 'up', 1.3, 0.6),
+    A(T('Light. Fast. Made for every day.', 1150, 52, { bold: false, color: 'rgba(255,255,255,0.8)' }), 'fade', 1.7, 0.6),
+    A(Rect(330, 1290, 420, 150, '#ffd166'), 'pop', 2.1, 0.6, 'pulse'),
+    A(T('Only 79.99', 1290, 68, { x: 330, w: 420, h: 150, color: '#0f172a' }), 'pop', 2.1, 0.6, 'pulse'),
+    A(B('Shop now', 1560, '', { bg: '#3b82f6' }), 'up', 2.6, 0.6, 'shine')
+  ]);
+}
+
+function todaysSpecialAd() {
+  return adScreen('Today’s Special', '#7f1d1d', '#ea580c', 'rays', 'fade', [
+    A(T('TODAY’S SPECIAL', 170, 84, { font: 'display', color: '#fde68a', shadow: true }), 'down', 0.1, 0.6),
+    A(E('🍔', 360, 560), 'bounce', 0.4, 1, 'float'),
+    A(C(730, 330, 280, '#ffd166', 1), 'pop', 1.2, 0.6, 'wiggle'),
+    A(T('ONLY\n9.99', 330, 66, { x: 730, w: 280, h: 280, color: '#7f1d1d', font: 'display' }), 'pop', 1.2, 0.6, 'wiggle'),
+    A(T('Double Cheese Burger', 1000, 84, { shadow: true }), 'up', 1.6, 0.6),
+    A(T('with fries and a drink', 1130, 50, { bold: false, color: 'rgba(255,255,255,0.85)' }), 'fade', 2.0, 0.6),
+    A(B('Order now', 1460, '', { bg: '#ffd166', color: '#7f1d1d' }), 'up', 2.4, 0.6, 'shine'),
+    A(T('Served 11 am to 3 pm', 1720, 40, { bold: false, color: 'rgba(255,255,255,0.7)' }), 'fade', 2.9, 0.6)
+  ]);
+}
+
+function couponCodeAd() {
+  return adScreen('Coupon Code', '#064e3b', '#10b981', 'sparkles', 'zoom', [
+    A(T('EXCLUSIVE OFFER', 200, 56, { color: '#d1fae5' }), 'fade', 0.1, 0.6),
+    A(T('20% OFF', 330, 210, { font: 'display', shadow: true, h: 300 }), 'zoom', 0.4, 0.7, 'pulse'),
+    A(T('your next purchase', 640, 58, { bold: false }), 'up', 0.9, 0.6),
+    A(Rect(140, 820, 800, 400, '#ffffff', { radius: 40 }), 'flip', 1.3, 0.8),
+    A(Rect(180, 860, 720, 320, '#ffffff', { radius: 26, borderWidth: 6, borderColor: '#a7f3d0' }), 'flip', 1.3, 0.8),
+    A(T('USE CODE', 900, 46, { color: '#047857', bold: false }), 'fade', 2.0, 0.5),
+    A(T('SAVE20', 990, 140, { color: '#064e3b', font: 'mono', h: 180 }), 'letters', 2.2, 0.6),
+    A(T('Show this screen at the counter', 1290, 46, { bold: false }), 'fade', 2.8, 0.6),
+    A(B('Get my code', 1500, '', { bg: '#ffffff', color: '#064e3b' }), 'up', 3.1, 0.6, 'shine')
+  ]);
+}
+
+function grandOpeningAd() {
+  return adScreen('Grand Opening', '#4c1d95', '#db2777', 'confetti', 'zoom', [
+    A(E('🎉', 200, 400), 'pop', 0.1, 0.8, 'tada'),
+    A(T('GRAND', 650, 170, { font: 'display', shadow: true, h: 220 }), 'up', 0.6, 0.6),
+    A(T('OPENING', 840, 170, { font: 'display', color: '#fde047', shadow: true, h: 220 }), 'up', 0.9, 0.6, 'glow'),
+    A(Rect(220, 1110, 640, 130, 'rgba(255,255,255,0.18)'), 'zoom', 1.5, 0.6),
+    A(T('6 December · 10 am', 1110, 54, { x: 220, w: 640, h: 130 }), 'zoom', 1.5, 0.6),
+    A(T('Gifts for the first 100 visitors', 1300, 50, { bold: false }), 'fade', 2.0, 0.6),
+    A(B('Find out more', 1520, '', { bg: '#fde047', color: '#4c1d95' }), 'up', 2.4, 0.6, 'shine')
+  ]);
+}
+
+function happyHourAd() {
+  return adScreen('Happy Hour', '#0c4a6e', '#f97316', 'stars', 'slide', [
+    A(T('HAPPY', 280, 180, { font: 'display', color: '#fde68a', shadow: true, h: 230 }), 'bounce', 0.1, 0.8),
+    A(T('HOUR', 480, 180, { font: 'display', shadow: true, h: 230 }), 'bounce', 0.35, 0.8),
+    A(E('🍹', 760, 400), 'jelly', 0.9, 0.9, 'swing'),
+    A(T('2 for 1 on all drinks', 1220, 76, { shadow: true }), 'up', 1.5, 0.6),
+    A(Rect(270, 1370, 540, 130, '#fde68a'), 'pop', 1.9, 0.6),
+    A(T('5 to 7 pm daily', 1370, 58, { x: 270, w: 540, h: 130, color: '#0c4a6e' }), 'pop', 1.9, 0.6),
+    A(B('See the menu', 1600, '', { bg: '#f97316' }), 'up', 2.3, 0.6, 'shine')
+  ]);
+}
+
+function freeGiftAd() {
+  return adScreen('Free Gift', '#831843', '#be185d', 'snow', 'zoom', [
+    A(T('FREE GIFT', 200, 160, { font: 'display', shadow: true, h: 220 }), 'zoom', 0.1, 0.7),
+    A(T('with every purchase over 50', 430, 58, { bold: false }), 'fade', 0.6, 0.6),
+    A(E('🎁', 580, 540), 'bounce', 0.9, 1, 'wiggle'),
+    A(Rect(0, 1230, 1080, 150, '#fde68a', { radius: 0 }), 'left', 1.7, 0.6),
+    A(T('While stocks last', 1230, 66, { x: 0, w: 1080, h: 150, color: '#831843' }), 'left', 1.7, 0.6),
+    A(B('Claim your gift', 1520, '', { bg: '#ffffff', color: '#be185d' }), 'up', 2.2, 0.6, 'shine')
+  ]);
+}
+
 /* Ready-made animated screens, offered in the template marketplace's Screens
    section. `group` files them (welcome | howto | result); `kind` = the game a
    how-to-play screen opens. */
@@ -303,8 +417,61 @@ const SCREEN_TEMPLATES = [
   { name: 'Stack start', icon: '🧱', blurb: 'How to play + PLAY button', group: 'howto', kind: 'stack', make: function () { return gameStartScreen('stack'); } },
   { name: 'Hoop start', icon: '🏀', blurb: 'How to play + PLAY button', group: 'howto', kind: 'hoop', make: function () { return gameStartScreen('hoop'); } },
   { name: 'Scratch start', icon: '🎟️', blurb: 'How it works + card button', group: 'howto', kind: 'scratch', make: function () { return gameStartScreen('scratch'); } },
-  { name: 'Winner', icon: '🏆', group: 'result', blurb: 'Trophy, score and confetti', make: function () { return winnerScreen('', ''); } }
+  { name: 'Winner', icon: '🏆', group: 'result', blurb: 'Trophy, score and confetti', make: function () { return winnerScreen('', ''); } },
+  { name: 'Brand spotlight', icon: '📣', group: 'ads', blurb: 'Your logo, tagline and a call to action', make: brandSpotlightAd },
+  { name: 'Mega sale', icon: '🏷️', group: 'ads', blurb: 'Big discount, sale dates and Shop button', make: megaSaleAd },
+  { name: 'New arrival', icon: '👟', group: 'ads', blurb: 'Product, price tag and Shop now', make: newArrivalAd },
+  { name: 'Today’s special', icon: '🍔', group: 'ads', blurb: 'Menu deal with a price badge', make: todaysSpecialAd },
+  { name: 'Coupon code', icon: '💸', group: 'ads', blurb: 'Discount code to show at the counter', make: couponCodeAd },
+  { name: 'Grand opening', icon: '🎉', group: 'ads', blurb: 'Event date, place and a celebration', make: grandOpeningAd },
+  { name: 'Happy hour', icon: '🍹', group: 'ads', blurb: 'Time-limited deal with a big headline', make: happyHourAd },
+  { name: 'Free gift', icon: '🎁', group: 'ads', blurb: 'Spend-and-get offer with a gift', make: freeGiftAd }
 ];
+
+/* An advertising kiosk: four ads that take turns, each with a button that
+   opens an offer form, and a thank-you that returns to the loop. */
+function adLoopProject() {
+  const ads = [brandSpotlightAd(), megaSaleAd(), newArrivalAd(), couponCodeAd()];
+  const form = {
+    id: uid('s'), name: 'Get the Offer', type: 'page', bg: '#22223b', bg2: '#4a4e69', effect: 'stars', transition: 'slide',
+    timer: { seconds: 0, target: '' },
+    objects: [
+      A(T('Get the offer', 220, 96), 'down', 0.1, 0.6),
+      A(T('Leave your details and we’ll send it to you', 380, 48, { bold: false, color: 'rgba(255,255,255,0.75)', x: 90, w: 900, h: 130 }), 'fade', 0.5, 0.6),
+      A({ id: uid('o'), type: 'input', x: 110, y: 600, w: 860, h: 150, placeholder: 'Your name', field: 'name', inputType: 'text', fontSize: 48, required: true, radius: 28 }, 'up', 0.7, 0.6),
+      A({ id: uid('o'), type: 'input', x: 110, y: 800, w: 860, h: 150, placeholder: 'Mobile number', field: 'phone', inputType: 'tel', fontSize: 48, required: true, radius: 28 }, 'up', 0.85, 0.6),
+      A(T('By submitting you agree to be contacted about this offer.', 1000, 34, { bold: false, color: 'rgba(255,255,255,0.6)', x: 140, w: 800, h: 110 }), 'fade', 1.1, 0.6),
+      A(B('Send it to me', 1200, '', { bg: '#06d6a0', color: '#073b4c' }), 'pop', 1.3, 0.7, 'shine'),
+      A(B('Back', 1440, ads[0].id, { x: 360, w: 360, h: 120, fontSize: 44, bg: 'rgba(255,255,255,0.14)', shadow: false }), 'fade', 1.6, 0.5)
+    ]
+  };
+  const thanks = {
+    id: uid('s'), name: 'Thank You', type: 'page', bg: '#4361ee', bg2: '#4cc9f0', effect: 'sparkles', transition: 'zoom',
+    timer: { seconds: 8, target: ads[0].id },
+    objects: [
+      A(E('🎉', 320, 480), 'bounce', 0.1, 1.1, 'float'),
+      A(T('Thanks, {{name}}!', 900, 110, { shadow: true }), 'letters', 0.9, 0.6),
+      A(T('Your offer is on its way.', 1100, 58, { bold: false }), 'up', 1.6, 0.6),
+      A(T('Back to the ads in a few seconds…', 1640, 36, { bold: false, color: 'rgba(255,255,255,0.6)' }), 'fade', 2.2, 0.6, 'blink')
+    ]
+  };
+  form.objects.filter(function (o) { return o.text === 'Send it to me'; })[0].action = { type: 'submit', target: thanks.id };
+
+  ads.forEach(function (ad, i) {
+    ad.timer = { seconds: AD_SECONDS, target: ads[(i + 1) % ads.length].id };
+    const cta = ad.objects.filter(function (o) { return o.type === 'button'; }).pop();
+    if (cta) cta.action = { type: 'goto', target: form.id };
+    ad.fx = 40 + i * 300;
+    ad.fy = 60;
+  });
+  form.fx = 490; form.fy = 520;
+  thanks.fx = 790; thanks.fy = 520;
+
+  return {
+    id: uid('p'), name: 'Advertising Kiosk', version: 1, width: 1080, height: 1920, startScreen: ads[0].id, idleTimeout: 45,
+    vars: { score: 0 }, assets: [sampleLogoAsset()], screens: ads.concat([form, thanks])
+  };
+}
 
 function demoProject() {
   const welcome = welcomeScreen('s_menu');
@@ -414,4 +581,5 @@ function blankProject() {
   return { id: uid('p'), name: 'Untitled Kiosk', version: 1, width: 1080, height: 1920, startScreen: s.id, idleTimeout: 60, vars: { score: 0 }, assets: [], screens: [s] };
 }
 
-const EMOJI_LIBRARY = '🎮 🏆 🎁 🎉 ⭐ 🌟 💎 🔥 ⚡ ❤️ 👍 😀 😎 🤩 😅 🥳 🧠 🧺 🍉 🍎 🍊 🍌 🍓 🍇 🍍 🥝 🍋 🍑 🍒 🥥 💣 🪙 💰 🎯 🎈 🚀 ⏱️ 📱 📍 ✅ ❌ ❓'.split(' ');
+/* The sticker palette: every illustration in art.js, by the emoji it stands for. */
+const EMOJI_LIBRARY = '🏆 🎁 🎉 ⭐ 🌟 ✨ 💎 🪙 💰 💸 🎟️ 🏷️ 🎯 🎈 🎡 🎮 🃏 🧩 🧠 ❤️ 🔥 ⚡ 👍 👆 ✅ ❌ ❓ 😀 🙂 😅 😎 🤩 🥳 🙈 🍔 🍦 ☕ 🍹 🍎 🍏 🍊 🍋 🍌 🍉 🍇 🍓 🍒 🍑 🍍 🥝 🥥 🥭 🍐 🫐 🧺 🏀 🏃 🔨 🧱 🐹 🐭 🐰 💣 🌵 🪨 📦 ⏰ ⏱️ 📱 📍 📣 👟 🚀 💫'.split(' ');

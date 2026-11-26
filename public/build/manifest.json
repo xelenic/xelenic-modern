@@ -60,7 +60,7 @@
     "src": "_space-grotesk-700-normal-RjhwGPKo.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CdS1xpWQ.css",
+    "file": "assets/app-BduFNySm.css",
     "name": "app",
     "names": [
       "app.css"
@@ -69,7 +69,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-Die-AnAq.js",
+    "file": "assets/app-CqSe56jR.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

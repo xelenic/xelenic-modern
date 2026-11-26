@@ -126,3 +126,99 @@
   .story-body { margin-top: 48px; }
   .story-cta { padding: 28px; }
 }
+
+/* The gallery: photos in a grid (they open in the lightbox below), then
+   videos and YouTube or Vimeo links, each with an optional caption. */
+.story-gallery { margin-top: 72px; padding: 0; } /* not style.css's padding for sections */
+.story-gallery h2 { margin-bottom: 20px; font-size: 1.4rem; }
+.story-gallery figcaption { margin-top: 10px; font-size: 0.92rem; line-height: 1.5; color: var(--text-dim); }
+.story-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+.story-photo {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: zoom-in;
+}
+.story-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
+.story-photo:hover img { transform: scale(1.05); }
+.story-photo:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.story-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 24px; }
+
+/* A photo, large, over the page (client-story.js). */
+.story-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 64px 84px;
+  background: rgba(5, 8, 16, 0.94);
+  animation: story-fade 0.2s ease-out;
+}
+.story-lightbox[hidden] { display: none; }
+.story-lightbox figure { display: grid; justify-items: center; max-width: 100%; max-height: 100%; }
+.story-lightbox img {
+  max-width: 100%;
+  max-height: calc(100vh - 180px);
+  border-radius: var(--radius-md);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  animation: story-pop 0.25s ease-out;
+}
+.story-lightbox figcaption { max-width: 70ch; margin-top: 16px; color: #e6e9f2; text-align: center; }
+.story-lightbox button {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s var(--ease);
+}
+.story-lightbox button:hover { background: rgba(255, 255, 255, 0.24); }
+.story-lightbox button:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+.story-lightbox .lb-close { top: 18px; right: 18px; }
+.story-lightbox .lb-prev { left: 18px; top: 50%; transform: translateY(-50%); }
+.story-lightbox .lb-next { right: 18px; top: 50%; transform: translateY(-50%); }
+.story-lightbox .lb-count { position: absolute; top: 30px; left: 24px; color: #c9cede; font-size: 0.9rem; }
+@keyframes story-fade { from { opacity: 0; } }
+@keyframes story-pop { from { opacity: 0; transform: scale(0.96); } }
+
+@media (max-width: 720px) {
+  .story-gallery { margin-top: 48px; }
+  .story-photos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .story-lightbox { padding: 64px 12px; }
+  .story-lightbox .lb-prev,
+  .story-lightbox .lb-next { top: auto; bottom: 18px; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-photo img,
+  .story-lightbox,
+  .story-lightbox img { transition: none; animation: none; }
+}
+
+/* A portrait featured photo: whole, beside the article (or centred on its
+   own), rather than cropped into a wide banner. */
+.story-split {
+  display: grid;
+  grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+  margin-top: 64px;
+}
+.story-split .story-body { max-width: 62ch; margin: 0; }
+.story-figure.is-portrait { width: 100%; max-width: 400px; }
+.story-media > .story-figure.is-portrait { justify-self: center; }
+.story-figure.is-portrait img { width: 100%; max-height: none; height: auto; object-fit: contain; box-shadow: var(--shadow-glow); }
+@media (max-width: 860px) {
+  .story-split { grid-template-columns: 1fr; gap: 36px; margin-top: 40px; }
+  .story-split .story-figure.is-portrait { justify-self: center; max-width: 360px; }
+}
